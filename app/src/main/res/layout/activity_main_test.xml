@@ -7,15 +7,16 @@
     android:layout_height="match_parent"
     android:baselineAligned="false"
     android:orientation="horizontal"
+    android:background="@color/white"
     android:weightSum="2">
 
     <RelativeLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:background="@color/white"
-        android:paddingHorizontal="@dimen/_16sdp"
         android:layout_marginTop="@dimen/_10sdp"
+        android:layout_weight="1"
+
+        android:paddingHorizontal="@dimen/_16sdp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -64,31 +65,6 @@
         android:background="@color/white"
         android:paddingHorizontal="20dp">
 
-        <TextView
-            android:id="@+id/tv_right_connect_device"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_10sdp"
-            android:fontFamily="@font/spoqahansansneo_bold"
-            android:text="오른발 기기"
-            android:textColor="@color/mainColor"
-            android:textSize="@dimen/_10sdp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@id/spin_right_device"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Spinner
-            android:id="@+id/spin_right_device"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/_20sdp"
-            android:layout_marginTop="@dimen/_12sdp"
-            android:background="@drawable/bg_rounded_02"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_right_connect_device" />
-
-
         <Button
             android:id="@+id/btn_right_device_open"
             style="?android:attr/borderlessButtonStyle"
@@ -123,35 +99,6 @@
             />
 
 
-        <TextView
-            android:id="@+id/left_tv_connect_device"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_10sdp"
-            android:layout_marginBottom="@dimen/_5sdp"
-            android:fontFamily="@font/spoqahansansneo_bold"
-            android:text="왼발 기기"
-            android:textColor="@color/mainColor"
-            android:textSize="@dimen/_10sdp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@id/spin_left_device"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btn_right_device_open"
-            app:layout_constraintVertical_chainStyle="packed" />
-
-
-        <Spinner
-            android:id="@+id/spin_left_device"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/_20sdp"
-            android:background="@drawable/bg_rounded_02"
-            app:layout_constraintBottom_toTopOf="@id/btn_left_device_open"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/left_tv_connect_device"
-            app:layout_constraintVertical_chainStyle="packed" />
-
-
         <Button
             android:id="@+id/btn_left_device_open"
             style="?android:attr/borderlessButtonStyle"
@@ -184,16 +131,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/btn_left_device_open"
             app:layout_constraintTop_toTopOf="@id/btn_left_device_open" />
-
-
-        <!--<ImageView
-            android:id="@+id/logo"
-            android:layout_width="match_parent"
-            android:layout_height="43dp"
-            android:src="@drawable/big_logo"
-            android:layout_marginVertical="3dp"
-            app:layout_constraintBottom_toTopOf="@id/connect_all"
-            app:layout_constraintTop_toBottomOf="@id/btn_left_device_close" />-->
 
 
         <Button
@@ -237,6 +174,108 @@
             app:layout_constraintTop_toBottomOf="@id/connect_all"
             app:layout_constraintVertical_chainStyle="packed"
 
+            />
+
+
+        <Spinner
+            android:id="@+id/spin_right_device"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_20sdp"
+            android:layout_marginTop="@dimen/_12sdp"
+            android:background="@drawable/bg_rounded_02"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_right_connect_device" />
+
+        <Spinner
+            android:id="@+id/spin_left_device"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_20sdp"
+            android:background="@drawable/bg_rounded_02"
+            app:layout_constraintBottom_toTopOf="@id/btn_left_device_open"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/left_tv_connect_device"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+
+        <TextView
+            android:id="@+id/tv_right_connect_device"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:fontFamily="@font/spoqahansansneo_bold"
+            android:text="오른발 기기"
+            android:textColor="@color/mainColor"
+            android:textSize="@dimen/_10sdp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/spin_right_device"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <ImageView
+            android:id="@+id/right_img_batt"
+            android:layout_width="@dimen/_30sdp"
+            android:layout_height="@dimen/_15sdp"
+            android:src="@drawable/battery_100"
+            android:layout_marginEnd="@dimen/_10sdp"
+            app:layout_constraintEnd_toStartOf="@id/right_batt_txv"
+            app:layout_constraintTop_toTopOf="@id/tv_right_connect_device"
+            app:layout_constraintBottom_toBottomOf="@id/tv_right_connect_device"
+            />
+
+        <TextView
+            android:id="@+id/right_batt_txv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/_10sdp"
+            android:text="100%"
+            android:textColor="@color/mainColor"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_right_connect_device"
+            app:layout_constraintBottom_toBottomOf="@id/tv_right_connect_device"
+            />
+
+
+        <TextView
+            android:id="@+id/left_tv_connect_device"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:layout_marginBottom="@dimen/_5sdp"
+            android:fontFamily="@font/spoqahansansneo_bold"
+            android:text="왼발 기기"
+            android:textColor="@color/mainColor"
+            android:textSize="@dimen/_10sdp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/spin_left_device"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btn_right_device_open"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+
+        <ImageView
+            android:id="@+id/left_img_batt"
+            android:layout_width="@dimen/_30sdp"
+            android:layout_height="@dimen/_15sdp"
+            android:src="@drawable/battery_100"
+            android:layout_marginEnd="@dimen/_10sdp"
+            app:layout_constraintEnd_toStartOf="@id/left_batt_txv"
+            app:layout_constraintTop_toTopOf="@id/left_tv_connect_device"
+            app:layout_constraintBottom_toBottomOf="@id/left_tv_connect_device"
+            />
+
+        <TextView
+            android:id="@+id/left_batt_txv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/_10sdp"
+            android:text="100%"
+            android:textColor="@color/mainColor"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/left_tv_connect_device"
+            app:layout_constraintBottom_toBottomOf="@id/left_tv_connect_device"
             />
 
 
