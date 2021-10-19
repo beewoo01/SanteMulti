@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">@color/mainColor</color>
+    <color name="colorPrimaryDark">@color/mainColor</color>
+    <color name="colorAccent">@color/mainColor</color>
+
+    <color name="mainColor">#102d69</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+
+    <color name="nullColor">#00000000</color>
+    <color name="button01">#dce5f4</color>
+    <color name="button02">#f0f0f0</color>
+    <color name="linecolor01">#a7a7a7</color>
+    <color name="linecolor02">#102d69</color>
+    <color name="background01">#f1f6fc</color>
+    <color name="background02">#f9f9fa</color>
+    <color name="viewpagerGray">#e8e8ea</color>
+</resources>

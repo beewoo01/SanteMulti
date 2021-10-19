@@ -1,0 +1,664 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.4514364" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.9" />
+
+    <Button
+        android:id="@+id/btn_connect_0"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.06"
+        app:layout_constraintWidth_percent="0.3"
+
+        android:text="Connect"
+        android:textAllCaps="false"
+        android:autoSizeTextType="uniform"
+        android:autoSizeMaxTextSize="20dp"
+        android:autoSizeMinTextSize="4dp"
+        android:padding="0dp"
+
+
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <RelativeLayout
+        android:id="@+id/spinner_layout_0"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.6"
+        app:layout_constraintHeight_percent="0.06"
+
+        android:layout_marginRight="10dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/btn_connect_0"
+        app:layout_constraintBottom_toBottomOf="@id/btn_connect_0">
+        <Spinner
+            android:id="@+id/spin_device_0"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textAlignment="center"
+            android:gravity="center_horizontal" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/txt_connect_status_0"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.8"
+        app:layout_constraintHeight_percent="0.03"
+
+        android:text="Status : Disconnect"
+        android:textAllCaps="false"
+        android:textSize="14dp"
+        android:gravity="left|center_vertical"
+
+        android:paddingLeft="10dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_connect_0" />
+
+    <TextView
+        android:id="@+id/txt_power_status_0"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.5"
+        app:layout_constraintHeight_percent="0.03"
+
+        android:text="Power : USB POWER"
+        android:textAllCaps="false"
+        android:textSize="14dp"
+        android:gravity="left|center_vertical"
+
+        android:paddingLeft="10dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txt_connect_status_0" />
+
+    <TextView
+        android:id="@+id/txt_batt_level_0"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.5"
+        app:layout_constraintHeight_percent="0.03"
+
+        android:text="Batt. level : 0.00V"
+        android:textAllCaps="false"
+        android:textSize="14dp"
+        android:gravity="left|center_vertical"
+
+        android:paddingLeft="10dp"
+        app:layout_constraintLeft_toRightOf="@id/txt_power_status_0"
+        app:layout_constraintTop_toBottomOf="@id/txt_connect_status_0" />
+
+    <Button
+        android:id="@+id/btn_acquire_0"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.06"
+        app:layout_constraintWidth_percent="0.3"
+
+        android:text="Acquire Start"
+        android:textAllCaps="false"
+        android:autoSizeTextType="uniform"
+        android:autoSizeMaxTextSize="16dp"
+        android:autoSizeMinTextSize="4dp"
+        android:padding="0dp"
+
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txt_power_status_0" />
+
+    <Button
+        android:id="@+id/btn_record_0"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.06"
+        app:layout_constraintWidth_percent="0.3"
+
+        android:text="Record Start"
+        android:textAllCaps="false"
+        android:autoSizeTextType="uniform"
+        android:autoSizeMaxTextSize="16dp"
+        android:autoSizeMinTextSize="4dp"
+        android:padding="0dp"
+
+        android:layout_marginRight="40dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txt_power_status_0" />
+
+    <TextView
+        android:id="@+id/txt_emg_title_0"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.2"
+        app:layout_constraintHeight_percent="0.03"
+
+        android:text="EMG"
+        android:textAllCaps="false"
+        android:textSize="16dp"
+        android:gravity="left|center_vertical"
+
+        android:paddingLeft="10dp"
+        android:layout_marginTop="5dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_acquire_0" />
+    <TextView
+        android:id="@+id/txt_emg_signal_0"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.35"
+        app:layout_constraintHeight_percent="0.03"
+
+        android:text="Signal : 0.00"
+        android:textAllCaps="false"
+        android:textSize="14dp"
+        android:gravity="left|center_vertical"
+
+        app:layout_constraintLeft_toRightOf="@id/txt_emg_title_0"
+        app:layout_constraintBottom_toBottomOf="@id/txt_emg_title_0" />
+    <TextView
+        android:id="@+id/txt_emg_rms_0"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.35"
+        app:layout_constraintHeight_percent="0.03"
+
+        android:text="RMS : 0.00"
+        android:textAllCaps="false"
+        android:textSize="14dp"
+        android:gravity="left|center_vertical"
+
+        app:layout_constraintLeft_toRightOf="@id/txt_emg_signal_0"
+        app:layout_constraintBottom_toBottomOf="@id/txt_emg_title_0" />
+
+    <TextView
+        android:id="@+id/txt_acc_title_0"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.2"
+        app:layout_constraintHeight_percent="0.03"
+
+        android:text="Acc."
+        android:textAllCaps="false"
+        android:textSize="16dp"
+        android:gravity="left|center_vertical"
+
+        android:paddingLeft="10dp"
+        android:layout_marginTop="5dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txt_emg_signal_0" />
+    <TextView
+        android:id="@+id/txt_acc_x_0"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.28"
+        app:layout_constraintHeight_percent="0.03"
+
+        android:text="X : 0.00"
+        android:textAllCaps="false"
+        android:textSize="14dp"
+        android:gravity="left|center_vertical"
+
+        app:layout_constraintLeft_toRightOf="@id/txt_emg_title_0"
+        app:layout_constraintBottom_toBottomOf="@id/txt_acc_title_0" />
+    <TextView
+        android:id="@+id/txt_acc_y_0"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.28"
+        app:layout_constraintHeight_percent="0.03"
+
+        android:text="Y : 0.00"
+        android:textAllCaps="false"
+        android:textSize="14dp"
+        android:gravity="left|center_vertical"
+
+        app:layout_constraintLeft_toRightOf="@id/txt_acc_x_0"
+        app:layout_constraintBottom_toBottomOf="@id/txt_acc_title_0" />
+    <TextView
+        android:id="@+id/txt_acc_z_0"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.28"
+        app:layout_constraintHeight_percent="0.03"
+
+        android:text="Z : 0.00"
+        android:textAllCaps="false"
+        android:textSize="14dp"
+        android:gravity="left|center_vertical"
+
+        app:layout_constraintLeft_toRightOf="@id/txt_acc_y_0"
+        app:layout_constraintBottom_toBottomOf="@id/txt_acc_title_0" />
+
+    <TextView
+        android:id="@+id/txt_gyro_title_0"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.2"
+        app:layout_constraintHeight_percent="0.03"
+
+        android:text="Gyro"
+        android:textAllCaps="false"
+        android:textSize="16dp"
+        android:gravity="left|center_vertical"
+
+        android:paddingLeft="10dp"
+        android:layout_marginTop="5dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txt_acc_x_0" />
+    <TextView
+        android:id="@+id/txt_gyro_x_0"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.28"
+        app:layout_constraintHeight_percent="0.03"
+
+        android:text="X : 0.00"
+        android:textAllCaps="false"
+        android:textSize="14dp"
+        android:gravity="left|center_vertical"
+
+        app:layout_constraintLeft_toRightOf="@id/txt_emg_title_0"
+        app:layout_constraintBottom_toBottomOf="@id/txt_gyro_title_0" />
+    <TextView
+        android:id="@+id/txt_gyro_y_0"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.28"
+        app:layout_constraintHeight_percent="0.03"
+
+        android:text="Y : 0.00"
+        android:textAllCaps="false"
+        android:textSize="14dp"
+        android:gravity="left|center_vertical"
+
+        app:layout_constraintLeft_toRightOf="@id/txt_gyro_x_0"
+        app:layout_constraintBottom_toBottomOf="@id/txt_gyro_title_0" />
+    <TextView
+        android:id="@+id/txt_gyro_z_0"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.28"
+        app:layout_constraintHeight_percent="0.03"
+
+        android:text="Z : 0.00"
+        android:textAllCaps="false"
+        android:textSize="14dp"
+        android:gravity="left|center_vertical"
+
+        app:layout_constraintLeft_toRightOf="@id/txt_gyro_y_0"
+        app:layout_constraintBottom_toBottomOf="@id/txt_gyro_title_0" />
+
+    <com.physiolab.santemulti.GraphView
+        android:id="@+id/view_graph_0"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+
+        android:layout_margin="10dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txt_gyro_title_0"
+        app:layout_constraintBottom_toBottomOf="@id/guideline"/>
+
+
+
+
+
+
+    <Button
+        android:id="@+id/btn_connect_1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.06"
+        app:layout_constraintWidth_percent="0.3"
+
+        android:text="Connect"
+        android:textAllCaps="false"
+        android:autoSizeTextType="uniform"
+        android:autoSizeMaxTextSize="20dp"
+        android:autoSizeMinTextSize="4dp"
+        android:padding="0dp"
+
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline" />
+
+    <RelativeLayout
+        android:id="@+id/spinner_layout_1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.6"
+        app:layout_constraintHeight_percent="0.06"
+
+        android:layout_marginRight="10dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/btn_connect_1"
+        app:layout_constraintBottom_toBottomOf="@id/btn_connect_1">
+        <Spinner
+            android:id="@+id/spin_device_1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textAlignment="center"
+            android:gravity="center_horizontal" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/txt_connect_status_1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.8"
+        app:layout_constraintHeight_percent="0.03"
+
+        android:text="Status : Disconnect"
+        android:textAllCaps="false"
+        android:textSize="14dp"
+        android:gravity="left|center_vertical"
+
+        android:paddingLeft="10dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_connect_1" />
+
+    <TextView
+        android:id="@+id/txt_power_status_1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.5"
+        app:layout_constraintHeight_percent="0.03"
+
+        android:text="Power : USB-Full Charge"
+        android:textAllCaps="false"
+        android:textSize="14dp"
+        android:gravity="left|center_vertical"
+
+        android:paddingLeft="10dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txt_connect_status_1" />
+
+    <TextView
+        android:id="@+id/txt_batt_level_1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.5"
+        app:layout_constraintHeight_percent="0.03"
+
+        android:text="Batt. level : 0.00V"
+        android:textAllCaps="false"
+        android:textSize="14dp"
+        android:gravity="left|center_vertical"
+
+        android:paddingLeft="10dp"
+        app:layout_constraintLeft_toRightOf="@id/txt_power_status_1"
+        app:layout_constraintTop_toBottomOf="@id/txt_connect_status_1" />
+
+    <Button
+        android:id="@+id/btn_acquire_1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.06"
+        app:layout_constraintWidth_percent="0.3"
+
+        android:text="Acquire Start"
+        android:textAllCaps="false"
+        android:autoSizeTextType="uniform"
+        android:autoSizeMaxTextSize="16dp"
+        android:autoSizeMinTextSize="4dp"
+        android:padding="0dp"
+
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txt_power_status_1" />
+
+    <Button
+        android:id="@+id/btn_record_1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.06"
+        app:layout_constraintWidth_percent="0.3"
+
+        android:text="Record Start"
+        android:textAllCaps="false"
+        android:autoSizeTextType="uniform"
+        android:autoSizeMaxTextSize="16dp"
+        android:autoSizeMinTextSize="4dp"
+        android:padding="0dp"
+
+        android:layout_marginRight="40dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txt_power_status_1" />
+
+    <TextView
+        android:id="@+id/txt_emg_title_1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.2"
+        app:layout_constraintHeight_percent="0.03"
+
+        android:text="EMG"
+        android:textAllCaps="false"
+        android:textSize="16dp"
+        android:gravity="left|center_vertical"
+
+        android:paddingLeft="10dp"
+        android:layout_marginTop="5dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_acquire_1" />
+    <TextView
+        android:id="@+id/txt_emg_signal_1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.35"
+        app:layout_constraintHeight_percent="0.03"
+
+        android:text="Signal : 0.00"
+        android:textAllCaps="false"
+        android:textSize="14dp"
+        android:gravity="left|center_vertical"
+
+        app:layout_constraintLeft_toRightOf="@id/txt_emg_title_1"
+        app:layout_constraintBottom_toBottomOf="@id/txt_emg_title_1" />
+    <TextView
+        android:id="@+id/txt_emg_rms_1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.35"
+        app:layout_constraintHeight_percent="0.03"
+
+        android:text="RMS : 0.00"
+        android:textAllCaps="false"
+        android:textSize="14dp"
+        android:gravity="left|center_vertical"
+
+        app:layout_constraintLeft_toRightOf="@id/txt_emg_signal_1"
+        app:layout_constraintBottom_toBottomOf="@id/txt_emg_title_1" />
+
+    <TextView
+        android:id="@+id/txt_acc_title_1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.2"
+        app:layout_constraintHeight_percent="0.03"
+
+        android:text="Acc."
+        android:textAllCaps="false"
+        android:textSize="16dp"
+        android:gravity="left|center_vertical"
+
+        android:paddingLeft="10dp"
+        android:layout_marginTop="5dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txt_emg_signal_1" />
+    <TextView
+        android:id="@+id/txt_acc_x_1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.28"
+        app:layout_constraintHeight_percent="0.03"
+
+        android:text="X : 0.00"
+        android:textAllCaps="false"
+        android:textSize="14dp"
+        android:gravity="left|center_vertical"
+
+        app:layout_constraintLeft_toRightOf="@id/txt_emg_title_1"
+        app:layout_constraintBottom_toBottomOf="@id/txt_acc_title_1" />
+    <TextView
+        android:id="@+id/txt_acc_y_1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.28"
+        app:layout_constraintHeight_percent="0.03"
+
+        android:text="Y : 0.00"
+        android:textAllCaps="false"
+        android:textSize="14dp"
+        android:gravity="left|center_vertical"
+
+        app:layout_constraintLeft_toRightOf="@id/txt_acc_x_1"
+        app:layout_constraintBottom_toBottomOf="@id/txt_acc_title_1" />
+    <TextView
+        android:id="@+id/txt_acc_z_1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.28"
+        app:layout_constraintHeight_percent="0.03"
+
+        android:text="Z : 0.00"
+        android:textAllCaps="false"
+        android:textSize="14dp"
+        android:gravity="left|center_vertical"
+
+        app:layout_constraintLeft_toRightOf="@id/txt_acc_y_1"
+        app:layout_constraintBottom_toBottomOf="@id/txt_acc_title_1" />
+
+    <TextView
+        android:id="@+id/txt_gyro_title_1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.2"
+        app:layout_constraintHeight_percent="0.03"
+
+        android:text="Gyro"
+        android:textAllCaps="false"
+        android:textSize="16dp"
+        android:gravity="left|center_vertical"
+
+        android:paddingLeft="10dp"
+        android:layout_marginTop="5dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txt_acc_x_1" />
+    <TextView
+        android:id="@+id/txt_gyro_x_1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.28"
+        app:layout_constraintHeight_percent="0.03"
+
+        android:text="X : 0.00"
+        android:textAllCaps="false"
+        android:textSize="14dp"
+        android:gravity="left|center_vertical"
+
+        app:layout_constraintLeft_toRightOf="@id/txt_emg_title_1"
+        app:layout_constraintBottom_toBottomOf="@id/txt_gyro_title_1" />
+    <TextView
+        android:id="@+id/txt_gyro_y_1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.28"
+        app:layout_constraintHeight_percent="0.03"
+
+        android:text="Y : 0.00"
+        android:textAllCaps="false"
+        android:textSize="14dp"
+        android:gravity="left|center_vertical"
+
+        app:layout_constraintLeft_toRightOf="@id/txt_gyro_x_1"
+        app:layout_constraintBottom_toBottomOf="@id/txt_gyro_title_1" />
+    <TextView
+        android:id="@+id/txt_gyro_z_1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.28"
+        app:layout_constraintHeight_percent="0.03"
+
+        android:text="Z : 0.00"
+        android:textAllCaps="false"
+        android:textSize="14dp"
+        android:gravity="left|center_vertical"
+
+        app:layout_constraintLeft_toRightOf="@id/txt_gyro_y_1"
+        app:layout_constraintBottom_toBottomOf="@id/txt_gyro_title_1" />
+
+    <com.physiolab.santemulti.GraphView
+        android:id="@+id/view_graph_1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+
+        android:layout_margin="10dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txt_gyro_title_1"
+        app:layout_constraintBottom_toBottomOf="@id/guideline2"/>
+
+    <Button
+        android:id="@+id/btn_connect_all"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.06"
+        app:layout_constraintWidth_percent="0.30"
+
+        android:text="Connect All"
+        android:textAllCaps="false"
+        android:autoSizeTextType="uniform"
+        android:autoSizeMaxTextSize="20dp"
+        android:autoSizeMinTextSize="4dp"
+        android:padding="0dp"
+
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/btn_acquire_all"
+        app:layout_constraintTop_toTopOf="@id/guideline2"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <Button
+        android:id="@+id/btn_acquire_all"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.06"
+        app:layout_constraintWidth_percent="0.3"
+
+        android:text="Acquire All"
+        android:textAllCaps="false"
+        android:autoSizeTextType="uniform"
+        android:autoSizeMaxTextSize="20dp"
+        android:autoSizeMinTextSize="4dp"
+        android:padding="0dp"
+
+        app:layout_constraintLeft_toRightOf="@id/btn_connect_all"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/guideline2"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
