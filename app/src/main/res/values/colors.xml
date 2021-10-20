@@ -17,4 +17,28 @@
     <color name="background02">#f9f9fa</color>
     <color name="viewpagerGray">#e8e8ea</color>
     <color name="gray">#808080</color>
+
+
+    <color name="MeasureBackground">#f1f6fd</color>
+    <color name="GraphBackground">#ffffff</color>
+
+    <color name="GraphBorder">#000000</color>
+    <color name="GraphGrid">#a6a6a6</color>
+    <color name="GraphEMG">#464646</color>
+    <color name="blue">#0000FF</color>
+    <color name="GraphAccX">#ff0000</color>
+    <color name="GraphAccY">#ff6eff</color>
+    <color name="GraphAccZ">#bf9000</color>
+    <color name="GraphGyroX">#0070c0</color>
+    <color name="GraphGyroY">#00c8ea</color>
+    <color name="GraphGyroZ">#009639</color>
+
+    <color name="EnableBtnBackground">#c9dcf7</color>
+    <color name="EnableBtnTextSel">#052e70</color>
+    <color name="EnableBtnTextNotSel">#dfdfdf</color>
+
+    <color name="PopupSpinText">#052e70</color>
+
+    <color name="LeadoffText">#ffffff</color>
+    <color name="LeadoffBackground">#ff0000</color>
 </resources>

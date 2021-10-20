@@ -1,4 +1,4 @@
-package com.physiolab.santemulti;
+package com.physiolab.sante.santemulti;
 
 import org.junit.Test;
 

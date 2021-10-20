@@ -1,4 +1,4 @@
-package com.physiolab.santemulti;
+package com.physiolab.sante.santemulti;
 
 import android.content.Context;
 
@@ -22,6 +22,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
-        assertEquals("com.physiolab.santemulti", appContext.getPackageName());
+        assertEquals("com.physiolab.sante.santemulti", appContext.getPackageName());
     }
 }

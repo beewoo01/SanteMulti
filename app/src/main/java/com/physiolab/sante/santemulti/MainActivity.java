@@ -1,4 +1,4 @@
-package com.physiolab.santemulti;
+package com.physiolab.sante.santemulti;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -8,7 +8,6 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothDevice;
 import android.content.ComponentName;
@@ -34,12 +33,11 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.physiolab.sante.BlueToothService.BTService;
-import com.physiolab.sante.BlueToothService.ST_DATA_PROC;
+import com.physiolab.sante.ST_DATA_PROC;
 
 import java.io.File;
 import java.util.Date;

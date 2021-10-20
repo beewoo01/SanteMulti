@@ -1,4 +1,4 @@
-package com.physiolab.santemulti;
+package com.physiolab.sante.santemulti;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -40,8 +40,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.physiolab.sante.BlueToothService.BTService;
-import com.physiolab.santemulti.databinding.ActivityMainTestBinding;
-import com.physiolab.santemulti.databinding.SearchDeviceItemBinding;
+import com.physiolab.sante.santemulti.databinding.ActivityMainTestBinding;
+import com.physiolab.sante.santemulti.databinding.SearchDeviceItemBinding;
 
 import java.util.ArrayList;
 import java.util.Iterator;

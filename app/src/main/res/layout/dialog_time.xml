@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/view_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#99000000"
+    android:gravity="center"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:id="@+id/mainLin"
+        android:layout_width="@dimen/_200sdp"
+        android:layout_height="@dimen/_110sdp"
+        android:layout_marginHorizontal="@dimen/_50sdp"
+        android:layout_marginVertical="@dimen/_30sdp"
+        android:background="@drawable/bg_rounded_01"
+        android:orientation="vertical"
+        android:padding="@dimen/_10sdp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            android:orientation="vertical">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/txt_time_range"
+
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Range" />
+
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_21sdp"
+                android:layout_marginTop="@dimen/_5sdp"
+                android:orientation="horizontal">
+
+
+                <EditText
+                    android:id="@+id/edit_time_range"
+                    android:layout_width="0dp"
+
+                    android:layout_height="@dimen/_20sdp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_rounded_02"
+                    android:inputType="numberDecimal"
+                    android:lines="1"
+                    android:singleLine="true" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="right|bottom"
+                android:orientation="horizontal">
+
+
+                <Button
+                    android:id="@+id/btn_cancle"
+                    android:layout_width="@dimen/_50sdp"
+                    android:layout_height="@dimen/_20sdp"
+                    android:background="@null"
+                    android:text="취소"
+                    android:textColor="@color/mainColor" />
+
+                <Button
+                    android:id="@+id/btn_ok"
+                    android:layout_width="@dimen/_50sdp"
+                    android:layout_height="@dimen/_20sdp"
+                    android:background="@null"
+                    android:text="변경"
+                    android:textColor="@color/mainColor" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/txt_title_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Time(S)"
+            android:textColor="@color/black"
+            android:textStyle="bold" />
+
+
+    </LinearLayout>
+
+
+</LinearLayout>

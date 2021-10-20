@@ -308,7 +308,7 @@
         app:layout_constraintLeft_toRightOf="@id/txt_gyro_y_0"
         app:layout_constraintBottom_toBottomOf="@id/txt_gyro_title_0" />
 
-    <com.physiolab.santemulti.GraphView
+    <com.physiolab.sante.santemulti.GraphView
         android:id="@+id/view_graph_0"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -611,7 +611,7 @@
         app:layout_constraintLeft_toRightOf="@id/txt_gyro_y_1"
         app:layout_constraintBottom_toBottomOf="@id/txt_gyro_title_1" />
 
-    <com.physiolab.santemulti.GraphView
+    <com.physiolab.sante.santemulti.GraphView
         android:id="@+id/view_graph_1"
         android:layout_width="0dp"
         android:layout_height="0dp"

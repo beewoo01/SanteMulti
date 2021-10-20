@@ -20,4 +20,14 @@
     <string name="txt_check_y_enable">Y-Axis</string>
     <string name="txt_check_z_enable">Z-Axis</string>
     <string name="txt_check_emg_enable">EMG Graph</string>
+
+    <string name="txt_title_acc">Acceleration(G)</string>
+    <string name="txt_title_gyro">Gyro(dps)</string>
+    <string name="txt_title_emg">EMG(uV)</string>
+    <string name="txt_range_min">Min.</string>
+    <string name="txt_range_max">~ Max.</string>
+
+    <string name="txt_title_time">Time(S)</string>
+    <string name="txt_time_range">Range</string>
+
 </resources>

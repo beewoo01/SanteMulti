@@ -7,14 +7,11 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.Binder;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.physiolab.santemulti.GlobalVariable;
+import com.physiolab.sante.ST_DATA_PROC;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -24,7 +21,6 @@ import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.TimeoutException;
 
 import static android.net.sip.SipErrorCode.SOCKET_ERROR;
 
@@ -89,6 +85,18 @@ public class BTService extends Service {
 
     public static final int PACKET_SAMPLE_NUM = 40;
     public static final int SAMPLE_RATE = 2000;
+
+    public static final int REQUEST_EMG_FILTER=0;
+    public static final int REQUEST_Acc_FILTER=1;
+    public static final int REQUEST_Gyro_FILTER=2;
+
+
+    public static final int REQUEST_Time_RANGE=3;
+
+    public static final int RESULT_CANCLE=-1;
+    public static final int RESULT_OK=0;
+
+    public final static long Time_Offset = 621355968000000000L+9L*60L*60L*1000L*1000L*10L;
     
 
     // RFCOMM Protocol을 위한 UUID
@@ -167,6 +175,12 @@ public class BTService extends Service {
         if (index>=MaxDeviceIndex) return;
         mHandler_main[index] = h;
         SetJNIMainHandler(btFwk[index],h);
+    }
+
+    public void SetMonitorHandler(Handler h, int index) {
+        if (index>=MaxDeviceIndex) return;
+        mHandler_main[index] = h;
+        SetJNIMonitorHandler(btFwk[index], h);
     }
 
     private void SendMessage(int msg,int arg1,int arg2,int index)
@@ -348,7 +362,7 @@ public class BTService extends Service {
     }
 
     //요구하는 장치(index)에서 데이터를 가져옴
-    public byte GetData(ST_DATA_PROC data,int index)
+    public byte GetData(ST_DATA_PROC data, int index)
     {
         if (index>=MaxDeviceIndex) return -1;
 

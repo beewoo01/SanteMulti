@@ -1,6 +1,6 @@
-package com.physiolab.sante.BlueToothService;
+package com.physiolab.sante;
 
-import com.physiolab.santemulti.GlobalVariable;
+import com.physiolab.sante.BlueToothService.BTService;
 
 public class ST_DATA_PROC {
     public double[] Org = new double[BTService.PACKET_SAMPLE_NUM];

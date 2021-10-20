@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name = "txt_logo_size">32</integer>
+    <integer name = "txt_device_link_size">37</integer>
+    <integer name = "txt_device_batt_size">39</integer>
+    <integer name = "spin_device_size">42</integer>
+    <integer name = "btn_connect_size">37</integer>
+    <integer name = "btn_measure_size">32</integer>
+
+    <integer name = "info_table_text">48</integer>
+
+    <integer name = "txt_info_leadoff">37</integer>
+    <integer name = "txt_info_leadoff_default">52</integer>
+    <integer name = "spin_info_leadoff">42</integer>
+
+    <integer name = "measure_button_size">42</integer>
+    <integer name = "measure_button_size2">47</integer>
+
+    <integer name = "enable_text_size">48</integer>
+    <integer name = "range_text_size">48</integer>
+    <integer name = "measure_leadoff">52</integer>
+
+
+    <integer name = "minmax_text_size">60</integer>
+
+    <integer name = "measure_second_size">24</integer>
+    <integer name = "measure_millisecond_size">32</integer>
+
+    <integer name = "txt_popup_title">39</integer>
+    <integer name = "btn_popup">39</integer>
+    <integer name = "spin_popup_filter">42</integer>
+
+    <integer name = "btn_time_control">37</integer>
+
+    <item name = "btn_method_size" format="float" type="dimen">0.1875</item>
+
+</resources>
