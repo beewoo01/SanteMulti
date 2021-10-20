@@ -1,3 +1,23 @@
 <resources>
     <string name="app_name">SanteMulti</string>
+
+    <string name="btn_emg_enable">EMG</string>
+    <string name="btn_acc_enable">Acc</string>
+    <string name="btn_gyro_enable">Gyro</string>
+
+    <string name="txt_default_range">Default Y</string>
+    <string name="txt_full_range">Full Y</string>
+    <string name="txt_time_label">Time(s)</string>
+
+    <string name="txt_prev_page">&lt;&lt;</string>
+    <string name="txt_prev_sec">&lt;</string>
+    <string name="txt_next_sec">&gt;</string>
+    <string name="txt_next_page">&gt;&gt;</string>
+
+    <string name="txt_leadoff">Lead Off</string>
+
+    <string name="txt_check_x_enable">X-Axis</string>
+    <string name="txt_check_y_enable">Y-Axis</string>
+    <string name="txt_check_z_enable">Z-Axis</string>
+    <string name="txt_check_emg_enable">EMG Graph</string>
 </resources>

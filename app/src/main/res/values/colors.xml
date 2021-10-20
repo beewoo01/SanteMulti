@@ -16,4 +16,5 @@
     <color name="background01">#f1f6fc</color>
     <color name="background02">#f9f9fa</color>
     <color name="viewpagerGray">#e8e8ea</color>
+    <color name="gray">#808080</color>
 </resources>

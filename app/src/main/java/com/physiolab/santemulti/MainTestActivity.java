@@ -105,6 +105,11 @@ public class MainTestActivity extends AppCompatActivity {
         InitControl();
         updateUI();
 
+        binding.btnDeviceMeasure.setOnClickListener( v -> {
+            Log.wtf("btnDeviceMeasure", "Click");
+            startActivity(new Intent(MainTestActivity.this, MeasureActivity.class));
+        });
+
 
         Intent intent = new Intent(
                 MainTestActivity.this, // 현재 화면
@@ -480,11 +485,11 @@ public class MainTestActivity extends AppCompatActivity {
             }
         }
 
-        if (isState[0] == STATE_NONE && isState[1] == STATE_NONE){
+        /*if (isState[0] == STATE_NONE && isState[1] == STATE_NONE){
             binding.btnDeviceMeasure.setEnabled(false);
         }else {
             binding.btnDeviceMeasure.setEnabled(true);
-        }
+        }*/
     }
 
 
