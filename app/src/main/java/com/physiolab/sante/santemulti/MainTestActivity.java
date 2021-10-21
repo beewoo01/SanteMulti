@@ -5,12 +5,15 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -30,7 +33,12 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -40,6 +48,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.physiolab.sante.BlueToothService.BTService;
+import com.physiolab.sante.SearchDeviceAdapter;
 import com.physiolab.sante.santemulti.databinding.ActivityMainTestBinding;
 import com.physiolab.sante.santemulti.databinding.SearchDeviceItemBinding;
 
@@ -93,6 +102,14 @@ public class MainTestActivity extends AppCompatActivity {
     private final int PERMISSION_STORAGE = 1;
     private final int PERMISSION_BLUETOOTH = 2;
 
+    private boolean isShowToast = true;
+    private SearchDeviceAdapter searchDeviceAdapter;
+    private ArrayList<BluetoothDevice> pairedList;
+    private BluetoothAdapter bluetoothAdapter;
+    private IntentFilter intentFilter;
+    private SpinnerAdapter adapterDevice;
+    private String addedDeviceAddress = null;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -127,7 +144,8 @@ public class MainTestActivity extends AppCompatActivity {
 
 
     private void CheckPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             // 다시 보지 않기 버튼을 만드려면 이 부분에 바로 요청을 하도록 하면 됨 (아래 else{..} 부분 제거)
 
             // 처음 호출시엔 if()안의 부분은 false로 리턴 됨 -> else{..}의 요청으로 넘어감
@@ -153,7 +171,38 @@ public class MainTestActivity extends AppCompatActivity {
                         .create()
                         .show();
             } else {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_STORAGE);
+                ActivityCompat.requestPermissions(this, new String[]{
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_STORAGE);
+            }
+        }
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                new AlertDialog.Builder(this)
+                        .setTitle("알림")
+                        .setMessage("위치 권한이 거부되었습니다.\n기기를 찾을수 없습니다.\n사용을 원하시면 설정에서 해당 권한을 직접 허용하셔야 합니다.")
+                        .setNeutralButton("설정", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                intent.setData(Uri.parse("package:" + getPackageName()));
+                                startActivity(intent);
+                            }
+                        })
+                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                //finish();
+                            }
+                        })
+                        .setCancelable(false)
+                        .create()
+                        .show();
+            } else {
+                ActivityCompat.requestPermissions(this, new String[]{
+                        Manifest.permission.ACCESS_COARSE_LOCATION}, 11);
             }
         }
     }
@@ -341,16 +390,20 @@ public class MainTestActivity extends AppCompatActivity {
 
             }
         };
+        pairedList = new ArrayList<>();
 
         for (Iterator<BluetoothDevice> it = devices.iterator(); it.hasNext(); ) {
             BluetoothDevice f = it.next();
+            pairedList.add(f);
             deviceAddress[cnt++] = f.getAddress();
         }
 
         /*float div = (float) getResources().getInteger(R.integer.spin_device_size);*/
         //spinDevice[0] = findViewById(R.id.spin_right_device);
-        SpinnerAdapter adapterDevice = new SpinnerAdapter(this, android.R.layout.simple_spinner_item, deviceAddress);
+        adapterDevice = new SpinnerAdapter(this, android.R.layout.simple_spinner_item, deviceAddress);
         adapterDevice.SetTextSize(16);
+
+
         spinDevice[0].setAdapter(adapterDevice);
         spinDevice[0].setOnItemSelectedListener(onSelChanged);
         if (deviceAddress.length > 0) spinDevice[0].setSelection(0);
@@ -367,27 +420,120 @@ public class MainTestActivity extends AppCompatActivity {
     private void initView() {
         /*deviceAddress*/
 
-        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        BluetoothDevice bluetoothDevice = null;
-        ArrayList<Pair<String, String>> arrayList = new ArrayList<>();
-        arrayList.add(new Pair<>("1", "일번"));
-        arrayList.add(new Pair<>("2", "이번"));
-        arrayList.add(new Pair<>("1", "일번"));
-        arrayList.add(new Pair<>("1", "일번"));
-        arrayList.add(new Pair<>("1", "일번"));
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        binding.deviceRe.setLayoutManager(new LinearLayoutManager(this));
-        binding.deviceRe.setAdapter(new SearchDeviceAdapter(arrayList));
+
+        if (intentFilter != null) {
+            unregisterReceiver(receiver);
+        }
+
+        intentFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
+        intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        intentFilter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
+        registerReceiver(receiver, intentFilter);
+
+        binding.searchTxv.setOnClickListener( v -> {
+            if (checkCoarseLocationPermassion()){
+                Log.d("searchTxv : ", "true");
+                boolean bool = bluetoothAdapter.startDiscovery();
+                Log.d("Discovery : ", String.valueOf(bool));
+            }else {
+                Log.d("searchTxv : ", "else");
+            }
+        });
+
+        showDiscoveredDevices();
     }
 
 
+    private final BroadcastReceiver receiver = new BroadcastReceiver() {
+
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+
+            if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
+                //t1.setText("Searching...");
+                isShowToast = true;
+                binding.searchTxv.setEnabled(false);
+                binding.searchTxv.setTextColor(Color.GRAY);
+                Toast.makeText(getApplicationContext(), "디바이스를 찾는 중입니다.", Toast.LENGTH_SHORT).show();
+
+            } else if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                Log.d("ACTION_FOUND", "이리오네");
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                if (device.getName() != null && device.getName().equalsIgnoreCase("TUG")) {
+                    if (!pairedList.contains(device.getAddress())){
+                        searchDeviceAdapter.addItem(device);
+                    }
+                }
+
+            } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+                //t1.setText("Finished");
+
+                binding.searchTxv.setEnabled(true);
+                binding.searchTxv.setTextColor(ContextCompat.getColor(MainTestActivity.this, R.color.mainColor));
+                if (isShowToast)
+                    Toast.makeText(getApplicationContext(), "디바이스 찾기가 종료되었습니다.", Toast.LENGTH_SHORT).show();
+
+            } else if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(action)){
+                Log.d("ACTIONBONDSTATECHANGED", "이리오네");
+            }
+
+        }
+    };
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (intentFilter != null) {
+            try {
+                unregisterReceiver(receiver);
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+
+        }
+    }
+
     private boolean checkCoarseLocationPermassion() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED
         ) {
 
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION}, 11);
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                new AlertDialog.Builder(this)
+                        .setTitle("알림")
+                        .setMessage("위치 권한이 거부되었습니다.\n블루트스를 찾을수 없습니다.\n사용을 원하시면 설정에서 해당 권한을 직접 허용하셔야 합니다.")
+                        .setNeutralButton("설정", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                intent.setData(Uri.parse("package:" + getPackageName()));
+                                startActivity(intent);
+                            }
+                        })
+                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                //finish();
+                            }
+                        })
+                        .setCancelable(false)
+                        .create()
+                        .show();
+            } else {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION}, 11);
+            }
+
+
+
 
             return false;
         } else {
@@ -395,47 +541,66 @@ public class MainTestActivity extends AppCompatActivity {
         }
     }
 
-
-    private class SearchDeviceAdapter extends RecyclerView.Adapter<SearchDeviceAdapter.ViewHolder> {
-
-        private final ArrayList<Pair<String, String>> pairs;
-
-
-        public SearchDeviceAdapter(ArrayList<Pair<String, String>> pairs) {
-            this.pairs = pairs;
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.wtf("onResume", "OnRESUME");
+        if (addedDeviceAddress != null){
+            UpdateSerial();
+            //BTCheck();
         }
 
-        public void addList() {
+    }
 
-        }
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.wtf("onRestart", "onRestart");
+    }
 
-        @NonNull
-        @Override
-        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            SearchDeviceItemBinding binding = SearchDeviceItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-            return new ViewHolder(binding);
-        }
+    private void showDiscoveredDevices() {
+        binding.deviceRe.setLayoutManager(new LinearLayoutManager(this));
+        searchDeviceAdapter = new SearchDeviceAdapter(bluetoothDevice -> {
+            boolean result = bluetoothDevice.createBond();
+            addedDeviceAddress = bluetoothDevice.getAddress();
+            Log.wtf("result", String.valueOf(result));
 
-        @Override
-        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            holder.holderBinding.txvAddress.setText(pairs.get(position).first);
-            holder.holderBinding.txvName.setText(pairs.get(position).second);
-        }
+        });
+        binding.deviceRe.setAdapter(searchDeviceAdapter);
+    }
 
-        @Override
-        public int getItemCount() {
-            return pairs.size();
-        }
+    private void checkBluetoothState() {
+        if (bluetoothAdapter == null) {
+            Toast.makeText(this, "Bluetooth를 지원하지 않은 단말기 입니다.", Toast.LENGTH_SHORT).show();
+        } else {
+            if (bluetoothAdapter.isEnabled()) {
+                if (bluetoothAdapter.isDiscovering()) {
+                    Toast.makeText(this, "장치 검색중입니다...", Toast.LENGTH_SHORT).show();
+                } else {
+                    //Toast.makeText(this, "Bluetooth is enable", Toast.LENGTH_SHORT).show();
 
-        public class ViewHolder extends RecyclerView.ViewHolder {
-            private SearchDeviceItemBinding holderBinding;
+                }
+            } else {
 
-            public ViewHolder(@NonNull SearchDeviceItemBinding holderBinding) {
-                super(holderBinding.getRoot());
-                this.holderBinding = holderBinding;
+                Intent enabvleIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+
+                resultLauncher.launch(enabvleIntent);
+                //startActivityForResult(enabvleIntent, 11);
             }
         }
     }
+
+    ActivityResultLauncher<Intent> resultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK){
+                    checkBluetoothState();
+                }
+            }
+    );
+
+
+
 
     @SuppressLint("SetTextI18n")
     private void updateUI() {
@@ -492,6 +657,49 @@ public class MainTestActivity extends AppCompatActivity {
         }*/
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode){
+            case 11:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, "Access coarse location allowed. You can scan Bluetooth devices", Toast.LENGTH_SHORT).show();
+                } else {
+                    new AlertDialog.Builder(this)
+                            .setTitle("알림")
+                            .setMessage("위치 권한이 거부되었습니다.\n블루트스를 찾을수 없습니다.\n" +
+                                    "사용을 원하시면 설정에서 해당 권한을 직접 허용하셔야 합니다.")
+                            .setNeutralButton("설정", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                    intent.setData(Uri.parse("package:" + getPackageName()));
+                                    startActivity(intent);
+                                }
+                            })
+                            .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    //finish();
+                                }
+                            })
+                            .setCancelable(false)
+                            .create()
+                            .show();
+                }
+                break;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 11){
+            checkBluetoothState();
+        }
+    }
 
     public class SpinnerAdapter extends ArrayAdapter<String> {
         Context context;
@@ -625,3 +833,4 @@ public class MainTestActivity extends AppCompatActivity {
         }
     }
 }
+

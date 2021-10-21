@@ -1,5 +1,6 @@
 package com.physiolab.sante.santemulti;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
@@ -164,10 +165,11 @@ public class MeasureFragment extends Fragment {
         mView.NextPage();
     }
 
-    public void SaveData(String wearingPart, Context context, ArrayList<String> timLab) {
+    public void SaveData(String wearingPart, Activity activity, ArrayList<String> timLab) {
         Log.wtf("SaveData", "333333333");
         //mView.SaveData(activity, info, context, timLab, progressDialog);
-        mView.SaveData(wearingPart, context, timLab);
+        mView.SaveData(wearingPart, activity, timLab);
+
 
     }
 

@@ -44,7 +44,7 @@ import com.physiolab.sante.santemulti.databinding.ActivityMeasureBinding;
 
 import java.util.ArrayList;
 
-public class MeasureActivity extends AppCompatActivity {
+public class MeasureActivity extends AppCompatActivity implements SaveFileListener{
 
 
     private ScreenSize screen = null;
@@ -509,6 +509,21 @@ public class MeasureActivity extends AppCompatActivity {
         santeApps[1].SetPreview(isPreview, 1);
         UpdateUI(0);
         UpdateUI(1);
+    }
+
+    @Override
+    public void onSuccess(int device) {
+
+        if (device == 1){
+            Toast.makeText(this, "파일 저장에 성공하였습니다.", Toast.LENGTH_SHORT).show();
+        }else {
+            fragMeasure[1].SaveData( "left", MeasureActivity.this, recordAdapter.getItems());
+        }
+    }
+
+    @Override
+    public void onFail() {
+        Toast.makeText(this, "파일 저장에 실패하였습니다.", Toast.LENGTH_SHORT).show();
     }
 
 
@@ -1094,7 +1109,7 @@ public class MeasureActivity extends AppCompatActivity {
             defaultDialog.dismiss();
             fragMeasure[0].SaveData( "right", MeasureActivity.this, recordAdapter.getItems());
 
-            fragMeasure[1].SaveData( "left", MeasureActivity.this, recordAdapter.getItems());
+
 
 
             Log.wtf("defaultDialogclose", "1111111111111");

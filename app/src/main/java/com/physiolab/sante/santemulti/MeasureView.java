@@ -952,12 +952,13 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
 
     //CSV 파일 저장
-    public void SaveData(String wearingPart, Context context, ArrayList<String> timeLab) {
-        Log.wtf("SaveData", "4444444444444444");
+    public void SaveData(String wearingPart, Activity activity, ArrayList<String> timeLab) {
+        Log.wtf("SaveData", "4444444444444444" + wearingPart);
+        SaveFileListener listener = (SaveFileListener) activity;
         this.progressDialog = progressDialog;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(context, "저장소 접근 권한이 없어서\n데이터가 저장되지 않았습니다.", Toast.LENGTH_SHORT).show();
+            if (activity.getApplicationContext().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(activity.getApplicationContext(), "저장소 접근 권한이 없어서\n데이터가 저장되지 않았습니다.", Toast.LENGTH_SHORT).show();
                 return;
             }
         }
@@ -1000,12 +1001,12 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
                     context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "";*/
             //Uri fileUri = context.getContentResolver().insert(extVolumeUri, values);
-            Uri fileUri = context.getContentResolver().insert(
+            Uri fileUri = activity.getApplicationContext().getContentResolver().insert(
                     extVolumeUri
                     , values);
 
 
-            FileOutputStream fos = new FileOutputStream(context.getContentResolver().openFileDescriptor(fileUri,
+            FileOutputStream fos = new FileOutputStream(activity.getApplicationContext().getContentResolver().openFileDescriptor(fileUri,
                     "w", null).getFileDescriptor());
 
 
@@ -1080,13 +1081,15 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
             writer.writeAll(data);
             writer.close();
-
+            int device = wearingPart.equals("right")? 0 : 1;
+            listener.onSuccess(device);
 
 
 
 
         } catch (Exception e) {
             e.printStackTrace();
+            listener.onFail();
             return;
         }
 
