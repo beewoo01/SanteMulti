@@ -230,7 +230,7 @@ public class PopupActivity  extends AppCompatActivity {
 
                         spinDevice = (Spinner)findViewById(R.id.spin_hpf);
 
-                        Toast.makeText(PopupActivity.this, "스피너 아이탬 포지션?" + spinDevice.getSelectedItemPosition(), Toast.LENGTH_LONG).show();
+                        //Toast.makeText(PopupActivity.this, "스피너 아이탬 포지션?" + spinDevice.getSelectedItemPosition(), Toast.LENGTH_LONG).show();
                         app[i].SetEMGHPF(spinDevice.getSelectedItemPosition(), i);
 
                         spinDevice = (Spinner)findViewById(R.id.spin_lpf);

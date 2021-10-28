@@ -222,7 +222,9 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
         });
 
 
-        santeApps = new SanteApp[]{(SanteApp) this.getApplication(), (SanteApp) this.getApplication()};
+        santeApps = new SanteApp[]{
+                (SanteApp) this.getApplication(),
+                (SanteApp) this.getApplication()};
 
 
 

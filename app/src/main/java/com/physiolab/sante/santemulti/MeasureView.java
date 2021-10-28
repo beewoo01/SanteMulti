@@ -955,7 +955,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
     public void SaveData(String wearingPart, Activity activity, ArrayList<String> timeLab) {
         Log.wtf("SaveData", "4444444444444444" + wearingPart);
         SaveFileListener listener = (SaveFileListener) activity;
-        this.progressDialog = progressDialog;
+        //this.progressDialog = progressDialog;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (activity.getApplicationContext().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(activity.getApplicationContext(), "저장소 접근 권한이 없어서\n데이터가 저장되지 않았습니다.", Toast.LENGTH_SHORT).show();

@@ -51,8 +51,30 @@
             android:layout_below="@+id/info_txv"
             android:layout_alignParentStart="true"
             android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
             android:overScrollMode="never"
+            android:visibility="gone"
             tools:listitem="@layout/search_device_item" />
+
+        <ImageView
+            android:id="@+id/bluetooth_imv"
+            android:layout_width="@dimen/_150sdp"
+            android:layout_height="@dimen/_150sdp"
+            android:layout_centerInParent="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/sante_bluetooth"
+            />
+
+        <TextView
+            android:id="@+id/bluetooth_txv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/bluetooth_imv"
+            android:layout_centerHorizontal="true"
+            android:text="디바이스를 검색해 주세요"
+            android:textSize="@dimen/_15sdp"
+            android:textColor="@color/black"
+            />
 
 
     </RelativeLayout>

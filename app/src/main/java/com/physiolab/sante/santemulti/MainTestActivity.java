@@ -124,7 +124,20 @@ public class MainTestActivity extends AppCompatActivity {
 
         binding.btnDeviceMeasure.setOnClickListener( v -> {
             Log.wtf("btnDeviceMeasure", "Click");
-            startActivity(new Intent(MainTestActivity.this, MeasureActivity.class));
+            if (isState[0] == STATE_NONE && isState[1] == STATE_NONE){
+                Toast.makeText(MainTestActivity.this,
+                        "기기를 연결 해주세요", Toast.LENGTH_SHORT).show();
+            } else if (isState[0] == STATE_NONE || isState[1] == STATE_NONE){
+                int deviceDirection = (isState[0] == STATE_NONE)? 1 : 0;
+                Log.wtf("deviceDirection", String.valueOf(deviceDirection));
+                Intent intent = new Intent(MainTestActivity.this, MeasureOneActivity.class);
+                intent.putExtra("device", deviceDirection);
+                startActivity(intent);
+            }
+            else {
+                startActivity(new Intent(MainTestActivity.this, MeasureActivity.class));
+            }
+
         });
 
 
@@ -393,7 +406,10 @@ public class MainTestActivity extends AppCompatActivity {
         pairedList = new ArrayList<>();
 
         for (Iterator<BluetoothDevice> it = devices.iterator(); it.hasNext(); ) {
+
             BluetoothDevice f = it.next();
+            Log.wtf("pairedList for name", f.getName());
+            Log.wtf("pairedList for address", f.getAddress());
             pairedList.add(f);
             deviceAddress[cnt++] = f.getAddress();
         }
@@ -434,8 +450,16 @@ public class MainTestActivity extends AppCompatActivity {
         registerReceiver(receiver, intentFilter);
 
         binding.searchTxv.setOnClickListener( v -> {
+            if (intentFilter != null){
+                Log.wtf("intentFilter ", "notnull");
+            }else {
+                Log.wtf("intentFilter ", "null!!");
+            }
             if (checkCoarseLocationPermassion()){
                 Log.d("searchTxv : ", "true");
+                binding.deviceRe.setVisibility(View.VISIBLE);
+                binding.bluetoothImv.setVisibility(View.GONE);
+                binding.bluetoothTxv.setVisibility(View.GONE);
                 boolean bool = bluetoothAdapter.startDiscovery();
                 Log.d("Discovery : ", String.valueOf(bool));
             }else {
@@ -473,8 +497,10 @@ public class MainTestActivity extends AppCompatActivity {
 
                 binding.searchTxv.setEnabled(true);
                 binding.searchTxv.setTextColor(ContextCompat.getColor(MainTestActivity.this, R.color.mainColor));
-                if (isShowToast)
+                if (isShowToast){
                     Toast.makeText(getApplicationContext(), "디바이스 찾기가 종료되었습니다.", Toast.LENGTH_SHORT).show();
+                }
+
 
             } else if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(action)){
                 Log.d("ACTIONBONDSTATECHANGED", "이리오네");
@@ -578,7 +604,6 @@ public class MainTestActivity extends AppCompatActivity {
                     Toast.makeText(this, "장치 검색중입니다...", Toast.LENGTH_SHORT).show();
                 } else {
                     //Toast.makeText(this, "Bluetooth is enable", Toast.LENGTH_SHORT).show();
-
                 }
             } else {
 

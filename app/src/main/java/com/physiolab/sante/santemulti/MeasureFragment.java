@@ -23,10 +23,10 @@ public class MeasureFragment extends Fragment {
 
     private MeasureView mView = null;
 
-    private float[] EMGData = new float[BTService.SAMPLE_RATE * 60 * 5];
-    private float[] LeadOffData = new float[BTService.SAMPLE_RATE * 60 * 5];
-    private float[][] AccData = new float[3][(BTService.SAMPLE_RATE / 10) * 60 * 5];
-    private float[][] GyroData = new float[3][(BTService.SAMPLE_RATE / 10) * 60 * 5];
+    private final float[] EMGData = new float[BTService.SAMPLE_RATE * 60 * 5];
+    private final float[] LeadOffData = new float[BTService.SAMPLE_RATE * 60 * 5];
+    private final float[][] AccData = new float[3][(BTService.SAMPLE_RATE / 10) * 60 * 5];
+    private final float[][] GyroData = new float[3][(BTService.SAMPLE_RATE / 10) * 60 * 5];
     private int EMGCount = 0;
     private int dataCount = 0;
 
