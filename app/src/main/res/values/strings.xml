@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SanteMulti</string>
+    <string name="app_name">신체기능평가솔루션</string>
 
     <string name="btn_emg_enable">EMG</string>
     <string name="btn_acc_enable">Acc</string>
