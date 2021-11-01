@@ -251,6 +251,12 @@ public class Connect_1chActivity extends AppCompatActivity {
             isVaild();
         });
 
+        binding.searchDevice.setOnClickListener( v -> {
+            Intent intent = new Intent(this, ScanActivity.class);
+            intent.putExtra("pairedArray", deviceAddress);
+            startActivity(intent);
+        });
+
     }
 
     private void isVaild(){
