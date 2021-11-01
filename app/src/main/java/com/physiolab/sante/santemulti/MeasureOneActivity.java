@@ -38,13 +38,15 @@ import com.physiolab.sante.ST_DATA_PROC;
 import com.physiolab.sante.SanteApp;
 import com.physiolab.sante.ScreenSize;
 import com.physiolab.sante.Spinner_Re_Adapter;
+import com.physiolab.sante.UserInfo;
 import com.physiolab.sante.dialog.DefaultDialog;
 import com.physiolab.sante.santemulti.databinding.ActivityMeasureBinding;
 import com.physiolab.sante.santemulti.databinding.ActivityMeasureOneBinding;
 
 import java.util.ArrayList;
+import java.util.Date;
 
-public class MeasureOneActivity extends AppCompatActivity implements SaveFileListener{
+public class MeasureOneActivity extends AppCompatActivity implements SaveFileListener {
 
     private ScreenSize screen = null;
 
@@ -88,6 +90,7 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
     private SoundPool sPool;
 
     int handleflag = 0;// 0 - > 쓰레드 안돔 // 1 도는중 // 2 다끝나고 진행중
+
 
     private ActivityMeasureOneBinding binding;
 
@@ -159,11 +162,19 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
         screen.getStandardSize(this);
 
 
+        binding.testNameEdt.setText(UserInfo.getInstance().memo);
+        /*
+        name = userInfo.getStringExtra("name");
+        height = userInfo.getStringExtra("height");
+        weight = userInfo.getStringExtra("weight");
+        birth = userInfo.getStringExtra("birth");
+        memo = userInfo.getStringExtra("memo");
+        gender = userInfo.getBooleanExtra("gender", false);*/
 
-
+        binding.backContainer.setOnClickListener(v -> finish());
 
         binding.dropdownMenuBtn.setVisibility(View.VISIBLE);
-        //findViewById(R.id.dropdown_menu_btn).setVisibility(View.VISIBLE);
+        findViewById(R.id.dropdown_menu_btn).setVisibility(View.VISIBLE);
 
         binding.recordRecyclerview.setAdapter(recordAdapter);
         binding.recordRecyclerview.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
@@ -188,7 +199,6 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
         });
 
         santeApps = (SanteApp) this.getApplication();
-
 
 
         InitControl();
@@ -421,13 +431,12 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
 
 
         MeasureView mView = (MeasureView) fragMeasure.getView();
-        if (mView != null){
+        if (mView != null) {
             mView.setOnTouchListener((v, event) -> {
                 gestureDetector.onTouchEvent(event);
                 return true;
             });
         }
-
 
 
         gestureDetector = new GestureDetector(this, new GestureDetector.OnGestureListener() {
@@ -470,6 +479,7 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
             Log.wtf("11111111111", "22222222222");
 
             timeThread = new TimeThread();
+            UserInfo.getInstance().measureTime = new Date(System.currentTimeMillis());
 
             if (powerStatus != BTService.POWER_BATT) {
                 Toast.makeText(santeApps, "USB연결중에는 측정할 수 없습니다.", Toast.LENGTH_SHORT).show();
@@ -491,6 +501,10 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
                 fragMeasure.Init();
                 SetTimeRange();
 
+                long now = System.currentTimeMillis();
+                UserInfo.getInstance().measureTime = new Date(now);
+                UserInfo.getInstance().alarm = isAlarm;
+                UserInfo.getInstance().watchCnt = 0;
 
                 cntIgnore = 25;
 
@@ -741,8 +755,9 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
         public void onClick(View v) {
 
             defaultDialog.dismiss();
-            String deviceDirection = device == 0? "right" : "left";
-            fragMeasure.SaveData( deviceDirection, MeasureOneActivity.this, recordAdapter.getItems());
+            //String deviceDirection = device == 0 ? "right" : "left";
+            UserInfo.getInstance().watchCnt = cntWatch;
+            fragMeasure.SaveData("ch1", MeasureOneActivity.this, recordAdapter.getItems());
 
         }
     };
@@ -851,6 +866,9 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
                     SetTimeRange();
 
                     long now = System.currentTimeMillis();
+                    UserInfo.getInstance().measureTime = new Date(now);
+                    UserInfo.getInstance().alarm = isAlarm;
+                    UserInfo.getInstance().watchCnt = 0;
 
                     cntIgnore = 25;
 
@@ -974,6 +992,7 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
                                         && fragMeasure.GetEnable(2)) {
 
                                     binding.txtLeadoff.setVisibility(View.VISIBLE);
+                                    UserInfo.getInstance().leadoff = true;
 
                                 } else binding.txtLeadoff.setVisibility(View.INVISIBLE);
 

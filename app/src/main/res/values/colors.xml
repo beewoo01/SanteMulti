@@ -25,6 +25,7 @@
     <color name="GraphBorder">#000000</color>
     <color name="GraphGrid">#a6a6a6</color>
     <color name="GraphEMG">#464646</color>
+    <color name="GraphRMS">#FF9800</color>
     <color name="blue">#0000FF</color>
     <color name="GraphAccX">#ff0000</color>
     <color name="GraphAccY">#ff6eff</color>

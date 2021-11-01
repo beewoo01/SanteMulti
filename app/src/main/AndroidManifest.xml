@@ -2,6 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.physiolab.sante.santemulti">
 
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application
         android:name="com.physiolab.sante.SanteApp"
         android:allowBackup="true"
@@ -11,45 +19,61 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MeasureOneActivity"
-            android:launchMode="standard"
-            android:screenOrientation="landscape"
-            android:windowSoftInputMode="adjustResize|adjustPan|stateAlwaysHidden"
-            />
-        <activity android:name="com.physiolab.sante.PopupActivity"
-            android:launchMode="standard"
-            android:screenOrientation="landscape"
-            />
-        <activity android:name="com.physiolab.sante.PopupTimeActivity"
-            android:launchMode="standard"
-            android:screenOrientation="landscape"
-            />
-        <activity android:name=".MeasureActivity"
-            android:launchMode="standard"
-            android:screenOrientation="landscape"
-            android:windowSoftInputMode="adjustResize|adjustPan|stateAlwaysHidden"
-            />
-        <activity android:name=".MainActivity"
-            android:launchMode="standard"
-            android:screenOrientation="landscape"
-            >
+        <activity android:name=".SelectActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".Connect_1chActivity" >
             <!--<intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>-->
         </activity>
-        <activity android:name=".MainTestActivity"
+        <activity
+            android:name=".MeasureOneActivity"
             android:launchMode="standard"
             android:screenOrientation="landscape"
-            android:windowSoftInputMode="adjustResize|adjustPan|stateAlwaysHidden"
-            >
+            android:windowSoftInputMode="adjustResize|adjustPan|stateAlwaysHidden" />
+        <activity
+            android:name="com.physiolab.sante.PopupActivity"
+            android:launchMode="standard"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name="com.physiolab.sante.PopupTimeActivity"
+            android:launchMode="standard"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".MeasureActivity"
+            android:launchMode="standard"
+            android:screenOrientation="landscape"
+            android:windowSoftInputMode="adjustResize|adjustPan|stateAlwaysHidden" />
+        <activity
+            android:name=".MainActivity"
+            android:launchMode="standard"
+            android:screenOrientation="landscape">
+
+            <!--
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            -->
+        </activity>
+        <activity
+            android:name=".MainTestActivity"
+            android:launchMode="standard"
+            android:screenOrientation="landscape"
+            android:windowSoftInputMode="adjustResize|adjustPan|stateAlwaysHidden">
+            <!--<intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>-->
         </activity>
 
         <service
@@ -57,13 +81,5 @@
             android:enabled="true"
             android:exported="false" />
     </application>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
-
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
 </manifest>

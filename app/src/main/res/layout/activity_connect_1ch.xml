@@ -1,0 +1,505 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    >
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/btn_home"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_25sdp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <LinearLayout
+                android:id="@+id/back_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+
+                >
+
+                <ImageButton
+                    android:id="@+id/back_imb"
+                    android:layout_width="@dimen/_5sdp"
+                    android:layout_height="@dimen/_10sdp"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="@dimen/_10sdp"
+                    android:background="@null"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/back_button" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="@dimen/_10sdp"
+                    android:fontFamily="@font/spoqahansansneo_bold"
+                    android:text="2ch 측정"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11sdp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toEndOf="@id/back_imb" />
+
+            </LinearLayout>
+
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/start_layout"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toBottomOf="@id/btn_home"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/logo_imv"
+            app:layout_constraintEnd_toStartOf="@id/end_layout"
+            android:paddingStart="@dimen/_20sdp"
+            android:paddingEnd="@dimen/_10sdp"
+            >
+
+            <TextView
+                android:id="@+id/info_txv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_5sdp"
+                android:text="대상자 정보입력"
+                android:textColor="@color/mainColor"
+                android:textSize="@dimen/_11sdp"
+                android:textStyle="bold"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+
+                />
+
+            <!--<Button
+                android:id="@+id/btn_getTarget"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_25sdp"
+                android:background="@drawable/button_01"
+                android:text="정보가져오기"
+                android:textColor="@color/mainColor"
+                android:textSize="@dimen/_6sdp"
+                android:layout_marginEnd="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginStart="@dimen/_3sdp"
+                app:layout_constraintTop_toBottomOf="@id/info_txv"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/btn_dataInsert"
+                />
+
+            <Button
+                android:id="@+id/btn_dataInsert"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_25sdp"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:background="@drawable/button_02"
+                android:text="정보등록"
+                android:textSize="@dimen/_6sdp"
+                android:textColor="@color/mainColor"
+                android:layout_marginEnd="@dimen/_3sdp"
+                android:onClick="@{ () -> activity.insertTarget()}"
+                app:layout_constraintTop_toBottomOf="@id/info_txv"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/btn_getTarget"
+                />-->
+
+            <TextView
+                android:id="@+id/name_txv"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_10sdp"
+                android:fontFamily="@font/spoqahansansneo_regular"
+                android:text="이름"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_6sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                app:layout_constraintTop_toBottomOf="@id/info_txv"
+                app:layout_constraintStart_toStartOf="parent"
+                />
+
+            <TextView
+                android:id="@+id/height_txv"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_10sdp"
+                android:fontFamily="@font/spoqahansansneo_regular"
+                android:text="키"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_6sdp"
+                app:layout_constraintStart_toStartOf="@id/edit_height"
+                app:layout_constraintTop_toTopOf="@id/name_txv"
+                />
+
+            <EditText
+                android:id="@+id/edit_name"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_17sdp"
+                android:background="@drawable/bg_rounded_02"
+                android:textSize="@dimen/_6sdp"
+                android:padding="@dimen/_5sdp"
+                android:singleLine="true"
+                android:hint="@string/name"
+                android:layout_marginEnd="@dimen/_5sdp"
+                app:layout_constraintTop_toBottomOf="@id/name_txv"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/edit_height"
+                />
+
+            <EditText
+                android:id="@+id/edit_height"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_17sdp"
+                android:background="@drawable/bg_rounded_02"
+                android:hint="@string/height"
+                android:inputType="number"
+                android:padding="@dimen/_5sdp"
+                android:singleLine="true"
+                android:layout_marginStart="@dimen/_5sdp"
+                android:textSize="@dimen/_6sdp"
+                app:layout_constraintTop_toBottomOf="@id/name_txv"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/edit_name"
+                />
+
+
+            <TextView
+                android:id="@+id/tv_dayOfBirth"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_10sdp"
+                android:fontFamily="@font/spoqahansansneo_regular"
+                android:text="생년월일"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_6sdp"
+                android:layout_marginTop="@dimen/_5sdp"
+                app:layout_constraintTop_toBottomOf="@id/edit_name"
+                app:layout_constraintStart_toStartOf="@id/name_txv"
+                />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_10sdp"
+                android:fontFamily="@font/spoqahansansneo_regular"
+                android:text="몸무게"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_6sdp"
+                android:layout_marginTop="@dimen/_5sdp"
+                app:layout_constraintTop_toBottomOf="@id/edit_name"
+                app:layout_constraintStart_toStartOf="@id/height_txv"
+                />
+
+            <EditText
+                android:id="@+id/edit_age"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_17sdp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_rounded_02"
+                android:hint="@string/birth_hint"
+                android:inputType="date"
+                android:maxLength="10"
+                android:padding="@dimen/_5sdp"
+                android:singleLine="true"
+                android:textSize="@dimen/_6sdp"
+                android:layout_marginEnd="@dimen/_5sdp"
+                app:layout_constraintTop_toBottomOf="@id/tv_dayOfBirth"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/edit_weight"
+                />
+
+            <EditText
+                android:id="@+id/edit_weight"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_17sdp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_rounded_02"
+                android:hint="몸무게"
+                android:inputType="number"
+                android:padding="@dimen/_5sdp"
+                android:singleLine="true"
+                android:textSize="@dimen/_6sdp"
+                android:layout_marginStart="@dimen/_5sdp"
+                app:layout_constraintTop_toBottomOf="@id/tv_dayOfBirth"
+                app:layout_constraintStart_toEndOf="@id/edit_age"
+                app:layout_constraintEnd_toEndOf="parent"
+                />
+
+            <TextView
+                android:id="@+id/tv_gender"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_10sdp"
+                android:layout_weight="1"
+                android:fontFamily="@font/spoqahansansneo_regular"
+                android:text="성별"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_6sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                app:layout_constraintTop_toBottomOf="@id/edit_age"
+                app:layout_constraintStart_toStartOf="parent"
+                />
+
+
+            <LinearLayout
+                android:id="@+id/btn_male"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/btn_female"
+                app:layout_constraintTop_toBottomOf="@id/tv_gender"
+                >
+
+                <RadioButton
+                    android:id="@+id/rb_male"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:buttonTint="@color/mainColor"
+                    android:clickable="false" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_5sdp"
+                    android:text="남성"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_6sdp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/btn_female"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/btn_male"
+                app:layout_constraintTop_toBottomOf="@id/tv_gender"
+                >
+
+                <RadioButton
+                    android:id="@+id/rb_female"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:buttonTint="@color/mainColor"
+                    android:clickable="false" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_5sdp"
+                    android:text="여성"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_6sdp" />
+
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_memo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_5sdp"
+                android:fontFamily="@font/spoqahansansneo_regular"
+                android:text="특이사항"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_6sdp"
+                app:layout_constraintBottom_toTopOf="@id/edit_memo"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btn_male"
+
+                />
+
+            <EditText
+                android:id="@+id/edit_memo"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="@dimen/_3sdp"
+                android:background="@drawable/bg_rounded_02"
+                android:gravity="top|start"
+                android:hint="내용을 입력해주세요."
+                android:padding="@dimen/_5sdp"
+                android:text="특이사항 없음"
+                android:textSize="@dimen/_6sdp"
+                app:layout_constraintTop_toBottomOf="@id/tv_memo"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/end_layout"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:paddingHorizontal="@dimen/_20sdp"
+            app:layout_constraintTop_toBottomOf="@id/btn_home"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/start_layout"
+            app:layout_constraintBottom_toTopOf="@id/logo_imv"
+            >
+
+            <TextView
+                android:id="@+id/tv_connect_device"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/spoqahansansneo_bold"
+                android:text="1ch 기기연결"
+                android:textColor="@color/mainColor"
+                android:textSize="@dimen/_11sdp"
+                android:textStyle="bold"
+                android:layout_marginBottom="@dimen/_5sdp"
+                app:layout_constraintVertical_chainStyle="packed"
+                app:layout_constraintBottom_toTopOf="@id/spin_device"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tv_connect_device"
+                app:layout_constraintBottom_toBottomOf="@id/tv_connect_device"
+                >
+
+                <ImageView
+                    android:id="@+id/img_batt"
+                    android:layout_width="@dimen/_30sdp"
+                    android:layout_height="@dimen/_15sdp"
+                    android:src="@drawable/battery_100"
+                    android:visibility="gone"
+                    />
+
+                <TextView
+                    android:id="@+id/tv_batt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_5sdp"
+                    android:text=""
+                    android:textColor="@color/mainColor"
+                    android:textSize="@dimen/_12sdp"
+                    android:visibility="gone"
+                    />
+            </LinearLayout>
+
+            <Spinner
+                android:id="@+id/spin_device"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_20sdp"
+                android:layout_marginTop="@dimen/_5sdp"
+                android:background="@drawable/bg_rounded_02"
+                app:layout_constraintVertical_chainStyle="packed"
+                app:layout_constraintTop_toBottomOf="@id/tv_connect_device"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/btn_device_open"
+                />
+
+
+
+            <Button
+                android:id="@+id/btn_device_open"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_25sdp"
+                android:layout_marginEnd="@dimen/_5sdp"
+                android:background="@drawable/button_05"
+                android:fontFamily="@font/spoqahansansneo_bold"
+                android:text="연결"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_8sdp"
+                android:layout_marginTop="@dimen/_5sdp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/spin_device"
+                app:layout_constraintEnd_toStartOf="@id/btn_device_close"
+                app:layout_constraintBottom_toTopOf="@id/search_device"
+                />
+
+            <Button
+                android:id="@+id/btn_device_close"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_25sdp"
+                android:layout_marginStart="@dimen/_5sdp"
+                android:background="@drawable/button_04"
+                android:text="연결끊기"
+                android:textSize="@dimen/_8sdp"
+                app:layout_constraintTop_toTopOf="@id/btn_device_open"
+                app:layout_constraintBottom_toBottomOf="@id/btn_device_open"
+                app:layout_constraintStart_toEndOf="@id/btn_device_open"
+                app:layout_constraintEnd_toEndOf="parent"
+                />
+
+
+            <Button
+                android:id="@+id/search_device"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_25sdp"
+                android:background="@drawable/button_05"
+                android:text="디바이스 찾기"
+                android:textSize="@dimen/_8sdp"
+                android:textColor="@color/white"
+                android:fontFamily="@font/spoqahansansneo_bold"
+                android:onClick="@{ () -> activity.searchDevice()}"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btn_device_close"
+                app:layout_constraintBottom_toTopOf="@id/logo"
+                />
+
+            <ImageView
+                android:id="@+id/logo"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_40sdp"
+                android:src="@drawable/big_logo"
+                app:layout_constraintTop_toBottomOf="@id/search_device"
+                app:layout_constraintBottom_toTopOf="@id/btn_device_measure"
+                />
+
+
+            <Button
+                android:id="@+id/btn_device_measure"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_50sdp"
+                android:layout_gravity="end"
+                android:layout_weight="1"
+                android:background="@drawable/button_05"
+                android:fontFamily="@font/spoqahansansneo_bold"
+                android:text="Ready to test"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10sdp"
+                android:onClick="@{ () -> activity.measureClick()}"
+                app:layout_constraintTop_toBottomOf="@id/logo"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <ImageView
+            android:id="@+id/logo_imv"
+            android:layout_width="@dimen/_60sdp"
+            android:layout_height="@dimen/_30sdp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/signature" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>

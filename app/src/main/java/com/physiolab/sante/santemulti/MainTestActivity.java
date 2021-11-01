@@ -21,6 +21,9 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.provider.Settings;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.util.Pair;
 import android.util.TypedValue;
@@ -49,6 +52,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.physiolab.sante.BlueToothService.BTService;
 import com.physiolab.sante.SearchDeviceAdapter;
+import com.physiolab.sante.UserInfo;
 import com.physiolab.sante.santemulti.databinding.ActivityMainTestBinding;
 import com.physiolab.sante.santemulti.databinding.SearchDeviceItemBinding;
 
@@ -106,7 +110,7 @@ public class MainTestActivity extends AppCompatActivity {
     private SearchDeviceAdapter searchDeviceAdapter;
     private ArrayList<BluetoothDevice> pairedList;
     private BluetoothAdapter bluetoothAdapter;
-    private IntentFilter intentFilter;
+    //private IntentFilter intentFilter;
     private SpinnerAdapter adapterDevice;
     private String addedDeviceAddress = null;
 
@@ -124,7 +128,8 @@ public class MainTestActivity extends AppCompatActivity {
 
         binding.btnDeviceMeasure.setOnClickListener( v -> {
             Log.wtf("btnDeviceMeasure", "Click");
-            if (isState[0] == STATE_NONE && isState[1] == STATE_NONE){
+            isVail();
+            /*if (isState[0] == STATE_NONE && isState[1] == STATE_NONE){
                 Toast.makeText(MainTestActivity.this,
                         "기기를 연결 해주세요", Toast.LENGTH_SHORT).show();
             } else if (isState[0] == STATE_NONE || isState[1] == STATE_NONE){
@@ -136,7 +141,7 @@ public class MainTestActivity extends AppCompatActivity {
             }
             else {
                 startActivity(new Intent(MainTestActivity.this, MeasureActivity.class));
-            }
+            }*/
 
         });
 
@@ -153,6 +158,98 @@ public class MainTestActivity extends AppCompatActivity {
 
         if (D) Log.d(TAG, "onCreate");
 
+    }
+
+    private void isVail(){
+        if (isState[0] == STATE_NONE || isState[1] == STATE_NONE){
+            showToast("기기를 연결해주세요");
+        }else if (TextUtils.isEmpty(binding.nameEdt.getText().toString()) || binding.nameEdt.getText().toString().length() < 1){
+            showToast("측정자이름을 입력해주세요");
+        }else if (TextUtils.isEmpty(binding.heightEdt.getText().toString()) || binding.heightEdt.getText().toString().length() < 1){
+            showToast("측정자 키를 입력해주세요");
+        }else if (TextUtils.isEmpty(binding.birthEdt.getText().toString()) || binding.birthEdt.getText().toString().length() < 1){
+            showToast("측정자 생년월일을 입력해주세요");
+        }else if (TextUtils.isEmpty(binding.weightEdt.getText().toString()) || binding.weightEdt.getText().toString().length() < 1){
+            showToast("측정자 몸무게를 입력해주세요");
+        }else if (!binding.rbMale.isChecked() && !binding.rbFemale.isChecked()){
+            showToast("측정자 성별을 선택해주세요");
+        }else {
+            moveMeasure();
+        }
+    }
+
+    private void moveMeasure(){
+        boolean infoGender = binding.rbMale.isChecked();
+        Intent intent = new Intent(MainTestActivity.this, MeasureActivity.class);
+        UserInfo.getInstance().name = binding.nameEdt.getText().toString();
+        UserInfo.getInstance().height = binding.heightEdt.getText().toString();
+        UserInfo.getInstance().weight = binding.weightEdt.getText().toString();
+        UserInfo.getInstance().birth = binding.birthEdt.getText().toString();
+        UserInfo.getInstance().memo = binding.specialEdt.getText().toString();
+        UserInfo.getInstance().gender = infoGender;
+        /*intent.putExtra("name", binding.editName.getText().toString());
+        intent.putExtra("height", binding.editHeight.getText().toString());
+        intent.putExtra("weight", binding.editWeight.getText().toString());
+        intent.putExtra("birth", binding.editAge.getText().toString());
+        intent.putExtra("memo", binding.editMemo.getText().toString());
+        intent.putExtra("gender", infoGender);*/
+        startActivity(intent);
+    }
+
+
+    //생년월일 자동 하이픈 채우기
+    private final TextWatcher textWatcher = new TextWatcher() {
+
+        private int _beforeLenght = 0;
+
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            _beforeLenght = s.length();
+        }
+
+        @SuppressLint("SetTextI18n")
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            if (s.length() <= 0) {
+                return;
+            }
+
+            char inputChar = s.charAt(s.length() - 1);
+            if (inputChar != '-' && (inputChar < '0' || inputChar > '9')) {
+                binding.birthEdt.getText().delete(s.length() - 1, s.length());
+                return;
+            }
+
+            int _afterLenght = s.length();
+
+            // 삭제 중
+            if (_beforeLenght > _afterLenght) {
+                // 삭제 중에 마지막에 -는 자동으로 지우기
+                if (s.toString().endsWith("-")) {
+                    binding.birthEdt.setText(s.toString().substring(0, s.length() - 1));
+                }
+            }
+            // 입력 중
+            else if (_beforeLenght < _afterLenght) {
+                if (_afterLenght == 5 && !s.toString().contains("-")) {
+                    binding.birthEdt.setText(s.toString().subSequence(0, 4) + "-" + s.toString().substring(4, s.length()));
+                } else if (_afterLenght == 8) {
+                    binding.birthEdt.setText(s.toString().subSequence(0, 7) + "-" + s.toString().substring(7, s.length()));
+                }
+            }
+            binding.birthEdt.setSelection(binding.birthEdt.length());
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+
+        }
+    };
+
+    private void showToast(String msg){
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
 
@@ -227,6 +324,24 @@ public class MainTestActivity extends AppCompatActivity {
         btn_disConnect[0] = binding.btnRightDeviceClose;
         btn_disConnect[1] = binding.btnLeftDeviceClose;
 
+        binding.birthEdt.addTextChangedListener(textWatcher);
+
+
+        binding.backContainer.setOnClickListener( v -> finish());
+
+        binding.rbMale.setOnClickListener(v -> {
+            // TextView 클릭될 시 할 코드작성
+
+            binding.rbMale.setChecked(true);
+            binding.rbFemale.setChecked(false);
+        });
+
+        binding.rbFemale.setOnClickListener(v -> {
+            // TextView 클릭될 시 할 코드작성
+
+            binding.rbMale.setChecked(false);
+            binding.rbFemale.setChecked(true);
+        });
 
         btn_connect[0].setOnClickListener(v -> {
             Log.wtf("btn_connet 0" , "onCLICK");
@@ -439,7 +554,7 @@ public class MainTestActivity extends AppCompatActivity {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
 
-        if (intentFilter != null) {
+        /*if (intentFilter != null) {
             unregisterReceiver(receiver);
         }
 
@@ -447,9 +562,9 @@ public class MainTestActivity extends AppCompatActivity {
         intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
         intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         intentFilter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
-        registerReceiver(receiver, intentFilter);
+        registerReceiver(receiver, intentFilter);*/
 
-        binding.searchTxv.setOnClickListener( v -> {
+        /*binding.searchTxv.setOnClickListener( v -> {
             if (intentFilter != null){
                 Log.wtf("intentFilter ", "notnull");
             }else {
@@ -467,11 +582,11 @@ public class MainTestActivity extends AppCompatActivity {
             }
         });
 
-        showDiscoveredDevices();
+        showDiscoveredDevices();*/
     }
 
 
-    private final BroadcastReceiver receiver = new BroadcastReceiver() {
+    /*private final BroadcastReceiver receiver = new BroadcastReceiver() {
 
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
@@ -507,9 +622,9 @@ public class MainTestActivity extends AppCompatActivity {
             }
 
         }
-    };
+    };*/
 
-    @Override
+    /*@Override
     protected void onPause() {
         super.onPause();
         if (intentFilter != null) {
@@ -520,7 +635,7 @@ public class MainTestActivity extends AppCompatActivity {
             }
 
         }
-    }
+    }*/
 
     private boolean checkCoarseLocationPermassion() {
         if (ContextCompat.checkSelfPermission(this,
@@ -584,7 +699,7 @@ public class MainTestActivity extends AppCompatActivity {
         Log.wtf("onRestart", "onRestart");
     }
 
-    private void showDiscoveredDevices() {
+    /*private void showDiscoveredDevices() {
         binding.deviceRe.setLayoutManager(new LinearLayoutManager(this));
         searchDeviceAdapter = new SearchDeviceAdapter(bluetoothDevice -> {
             boolean result = bluetoothDevice.createBond();
@@ -593,7 +708,7 @@ public class MainTestActivity extends AppCompatActivity {
 
         });
         binding.deviceRe.setAdapter(searchDeviceAdapter);
-    }
+    }*/
 
     private void checkBluetoothState() {
         if (bluetoothAdapter == null) {
@@ -703,11 +818,8 @@ public class MainTestActivity extends AppCompatActivity {
                                     startActivity(intent);
                                 }
                             })
-                            .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    //finish();
-                                }
+                            .setPositiveButton("확인", (dialogInterface, i) -> {
+                                //finish();
                             })
                             .setCancelable(false)
                             .create()

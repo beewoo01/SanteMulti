@@ -1,6 +1,7 @@
 package com.physiolab.sante.santemulti;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentProvider;
@@ -27,8 +28,11 @@ import androidx.core.content.ContextCompat;
 
 import com.opencsv.CSVWriter;
 import com.physiolab.sante.BlueToothService.BTService;
+import com.physiolab.sante.UserInfo;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -54,6 +58,10 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
     private float[] LeadOffData = null;
     private float[][] AccData = null;
     private float[][] GyroData = null;
+
+    private double[] RMSData = null;
+
+
     private int EMGCount = 0;
     private int dataCount = 0;
     private double diff = 0;
@@ -68,6 +76,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
     private float TimeRange = 30.0f;
 
     private boolean EMGEnable = true;
+    private boolean EMGRMSEnable = true;
     private boolean AccXEnable = true;
     private boolean AccYEnable = true;
     private boolean AccZEnable = true;
@@ -115,6 +124,11 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         EMGPnt.setColor(getResources().getColor(R.color.GraphEMG));
         EMGPnt.setStyle(Paint.Style.STROKE);
 
+        EMGRMSPnt = new Paint();
+        EMGRMSPnt.setColor(getResources().getColor(R.color.GraphRMS));
+        EMGRMSPnt.setStyle(Paint.Style.STROKE);
+
+
         AccPnt[0] = new Paint();
         AccPnt[0].setColor(getResources().getColor(R.color.GraphAccX));
         AccPnt[0].setStrokeWidth(2.0f);
@@ -158,8 +172,9 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         Refresh();
     }
 
-    public void SetData(float[] emg, float[] leadoff, float[][] acc, float[][] gyro) {
+    public void SetData(float[] emg, double[] rms, float[] leadoff, float[][] acc, float[][] gyro) {
         EMGData = emg;
+        RMSData = rms;
         LeadOffData = leadoff;
         AccData = acc;
         GyroData = gyro;
@@ -793,12 +808,12 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
     //폴더 만들기
     private void CreateFolder() {
-        File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/SanteMulti/");
+        File f = new File(getContext().getExternalFilesDir(null) + "/Sante/");
         //File f = new File(getContext().getFilesDir(), "/Sante/");
         //File f = new File(getContext().getExternalFilesDir(null) + "/Sante/");
 
         if (f.exists()) {
-            if (f.isDirectory() == false) {
+            if (!f.isDirectory()) {
                 return;
             }
         } else {
@@ -955,6 +970,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
     public void SaveData(String wearingPart, Activity activity, ArrayList<String> timeLab) {
         Log.wtf("SaveData", "4444444444444444" + wearingPart);
         SaveFileListener listener = (SaveFileListener) activity;
+        saveLog();
         //this.progressDialog = progressDialog;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (activity.getApplicationContext().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -974,7 +990,10 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         }*/
 
         Date nowDate = new Date(System.currentTimeMillis());
+        export += UserInfo.getInstance().name;
         export += "_" + DateFormat.format("yyyyMMdd_HHmmss", nowDate).toString();
+        export += "_";
+        export += UserInfo.getInstance().memo;
         export += "_";
         //export += UserInfo.getInstance().direction_of_wear;
         export += wearingPart;
@@ -1055,6 +1074,8 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                                 .getBytes());*/
 
 
+                double rmsData = RMSData[tmp];
+
                 float fdata0 = AccData[0][tmp];
                 float fdata1 = AccData[1][tmp];
                 float fdata2 = AccData[2][tmp];
@@ -1074,7 +1095,9 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
                 data.add(new String[]{ putData, Float.toString(fdata0), Float.toString(fdata1),
                         Float.toString(fdata2), Float.toString(fdata3), Float.toString(fdata4),
-                        Float.toString(fdata5),  Float.toString(fdata6), Float.toString(fdata7)});
+                        Float.toString(fdata5),  Float.toString(fdata6), Float.toString(fdata7)/*,
+                        Double.toString(rmsData)*/
+                });
                 //Log.d("time?????", String.valueOf(time));
                 time += 0.0005F;
             }
@@ -1095,6 +1118,154 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
 
     }
+
+
+    @SuppressLint("DefaultLocale")
+    private void saveLog() {
+        String outputStr = "";
+        String str = "";
+
+        File logFile = new File(getContext().getExternalFilesDir(null), "/Sante/" + "/Sante_TUG.log");
+
+
+        if (!logFile.exists()) {
+            CreateLogFile();
+        }
+
+        FileOutputStream fileOutput = null;
+        BufferedWriter bufWriter = null;
+
+        try {
+            fileOutput = new FileOutputStream(logFile, true);
+            bufWriter = new BufferedWriter(new OutputStreamWriter(fileOutput));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+
+        outputStr = DateFormat.format("yyyyMMdd", UserInfo.getInstance().measureTime).toString() + ", ";
+        outputStr += DateFormat.format("HH", UserInfo.getInstance().measureTime).toString() + ", ";
+        outputStr += DateFormat.format("mm", UserInfo.getInstance().measureTime).toString() + ", ";
+        outputStr += UserInfo.getInstance().name.replace(",", " ") + ", ";
+        outputStr += UserInfo.getInstance().birth + ", ";
+        if (UserInfo.getInstance().gender) outputStr += "남" + ", ";
+        else outputStr += "여" + ", ";
+//        outputStr += info.location.replace(","," ") + ", ";
+
+        str = UserInfo.getInstance().memo.replace(",", " ");
+        str = str.replace("\r", " ");
+        str = str.replace("\n", " ");
+        outputStr += str + ", ";
+
+        str = "";
+        if (UserInfo.getInstance().watchCnt <= 0) {
+            str = "00:00.00";
+        } else {
+            int minute = 0;
+            int second = 0;
+            int milliSecond = 0;
+
+            milliSecond = (int) Math.floor((double) UserInfo.getInstance().watchCnt / (double) BTService.SAMPLE_RATE * 100.0);
+            second = (int) Math.floor((double) milliSecond / 100.0);
+            milliSecond = milliSecond % 100;
+            minute = (int) Math.floor((double) second / 60.0);
+            second = second % 60;
+            minute = minute % 60;
+
+            str = String.format("%02d:%02d:%02d", minute, second, milliSecond);
+        }
+        outputStr += str + ", ";
+
+
+        if (UserInfo.getInstance().alarm) outputStr += "On" + ", ";
+        else outputStr += "Off" + ", ";
+        if (UserInfo.getInstance().leadoff) outputStr += "Yes" + ", ";
+        else outputStr += "No" + ", ";
+        /*if (UserInfo.getInstance().leadoff) outputStr += "Yes" + "\r\n";
+        else outputStr += "No" + "\r\n";*/
+        outputStr += UserInfo.getInstance().memo + "\r\n";
+
+        try {
+            bufWriter.write(outputStr);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            bufWriter.close();
+            fileOutput.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    private void CreateLogFile() {
+        String outputStr = "";
+        CreateFolder();
+
+
+        File logFile = new File(getContext().getExternalFilesDir(null) + "/Sante/" + "/Sante_TUG.log");
+
+        FileOutputStream fileOutput = null;
+        BufferedWriter bufWriter = null;
+
+        try {
+            fileOutput = new FileOutputStream(logFile, false);
+            bufWriter = new BufferedWriter(new OutputStreamWriter(fileOutput));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+
+        outputStr = "시험날짜, ";
+        outputStr += "시간, ";
+        outputStr += "분, ";
+        outputStr += "이름, ";
+        outputStr += "나이, ";
+        outputStr += "성별, ";
+        outputStr += "측정지, ";
+        outputStr += "특이사항, ";
+        outputStr += "수행시간, ";
+        outputStr += "3초알림, ";
+        outputStr += "Lead off, ";
+        outputStr += "테스트명\r\n";
+
+        try {
+            bufWriter.write(outputStr);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            bufWriter.close();
+            fileOutput.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+    }
+
+    private float[] sEMG_MVC_RMS(float[] MVC2, float ct, int dt) {
+        int MN = MVC2.length;
+        float[] rms_mvc = new float[MN];
+        float[] sqr_mvc = new float[MN];
+        for (int i = 0; i < MN; i++) {
+            sqr_mvc[i] = MVC2[i] * MVC2[i];
+        }
+        int cut_N = Math.round(ct/dt);
+        for(int i = 0;i<MN;i++){
+            if( i < cut_N/2){
+//                rms_mvc[i] =
+
+            }
+
+        }
+
+        return rms_mvc;
+    }
+
 
 
 

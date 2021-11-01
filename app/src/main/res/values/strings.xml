@@ -29,5 +29,14 @@
 
     <string name="txt_title_time">Time(S)</string>
     <string name="txt_time_range">Range</string>
+    <string name="name">이름</string>
+    <string name="height">키</string>
+    <string name="birth">생년월일</string>
+    <string name="birth_hint">ex)yyyy-MM-dd</string>
+    <string name="weight">몸무게</string>
+    <string name="special">특이사항</string>
+    <string name="gender">성별</string>
+    <string name="female">여성</string>
+    <string name="male">남성</string>
 
 </resources>

@@ -39,12 +39,14 @@ import com.physiolab.sante.ST_DATA_PROC;
 import com.physiolab.sante.SanteApp;
 import com.physiolab.sante.ScreenSize;
 import com.physiolab.sante.Spinner_Re_Adapter;
+import com.physiolab.sante.UserInfo;
 import com.physiolab.sante.dialog.DefaultDialog;
 import com.physiolab.sante.santemulti.databinding.ActivityMeasureBinding;
 
 import java.util.ArrayList;
+import java.util.Date;
 
-public class MeasureActivity extends AppCompatActivity implements SaveFileListener{
+public class MeasureActivity extends AppCompatActivity implements SaveFileListener {
 
 
     private ScreenSize screen = null;
@@ -192,10 +194,10 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
         screen = new ScreenSize();
         screen.getStandardSize(this);
 
+        binding.testNameEdt.setText(UserInfo.getInstance().memo);
 
 
-
-
+        binding.backContainer.setOnClickListener(v -> finish());
         binding.dropdownMenuBtn.setVisibility(View.VISIBLE);
         //findViewById(R.id.dropdown_menu_btn).setVisibility(View.VISIBLE);
 
@@ -225,8 +227,6 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
         santeApps = new SanteApp[]{
                 (SanteApp) this.getApplication(),
                 (SanteApp) this.getApplication()};
-
-
 
 
         InitControl();
@@ -429,11 +429,6 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
         }
 
 
-
-
-
-
-
         txtAccMaxes[device].setText(String.format("%.1f", fragMeasure[device].GetAccMax()));
         txtAccMins[device].setText(String.format("%.1f", fragMeasure[device].GetAccMin()));
         txtGyroMaxes[device].setText(String.format("%.1f", fragMeasure[device].GetGyroMax()));
@@ -516,10 +511,11 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
     @Override
     public void onSuccess(int device) {
 
-        if (device == 1){
+        if (device == 1) {
             Toast.makeText(this, "파일 저장에 성공하였습니다.", Toast.LENGTH_SHORT).show();
-        }else {
-            fragMeasure[1].SaveData( "left", MeasureActivity.this, recordAdapter.getItems());
+        } else {
+            //fragMeasure[1].SaveData("left", MeasureActivity.this, recordAdapter.getItems());
+            fragMeasure[1].SaveData("ch2", MeasureActivity.this, recordAdapter.getItems());
         }
     }
 
@@ -609,7 +605,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                                 if (avgLeadoff[deviceIndex] > thresholdLeadoff[deviceIndex] && (isPreview || isStart) && fragMeasure[deviceIndex].GetEnable(2)) {
 
                                     binding.txtLeadoff.setVisibility(View.VISIBLE);
-
+                                    UserInfo.getInstance().leadoff = true;
                                 } else binding.txtLeadoff.setVisibility(View.INVISIBLE);
 
                                 if (!fragMeasure[deviceIndex].Add(data)) {
@@ -736,6 +732,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
             Log.wtf("11111111111", "22222222222");
 
             timeThread = new TimeThread[powerStatus.length];
+            UserInfo.getInstance().measureTime = new Date(System.currentTimeMillis());
 
             for (int i = 0; i < powerStatus.length; i++) {
                 if (powerStatus[i] != BTService.POWER_BATT) {
@@ -757,6 +754,11 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                     SetWatch(cntWatch);
                     fragMeasure[i].Init();
                     SetTimeRange(i);
+
+                    long now = System.currentTimeMillis();
+                    UserInfo.getInstance().measureTime = new Date(now);
+                    UserInfo.getInstance().alarm = isAlarm;
+                    UserInfo.getInstance().watchCnt = 0;
 
 
                     cntIgnore = 25;
@@ -1025,7 +1027,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
             startActivityForResult(intent, BTService.REQUEST_Time_RANGE);
         });
 
-        binding.txtTimeLabel2.setOnClickListener( v -> {
+        binding.txtTimeLabel2.setOnClickListener(v -> {
             Intent intent = new Intent(MeasureActivity.this, PopupTimeActivity.class);
             intent.putExtra("Type", BTService.REQUEST_Time_RANGE);
             intent.putExtra("deviceLength", 2);
@@ -1103,24 +1105,23 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
         @Override
         public void onClick(View v) {
 
-                /*progressDialog = new ProgressDialog(MeasureActivity.this);
-                progressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                progressDialog.setIndeterminate(true);
-                progressDialog.setCancelable(false);*/
+            /*progressDialog = new ProgressDialog(MeasureActivity.this);
+              progressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+              progressDialog.setIndeterminate(true);
+              progressDialog.setCancelable(false);*/
 
             defaultDialog.dismiss();
-            fragMeasure[0].SaveData( "right", MeasureActivity.this, recordAdapter.getItems());
-
-
+            UserInfo.getInstance().watchCnt = cntWatch;
+            fragMeasure[0].SaveData("ch1", MeasureActivity.this, recordAdapter.getItems());
 
 
             Log.wtf("defaultDialogclose", "1111111111111");
 
-                /*progressDialog.show();
-                progressDialog.setContentView(R.layout.progress);
+            /*progressDialog.show();
+              progressDialog.setContentView(R.layout.progress);
 
-                measureInfo.watchCnt = cntWatch;
-                Log.wtf("defaultDialogclose", "22222222222222");
+              measureInfo.watchCnt = cntWatch;
+              Log.wtf("defaultDialogclose", "22222222222222");
 
 
                 UserInfo.getInstance().direction_of_wear = "right";
@@ -1246,6 +1247,10 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                     SetTimeRange(deviceNum);
 
                     long now = System.currentTimeMillis();
+                    UserInfo.getInstance().measureTime = new Date(now);
+                    UserInfo.getInstance().alarm = isAlarm;
+                    UserInfo.getInstance().watchCnt = 0;
+
 
                     cntIgnore = 25;
 
@@ -1272,7 +1277,6 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
         }
     }
-
 
 
     private void BeepInit() {
