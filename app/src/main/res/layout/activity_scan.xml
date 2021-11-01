@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/toolbar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_20sdp"
+        android:layout_marginTop="@dimen/_5sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:id="@+id/btn_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            >
+
+            <ImageButton
+                android:layout_width="@dimen/_5sdp"
+                android:layout_height="@dimen/_10sdp"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:background="@null"
+                android:scaleType="centerInside"
+                android:src="@drawable/back_button" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/_5sdp"
+                android:text="디바이스 찾기"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_11sdp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/findDevice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="찾기"
+            android:textColor="@color/mainColor"
+            android:textStyle="bold"
+            android:textSize="@dimen/_10sdp"
+            android:layout_marginEnd="@dimen/_20sdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerview_search"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar_layout"
+        app:layout_constraintBottom_toTopOf="@id/btn_pair"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/search_device_item"
+        />
+
+
+    <Button
+        android:id="@+id/btn_pair"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/_25sdp"
+        android:background="@color/mainColor"
+        android:text="페어링"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_10sdp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/recyclerview_search"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

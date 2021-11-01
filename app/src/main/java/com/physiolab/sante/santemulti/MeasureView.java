@@ -34,7 +34,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Date;
@@ -970,7 +972,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
     public void SaveData(String wearingPart, Activity activity, ArrayList<String> timeLab) {
         Log.wtf("SaveData", "4444444444444444" + wearingPart);
         SaveFileListener listener = (SaveFileListener) activity;
-        saveLog();
+
         //this.progressDialog = progressDialog;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (activity.getApplicationContext().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -981,6 +983,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
         //Log(info);
 
+        saveLog();
 
         boolean isExportExist = false;
         export = "";
@@ -1116,6 +1119,82 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
             return;
         }
 
+
+    }
+
+    private void saveCSV(){
+        try {
+            File exportFile = new File(getContext().getExternalFilesDir(null) + "/Sante/" + export);
+            FileOutputStream fos = new FileOutputStream(exportFile);
+            Writer out = new OutputStreamWriter(fos, "UTF-8");
+            CSVWriter writer = new CSVWriter(out);
+
+            List<String[]> data = new ArrayList<>();
+
+            data.add(new String[]{String.valueOf(BTService.Time_Offset + UserInfo.getInstance().measureTime.getTime() * 10000L)
+                    , String.valueOf(UserInfo.getInstance().gender), UserInfo.getInstance().birth,
+                    UserInfo.getInstance().height, UserInfo.getInstance().weight, String.valueOf(UserInfo.getInstance().alarm),
+                    String.valueOf(EMGCount), "", "", "", "", "", "", "", "", "", "",
+                    "", "", "", "", "", "", "", "", "", ""
+            });
+
+            /*if (timeLab != null && timeLab.size() > 0){
+                timeLab.add(0, String.valueOf(timeLab.size()));
+                String[] realRaay = new String[timeLab.size()];
+                realRaay = timeLab.toArray(realRaay);
+
+                data.add(realRaay);
+
+            }*/
+
+            String LINE_SEPERATOR = System.getProperty("line.separator");
+            if (LINE_SEPERATOR != null){
+                WriteString(data, UserInfo.getInstance().name.replace(LINE_SEPERATOR, ""));
+                WriteString(data, UserInfo.getInstance().memo.replace(LINE_SEPERATOR, "\r\n"));
+            }
+
+
+            float time = 0F;
+            float result;
+
+
+            for (int i = 0; i < EMGCount; i++){
+
+                int tmp = (int) Math.floor((double) i / 10.0);
+                result = (float) (Math.floor(time * 10000)/10000);
+                float fdata0 = AccData[0][tmp];
+                float fdata1 = AccData[1][tmp];
+                float fdata2 = AccData[2][tmp];
+
+                float fdata3 = GyroData[0][tmp];
+                float fdata4 = GyroData[1][tmp];
+                float fdata5 = GyroData[2][tmp];
+
+                float fdata6 = EMGData[i];
+                float fdata7 = LeadOffData[i];
+                String putData = Float.toString(result);
+                if (putData.equals("5.0E-4")){
+                    putData = "0.0005";
+                }else if (putData.equals("0.0")){
+                    putData = "0";
+                }
+
+                data.add(new String[]{ putData, Float.toString(fdata0), Float.toString(fdata1),
+                        Float.toString(fdata2), Float.toString(fdata3), Float.toString(fdata4),
+                        Float.toString(fdata5),  Float.toString(fdata6), Float.toString(fdata7)});
+                //Log.d("time?????", String.valueOf(time));
+                time += 0.0005F;
+            }
+
+            writer.writeAll(data);
+            writer.close();
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
