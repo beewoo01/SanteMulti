@@ -10,6 +10,7 @@ public class UserInfo {
     public String weight;
     public String birth;
     public String memo;
+    public String spacial;
     public boolean gender;
 
     public boolean leadoff = false;

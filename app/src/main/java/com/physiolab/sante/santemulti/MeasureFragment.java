@@ -64,7 +64,7 @@ public class MeasureFragment extends Fragment {
             LeadOffData[EMGCount] = (float) data.BPF_DC[i];
 
 
-            /*RMSData[EMGCount] = data.RMS[i];*/
+            RMSData[EMGCount] = data.RMS[i];
 
 
             EMGCount++;

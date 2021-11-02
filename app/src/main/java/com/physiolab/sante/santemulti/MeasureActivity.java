@@ -194,7 +194,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
         screen = new ScreenSize();
         screen.getStandardSize(this);
 
-        binding.testNameEdt.setText(UserInfo.getInstance().memo);
+        //binding.testNameEdt.setText(UserInfo.getInstance().memo);
 
 
         binding.backContainer.setOnClickListener(v -> finish());
@@ -1112,6 +1112,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
             defaultDialog.dismiss();
             UserInfo.getInstance().watchCnt = cntWatch;
+            UserInfo.getInstance().memo = binding.testNameEdt.getText().toString();
             fragMeasure[0].SaveData("ch1", MeasureActivity.this, recordAdapter.getItems());
 
 

@@ -20,6 +20,7 @@
     <string name="txt_check_y_enable">Y-Axis</string>
     <string name="txt_check_z_enable">Z-Axis</string>
     <string name="txt_check_emg_enable">EMG Graph</string>
+    <string name="txt_check_emg_rms_enable">EMG RMS Graph</string>
 
     <string name="txt_title_acc">Acceleration(G)</string>
     <string name="txt_title_gyro">Gyro(dps)</string>

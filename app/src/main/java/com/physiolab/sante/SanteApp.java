@@ -37,6 +37,8 @@ public class SanteApp extends Application {
         public final int EMGHPF = 1;
         public final int EMGLPF = 0;
 
+        public final int EMGRMS = 2;
+
         public final float EMGMax = 1000.0f;
         public final float EMGMin = -1000.0f;
 
@@ -105,6 +107,9 @@ public class SanteApp extends Application {
 
     public int GetEMGHPF(int device) { return sharedPreferences.getInt("EMGHPF"+device,defaultValue.EMGHPF);}
     public int GetEMGLPF(int device) { return sharedPreferences.getInt("EMGLPF"+device,defaultValue.EMGLPF);}
+
+    public int GetEMGRMS(int device) { return sharedPreferences.getInt("EMGRMS"+device, defaultValue.EMGRMS);}
+    //editor.putInt("EMGRMS"+device,rms);
 
     public float GetAccMax(int device) { return sharedPreferences.getFloat("AccMax"+device,defaultValue.AccMax); }
     public float GetAccMin(int device) { return sharedPreferences.getFloat("AccMin"+device,defaultValue.AccMin); }
@@ -180,6 +185,15 @@ public class SanteApp extends Application {
         editor.putInt("EMGLPF"+device,lpf);
         editor.commit();
     }
+
+
+    public void SetEMGRMS(int rms ,int device){
+        SharedPreferences.Editor editor= sharedPreferences.edit();
+        editor.putInt("EMGRMS"+device,rms);
+        editor.commit();
+    }
+
+
 
     public void SetAccMax(float max, int device) {
         SharedPreferences.Editor editor= sharedPreferences.edit();

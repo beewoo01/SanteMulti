@@ -162,7 +162,7 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
         screen.getStandardSize(this);
 
 
-        binding.testNameEdt.setText(UserInfo.getInstance().memo);
+        //binding.testNameEdt.setText(UserInfo.getInstance().memo);
         /*
         name = userInfo.getStringExtra("name");
         height = userInfo.getStringExtra("height");
@@ -757,6 +757,7 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
             defaultDialog.dismiss();
             //String deviceDirection = device == 0 ? "right" : "left";
             UserInfo.getInstance().watchCnt = cntWatch;
+            UserInfo.getInstance().spacial = binding.testNameEdt.getText().toString();
             fragMeasure.SaveData("ch1", MeasureOneActivity.this, recordAdapter.getItems());
 
         }

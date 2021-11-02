@@ -90,13 +90,14 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
     private Paint gridPnt;
     private Paint gridCenterPnt;
     private Paint EMGPnt;
-    private Paint EMGRMSPnt;
     private Paint[] AccPnt = new Paint[3];
     private Paint[] GyroPnt = new Paint[3];
 
     private boolean isRedraw = false;
     //private DefaultDialog defaultDialog;
     private ProgressDialog progressDialog;
+
+    private SaveFileListener listener;
 
 
 
@@ -125,10 +126,6 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         EMGPnt = new Paint();
         EMGPnt.setColor(getResources().getColor(R.color.GraphEMG));
         EMGPnt.setStyle(Paint.Style.STROKE);
-
-        EMGRMSPnt = new Paint();
-        EMGRMSPnt.setColor(getResources().getColor(R.color.GraphRMS));
-        EMGRMSPnt.setStyle(Paint.Style.STROKE);
 
 
         AccPnt[0] = new Paint();
@@ -337,6 +334,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
             //if (GyroEnable)
             {
+
                 for (int axis = 2; axis >= 0; axis--) {
                     if (axis == 2 && !GyroZEnable) continue;
                     if (axis == 1 && !GyroYEnable) continue;
@@ -446,26 +444,28 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
             bufferCanvas.drawColor(getResources().getColor(android.R.color.transparent), PorterDuff.Mode.SRC);
 
-//            if (EMGEnable) {
-//                xMinCount = (int) Math.max(Math.floor((double) TimeStart * (double) BTService.SAMPLE_RATE), 0.0);
-//                xMaxCount = (int) Math.min(Math.ceil((double) (TimeStart + TimeRange) * (double) BTService.SAMPLE_RATE), (double) EMGCount);
-//
-//                path.reset();
-//
-//                yPos = bufferGraph.getHeight() * ((EMGYMax - EMGData[xMinCount]) / (EMGYMax - EMGYMin));
-//                xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) xMinCount / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
-//
-//                path.moveTo(xPos, yPos);
-//
-//                for (int i = xMinCount + 1; i < xMaxCount; i++) {
-//                    yPos = bufferGraph.getHeight() * ((EMGYMax - EMGData[i]) / (EMGYMax - EMGYMin));
-//                    xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) i / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
-//
-//                    path.lineTo(xPos, yPos);
-//                }
-//                bufferCanvas.drawPath(path, EMGPnt);
-//            }
-            if (EMGEnable) {
+            if (EMGEnable && !EMGRMSEnable) {
+                xMinCount = (int) Math.max(Math.floor((double) TimeStart * (double) BTService.SAMPLE_RATE), 0.0);
+                xMaxCount = (int) Math.min(Math.ceil((double) (TimeStart + TimeRange) * (double) BTService.SAMPLE_RATE), (double) EMGCount);
+
+                path.reset();
+
+                yPos = bufferGraph.getHeight() * ((EMGYMax - EMGData[xMinCount]) / (EMGYMax - EMGYMin));
+                xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) xMinCount / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
+
+                path.moveTo(xPos, yPos);
+
+                for (int i = xMinCount + 1; i < xMaxCount; i++) {
+                    yPos = bufferGraph.getHeight() * ((EMGYMax - EMGData[i]) / (EMGYMax - EMGYMin));
+                    xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) i / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
+
+                    path.lineTo(xPos, yPos);
+                }
+                bufferCanvas.drawPath(path, EMGPnt);
+            }
+
+            else if (EMGEnable && EMGRMSEnable) {
+                //Log.wtf("EMGEnable!!!", String.valueOf(EMGEnable));
                 xMinCount = (int) Math.max(Math.floor((double) TimeStart * (double) BTService.SAMPLE_RATE), 0.0);
                 xMaxCount = (int) Math.min(Math.ceil((double) (TimeStart + TimeRange) * (double) BTService.SAMPLE_RATE), (double) EMGCount);
 
@@ -573,7 +573,8 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 break;
             case 2:
                 axis[0] = EMGEnable;
-                axis[1] = EMGEnable;
+                //axis[1] = EMGEnable;
+                axis[1] = EMGRMSEnable;
                 axis[2] = EMGEnable;
                 break;
             default:
@@ -637,6 +638,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 return (GyroXEnable || GyroYEnable || GyroZEnable);
             case 2:
                 EMGEnable = x;
+                EMGRMSEnable = y;
                 Refresh();
                 return EMGEnable;
             default:
@@ -971,7 +973,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
     //CSV 파일 저장
     public void SaveData(String wearingPart, Activity activity, ArrayList<String> timeLab) {
         Log.wtf("SaveData", "4444444444444444" + wearingPart);
-        SaveFileListener listener = (SaveFileListener) activity;
+        listener = (SaveFileListener) activity;
 
         //this.progressDialog = progressDialog;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -996,7 +998,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         export += UserInfo.getInstance().name;
         export += "_" + DateFormat.format("yyyyMMdd_HHmmss", nowDate).toString();
         export += "_";
-        export += UserInfo.getInstance().memo;
+        export += UserInfo.getInstance().spacial;
         export += "_";
         //export += UserInfo.getInstance().direction_of_wear;
         export += wearingPart;
@@ -1005,10 +1007,10 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         //CreateFolder();
 
 
+        saveCSV(wearingPart, timeLab);
 
 
-
-        try {
+        /*try {
 
             File exportFile = new File(export);
             exportFile.mkdirs();
@@ -1019,9 +1021,9 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
             //values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOCUMENTS);
 
             Uri extVolumeUri = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL);
-            /*Uri extVolumeUri =
+            *//*Uri extVolumeUri =
 
-                    context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "";*/
+                    context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "";*//*
             //Uri fileUri = context.getContentResolver().insert(extVolumeUri, values);
             Uri fileUri = activity.getApplicationContext().getContentResolver().insert(
                     extVolumeUri
@@ -1056,9 +1058,9 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
             }
 
 
-           /* String LINE_SEPERATOR = System.getProperty("line.separator");
+           *//* String LINE_SEPERATOR = System.getProperty("line.separator");
             WriteString(data, info.name.replace(LINE_SEPERATOR, ""));
-            WriteString(data, info.memo.replace(LINE_SEPERATOR, "\r\n"));*/
+            WriteString(data, info.memo.replace(LINE_SEPERATOR, "\r\n"));*//*
 
 
             float time = 0F;
@@ -1070,11 +1072,11 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 result = (float) (Math.floor(time * 10000)/10000);
 
 
-                /*bufOutput.write(
+                *//*bufOutput.write(
                         String.format("%.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f\r\n",
                                 data.Filted[i],data.RMS[i],data.Acc[0][index],data.Acc[1][index],
                                 data.Acc[2][index],data.Gyro[0][index],data.Gyro[1][index],data.Gyro[2][index])
-                                .getBytes());*/
+                                .getBytes());*//*
 
 
                 double rmsData = RMSData[tmp];
@@ -1098,8 +1100,8 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
                 data.add(new String[]{ putData, Float.toString(fdata0), Float.toString(fdata1),
                         Float.toString(fdata2), Float.toString(fdata3), Float.toString(fdata4),
-                        Float.toString(fdata5),  Float.toString(fdata6), Float.toString(fdata7)/*,
-                        Double.toString(rmsData)*/
+                        Float.toString(fdata5),  Float.toString(fdata6), Float.toString(fdata7)*//*,
+                        Double.toString(rmsData)*//*
                 });
                 //Log.d("time?????", String.valueOf(time));
                 time += 0.0005F;
@@ -1117,12 +1119,12 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
             e.printStackTrace();
             listener.onFail();
             return;
-        }
+        }*/
 
 
     }
 
-    private void saveCSV(){
+    private void saveCSV(String wearingPart, ArrayList<String> timeLab){
         try {
             File exportFile = new File(getContext().getExternalFilesDir(null) + "/Sante/" + export);
             FileOutputStream fos = new FileOutputStream(exportFile);
@@ -1138,14 +1140,14 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                     "", "", "", "", "", "", "", "", "", ""
             });
 
-            /*if (timeLab != null && timeLab.size() > 0){
+            if (timeLab != null && timeLab.size() > 0){
                 timeLab.add(0, String.valueOf(timeLab.size()));
                 String[] realRaay = new String[timeLab.size()];
                 realRaay = timeLab.toArray(realRaay);
 
                 data.add(realRaay);
 
-            }*/
+            }
 
             String LINE_SEPERATOR = System.getProperty("line.separator");
             if (LINE_SEPERATOR != null){
@@ -1162,6 +1164,8 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
                 int tmp = (int) Math.floor((double) i / 10.0);
                 result = (float) (Math.floor(time * 10000)/10000);
+
+                double rmsData = RMSData[tmp];
                 float fdata0 = AccData[0][tmp];
                 float fdata1 = AccData[1][tmp];
                 float fdata2 = AccData[2][tmp];
@@ -1181,13 +1185,17 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
                 data.add(new String[]{ putData, Float.toString(fdata0), Float.toString(fdata1),
                         Float.toString(fdata2), Float.toString(fdata3), Float.toString(fdata4),
-                        Float.toString(fdata5),  Float.toString(fdata6), Float.toString(fdata7)});
+                        Float.toString(fdata5),  Float.toString(fdata6), Float.toString(fdata7),
+                        Double.toString(rmsData)
+                });
                 //Log.d("time?????", String.valueOf(time));
                 time += 0.0005F;
             }
 
             writer.writeAll(data);
             writer.close();
+            int device = wearingPart.equals("ch1")? 0 : 1;
+            listener.onSuccess(device);
 
 
         } catch (IOException e) {
@@ -1237,6 +1245,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         outputStr += str + ", ";
 
         str = "";
+        outputStr += UserInfo.getInstance().spacial + ", ";
         if (UserInfo.getInstance().watchCnt <= 0) {
             str = "00:00.00";
         } else {
@@ -1260,9 +1269,9 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         else outputStr += "Off" + ", ";
         if (UserInfo.getInstance().leadoff) outputStr += "Yes" + ", ";
         else outputStr += "No" + ", ";
-        /*if (UserInfo.getInstance().leadoff) outputStr += "Yes" + "\r\n";
-        else outputStr += "No" + "\r\n";*/
-        outputStr += UserInfo.getInstance().memo + "\r\n";
+        if (UserInfo.getInstance().leadoff) outputStr += "Yes" + "\r\n";
+        else outputStr += "No" + "\r\n";
+        //outputStr += UserInfo.getInstance().memo + "\r\n";
 
         try {
             bufWriter.write(outputStr);
@@ -1306,10 +1315,11 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         outputStr += "성별, ";
         outputStr += "측정지, ";
         outputStr += "특이사항, ";
+        outputStr += "테스트명, ";
         outputStr += "수행시간, ";
         outputStr += "3초알림, ";
-        outputStr += "Lead off, ";
-        outputStr += "테스트명\r\n";
+        outputStr += "Lead off\r\n ";
+
 
         try {
             bufWriter.write(outputStr);

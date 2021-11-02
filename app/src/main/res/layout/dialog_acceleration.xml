@@ -12,7 +12,7 @@
     <LinearLayout
         android:id="@+id/mainLin"
         android:layout_width="@dimen/_300sdp"
-        android:layout_height="@dimen/_160sdp"
+        android:layout_height="@dimen/_200sdp"
         android:layout_marginHorizontal="@dimen/_50sdp"
         android:layout_marginVertical="@dimen/_30sdp"
         android:background="@drawable/bg_rounded_01"
@@ -131,7 +131,6 @@
                 <LinearLayout
                     android:id="@+id/spinner_layout_lpf"
                     android:layout_width="0dp"
-
                     android:layout_height="@dimen/_21sdp"
                     android:layout_marginLeft="@dimen/_10sdp"
                     android:layout_weight="1"
@@ -139,14 +138,33 @@
 
                     <Spinner
                         android:id="@+id/spin_lpf"
-
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/_20sdp"
-
                         android:background="@drawable/bg_rounded_02"
                         android:padding="@dimen/_5sdp" />
                 </LinearLayout>
             </LinearLayout>
+            <LinearLayout
+                android:id="@+id/spinner_layout_rms"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_21sdp"
+                android:orientation="horizontal"
+                android:layout_marginTop="@dimen/_5sdp"
+                android:weightSum="3"
+                >
+
+                <Spinner
+                    android:id="@+id/spin_rms"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/_20sdp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="@dimen/_20sdp"
+                    android:background="@drawable/bg_rounded_02"
+                    android:padding="@dimen/_5sdp" />
+
+
+            </LinearLayout>
+
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -160,6 +178,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:orientation="horizontal">
+
 
                     <CheckBox
                         android:id="@+id/chk_x_axis"

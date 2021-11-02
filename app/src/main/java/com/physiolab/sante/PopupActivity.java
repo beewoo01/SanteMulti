@@ -236,6 +236,10 @@ public class PopupActivity  extends AppCompatActivity {
                         spinDevice = (Spinner)findViewById(R.id.spin_lpf);
                         app[i].SetEMGLPF(spinDevice.getSelectedItemPosition(), i);
 
+                        spinDevice = (Spinner)findViewById(R.id.spin_rms);
+                        app[i].SetEMGRMS(spinDevice.getSelectedItemPosition(), i);
+
+
                         minValue = (float)Math.floor(minValue);
                         maxValue = (float)Math.floor(maxValue);
 
@@ -476,6 +480,11 @@ public class PopupActivity  extends AppCompatActivity {
                 spinDevice.setSelection(app.GetEMGLPF(i));
                 //spinDevice.setOnItemSelectedListener(onSelChanged);
 
+                spinDevice = findViewById(R.id.spin_rms);
+                adapterDevice = new SpinnerAdapter(this, android.R.layout.simple_spinner_item, new String[] {"0.05s", "0.1s", "0.3s", "0.5s", "1s"});
+                spinDevice.setAdapter(adapterDevice);
+                spinDevice.setSelection(app.GetEMGRMS(i));
+
                 et = findViewById(R.id.edit_range_min);
 //            et.setTextSize((float) (screen.standardSize_X / div));
                 et.setText(String.format("%.0f",app.GetEMGMin(i)));
@@ -518,7 +527,9 @@ public class PopupActivity  extends AppCompatActivity {
         cb.setChecked(enableAxis[1]);
         if (requestType==BTService.REQUEST_EMG_FILTER)
         {
-            cb.setVisibility(View.GONE);
+            cb.setText(R.string.txt_check_emg_rms_enable);
+            cb.setTextColor(getResources().getColor(R.color.GraphEMG));
+            //cb.setVisibility(View.GONE);
         }
         else if (requestType==BTService.REQUEST_Acc_FILTER)
         {
