@@ -1239,6 +1239,8 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         else outputStr += "여" + ", ";
 //        outputStr += info.location.replace(","," ") + ", ";
 
+        outputStr += "tug1" + ", ";
+
         str = UserInfo.getInstance().memo.replace(",", " ");
         str = str.replace("\r", " ");
         str = str.replace("\n", " ");
@@ -1267,11 +1269,10 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
         if (UserInfo.getInstance().alarm) outputStr += "On" + ", ";
         else outputStr += "Off" + ", ";
-        if (UserInfo.getInstance().leadoff) outputStr += "Yes" + ", ";
-        else outputStr += "No" + ", ";
+
         if (UserInfo.getInstance().leadoff) outputStr += "Yes" + "\r\n";
         else outputStr += "No" + "\r\n";
-        //outputStr += UserInfo.getInstance().memo + "\r\n";
+
 
         try {
             bufWriter.write(outputStr);

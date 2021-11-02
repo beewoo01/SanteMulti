@@ -311,7 +311,7 @@ public class Connect_1chActivity extends AppCompatActivity {
             if (selObj!=null) deviceAddress=selObj.toString();
 
 
-            if (isState[0] != STATE_NONE && deviceAddress.equals(btService.getDeviceNum(1))) return;
+            if (isState[0] != STATE_NONE && deviceAddress.equals(btService.getDeviceNum(0))) return;
 
             if (btService!=null) btService.Connect(deviceAddress,0);
         }
@@ -321,8 +321,10 @@ public class Connect_1chActivity extends AppCompatActivity {
         selObj = spinDevice.getSelectedItem();
         if (selObj != null) {
             deviceAddress[0] = selObj.toString();
-            btService.Init();
+            //btService.Init();
         }
+        UpdateUI();
+
     }
 
     //생년월일 자동 하이픈 채우기

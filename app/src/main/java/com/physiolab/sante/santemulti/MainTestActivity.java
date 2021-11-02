@@ -751,7 +751,7 @@ public class MainTestActivity extends AppCompatActivity {
                 btn_connect[i].setEnabled(true);
                 btn_disConnect[i].setEnabled(false);
                 spinDevice[i].setEnabled(true);
-
+                binding.btnDeviceMeasure.setEnabled(true);
 
                 battTxv[i].setVisibility(View.GONE);
                 battImv[i].setVisibility(View.GONE);
@@ -768,6 +768,7 @@ public class MainTestActivity extends AppCompatActivity {
                 spinDevice[i].setEnabled(false);
 
                 battTxv[i].setVisibility(View.VISIBLE);
+
                 battImv[i].setVisibility(View.VISIBLE);
 
                 int batt = Math.round(battLevel[i] * 20);
