@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 
+import com.physiolab.sante.UserInfo;
+import com.physiolab.sante.santemulti.DialogOnClick;
 import com.physiolab.sante.santemulti.R;
 import com.physiolab.sante.santemulti.databinding.DialogDefaultBinding;
 
@@ -21,6 +23,7 @@ public class DefaultDialog extends BaseDialog{
     private Context mContext;
     private DialogDefaultBinding binding;
 
+    private DialogOnClick listener;
 
     public DefaultDialog(Context context, View.OnClickListener closeButtonListener, String title, String body) {
         super(context, R.style.FullScreenDialogStyle);
@@ -30,6 +33,15 @@ public class DefaultDialog extends BaseDialog{
         this.body = body;
 
 
+    }
+
+    public DefaultDialog(Context context, DialogOnClick listener, String title, String body) {
+        super(context, R.style.FullScreenDialogStyle);
+        //mCloseButtonListener = closeButtonListener;
+        this.listener = listener;
+        mContext = context;
+        this.title = title;
+        this.body = body;
     }
 
     @Override
@@ -43,7 +55,13 @@ public class DefaultDialog extends BaseDialog{
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
         getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
-        binding.btnConfirm.setOnClickListener(mCloseButtonListener);
+        binding.editMemo.setText(UserInfo.getInstance().memo);
+        binding.btnConfirm.setOnClickListener(v -> {
+            UserInfo.getInstance().memo = binding.editMemo.getText().toString();
+            listener.confirm();
+            dismiss();
+        });
+        //binding.btnConfirm.setOnClickListener(mCloseButtonListener);
         binding.btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

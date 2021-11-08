@@ -4,13 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#99000000"
-    android:gravity="center"
+    android:gravity="top|center"
     android:orientation="vertical">
 
 
     <LinearLayout
         android:id="@+id/mainLin"
-        android:layout_width="@dimen/_150sdp"
+        android:layout_width="@dimen/_180sdp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/_50sdp"
         android:layout_marginVertical="@dimen/_30sdp"
@@ -19,21 +19,35 @@
         android:padding="@dimen/_10sdp">
 
 
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/body"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_5sdp"
-            android:text="" />
+            />
 
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="wrap_content"
+
+
+        <EditText
+            android:id="@+id/edit_memo"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text=""
+            android:textSize="@dimen/_6sdp"
+            android:background="@drawable/bg_rounded_edt"
+            android:padding="@dimen/_7sdp"
+            android:paddingStart="@dimen/_5sdp"
+            android:hint="특이사항"
+            android:maxLines="1"
             android:textColor="@color/black"
-            android:textStyle="bold" />
+            android:layout_marginTop="@dimen/_8sdp"
+            />
 
         <LinearLayout
             android:layout_width="match_parent"

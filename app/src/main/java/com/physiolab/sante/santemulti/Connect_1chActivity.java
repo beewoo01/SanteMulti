@@ -263,20 +263,26 @@ public class Connect_1chActivity extends AppCompatActivity {
 
         if (isState[0] == STATE_NONE){
             showToast("기기를 연결해주세요");
+            return;
         }else if (TextUtils.isEmpty(binding.editName.getText().toString()) || binding.editName.getText().toString().length() < 1){
             showToast("측정자이름을 입력해주세요");
+            return;
         }else if (TextUtils.isEmpty(binding.editHeight.getText().toString()) || binding.editHeight.getText().toString().length() < 1){
-            showToast("측정자 키를 입력해주세요");
+            binding.editHeight.setText("100");
+            //showToast("측정자 키를 입력해주세요");
         }else if (TextUtils.isEmpty(binding.editAge.getText().toString()) || binding.editAge.getText().toString().length() < 1){
-            showToast("측정자 생년월일을 입력해주세요");
+            binding.editAge.setText("19000101");
+            //showToast("측정자 생년월일을 입력해주세요");
         }else if (TextUtils.isEmpty(binding.editWeight.getText().toString()) || binding.editWeight.getText().toString().length() < 1){
-            showToast("측정자 몸무게를 입력해주세요");
+            binding.editWeight.setText("10");
+            //showToast("측정자 몸무게를 입력해주세요");
         }else if (!binding.rbMale.isChecked() && !binding.rbFemale.isChecked()){
-            showToast("측정자 성별을 선택해주세요");
-        }else {
+            binding.rbMale.setChecked(true);
+            //showToast("측정자 성별을 선택해주세요");
+        }/*else {
             moveMeasure();
-        }
-
+        }*/
+        moveMeasure();
 
     }
 

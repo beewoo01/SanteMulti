@@ -494,7 +494,14 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
         if (isStart && handleflag == 2) {
 
-            defaultDialog = new DefaultDialog(this, defaultDialogclose, "알림", "측정결과를 저장하시겠습니까?");
+            /*defaultDialog = new DefaultDialog(this, defaultDialogclose, "알림", "측정결과를 저장하시겠습니까?");
+            defaultDialog.show();*/
+
+            defaultDialog = new DefaultDialog(this, () -> {
+                UserInfo.getInstance().watchCnt = cntWatch;
+                UserInfo.getInstance().spacial = binding.testNameEdt.getText().toString();
+                fragMeasure[0].SaveData("ch1", MeasureActivity.this, recordAdapter.getItems());
+            }, "알림", "측정결과를 저장하시겠습니까?");
             defaultDialog.show();
 
 

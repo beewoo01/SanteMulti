@@ -163,19 +163,24 @@ public class MainTestActivity extends AppCompatActivity {
     private void isVail(){
         if (isState[0] == STATE_NONE || isState[1] == STATE_NONE){
             showToast("기기를 연결해주세요");
+            return;
         }else if (TextUtils.isEmpty(binding.nameEdt.getText().toString()) || binding.nameEdt.getText().toString().length() < 1){
             showToast("측정자이름을 입력해주세요");
+            return;
         }else if (TextUtils.isEmpty(binding.heightEdt.getText().toString()) || binding.heightEdt.getText().toString().length() < 1){
-            showToast("측정자 키를 입력해주세요");
+            binding.heightEdt.setText("100");
+            //showToast("측정자 키를 입력해주세요");
         }else if (TextUtils.isEmpty(binding.birthEdt.getText().toString()) || binding.birthEdt.getText().toString().length() < 1){
-            showToast("측정자 생년월일을 입력해주세요");
+            binding.birthEdt.setText("19000101");
+            //showToast("측정자 생년월일을 입력해주세요");
         }else if (TextUtils.isEmpty(binding.weightEdt.getText().toString()) || binding.weightEdt.getText().toString().length() < 1){
-            showToast("측정자 몸무게를 입력해주세요");
+            binding.weightEdt.setText("10");
+            //showToast("측정자 몸무게를 입력해주세요");
         }else if (!binding.rbMale.isChecked() && !binding.rbFemale.isChecked()){
-            showToast("측정자 성별을 선택해주세요");
-        }else {
-            moveMeasure();
+            binding.rbMale.setChecked(true);
+            //showToast("측정자 성별을 선택해주세요");
         }
+        moveMeasure();
     }
 
     private void moveMeasure(){

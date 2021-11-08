@@ -812,7 +812,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
     //폴더 만들기
     private void CreateFolder() {
-        File f = new File(getContext().getExternalFilesDir(null) + "/Sante/");
+        File f = new File(getContext().getExternalFilesDir(null) + "/I-Motion/");
         //File f = new File(getContext().getFilesDir(), "/Sante/");
         //File f = new File(getContext().getExternalFilesDir(null) + "/Sante/");
 
@@ -1126,7 +1126,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
     private void saveCSV(String wearingPart, ArrayList<String> timeLab){
         try {
-            File exportFile = new File(getContext().getExternalFilesDir(null) + "/Sante/" + export);
+            File exportFile = new File(getContext().getExternalFilesDir(null) + "/I-Motion/" + export);
             FileOutputStream fos = new FileOutputStream(exportFile);
             Writer out = new OutputStreamWriter(fos, "UTF-8");
             CSVWriter writer = new CSVWriter(out);
@@ -1212,7 +1212,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         String outputStr = "";
         String str = "";
 
-        File logFile = new File(getContext().getExternalFilesDir(null), "/Sante/" + "/Sante_TUG.log");
+        File logFile = new File(getContext().getExternalFilesDir(null), "/I-Motion/" + "/Sante_TUG.log");
 
 
         if (!logFile.exists()) {
@@ -1295,7 +1295,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         CreateFolder();
 
 
-        File logFile = new File(getContext().getExternalFilesDir(null) + "/Sante/" + "/Sante_TUG.log");
+        File logFile = new File(getContext().getExternalFilesDir(null) + "/I-Motion/" + "/Sante_TUG.log");
 
         FileOutputStream fileOutput = null;
         BufferedWriter bufWriter = null;

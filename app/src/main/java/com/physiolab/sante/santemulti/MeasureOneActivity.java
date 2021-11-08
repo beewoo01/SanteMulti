@@ -735,11 +735,19 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
 
         if (isStart && handleflag == 2) {
 
-            defaultDialog = new DefaultDialog(this,
-                    defaultDialogclose, "알림",
-                    "측정결과를 저장하시겠습니까?");
+            defaultDialog = new DefaultDialog(this, () -> {
+                UserInfo.getInstance().watchCnt = cntWatch;
+                UserInfo.getInstance().spacial = binding.testNameEdt.getText().toString();
+                fragMeasure.SaveData("ch1", MeasureOneActivity.this, recordAdapter.getItems());
+            }, "알림", "측정결과를 저장하시겠습니까?");
             defaultDialog.show();
 
+            /*defaultDialog = new DefaultDialog(this, v -> {
+                UserInfo.getInstance().watchCnt = cntWatch;
+                UserInfo.getInstance().spacial = binding.testNameEdt.getText().toString();
+                fragMeasure.SaveData("ch1", MeasureOneActivity.this, recordAdapter.getItems());
+            }, "알림", "측정결과를 저장하시겠습니까?");
+            defaultDialog.show();*/
 
         }
 
@@ -748,6 +756,7 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
         santeApps.SetPreview(isPreview, device);
         UpdateUI();
     }
+
 
 
     private final View.OnClickListener defaultDialogclose = new View.OnClickListener() {
