@@ -1165,7 +1165,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 int tmp = (int) Math.floor((double) i / 10.0);
                 result = (float) (Math.floor(time * 10000)/10000);
 
-                double rmsData = RMSData[tmp];
+                double rmsData = RMSData[i];
                 float fdata0 = AccData[0][tmp];
                 float fdata1 = AccData[1][tmp];
                 float fdata2 = AccData[2][tmp];
@@ -1368,7 +1368,8 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                     break;
                 result += Math.pow(EMGData[count - (m - i)], 2);
             }
-            result = (float) Math.sqrt(result) / m;
+            //result = (float) Math.sqrt(result) / m;
+            result = (float) Math.sqrt(result/m);
             return result;
 
         }
