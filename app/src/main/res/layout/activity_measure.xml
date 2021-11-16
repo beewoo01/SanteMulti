@@ -71,7 +71,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/_3sdp"
             android:fontFamily="@font/spoqahansansneo_bold"
-            android:text="Sante I-Motion"
+            android:text="Sante I-Motion Lab"
             android:textColor="@color/mainColor"
             android:textSize="@dimen/_11sdp"
             app:layout_constraintStart_toStartOf="parent"

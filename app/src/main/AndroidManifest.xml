@@ -26,7 +26,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Connect_1chActivity">
+        <activity android:name=".Connect_1chActivity"
+            android:screenOrientation="landscape"
+            android:windowSoftInputMode="adjustResize|adjustPan|stateAlwaysHidden"
+            >
 
             <!--
             <intent-filter>

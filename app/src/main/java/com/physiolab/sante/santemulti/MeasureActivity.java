@@ -79,7 +79,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
     private TextView[] txtTimeMins;
     private TextView[] txtTimeMaxes;
 
-    private TimeThread[] timeThread;
+    private TimeThread[] timeThread = new TimeThread[2];
 
     private static final String TAG = "Activity-Measure";
     private static final boolean D = true;
@@ -102,6 +102,8 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
     private final TextView[] txtGyroMins = new TextView[2];
     private final TextView[] txtEmgMaxes = new TextView[2];
     private final TextView[] txtEmgMins = new TextView[2];
+
+    private final TextView[] txtReadOffs = new TextView[2];
 
     private final Spinner_Re_Adapter recordAdapter = new Spinner_Re_Adapter(new ArrayList<>());
 
@@ -191,6 +193,9 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
         txtEmgMins[0] = binding.txtEmgMin;
         txtEmgMins[1] = binding.txtEmgMin2;
 
+        txtReadOffs[0] = binding.txtLeadoff;
+        txtReadOffs[1] = binding.txtLeadoff2;
+
         screen = new ScreenSize();
         screen.getStandardSize(this);
 
@@ -269,11 +274,11 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
     @Override
     protected void onDestroy() {
-        Log.d(TAG, "onDestroy");
+        /*Log.d(TAG, "onDestroy");*/
         super.onDestroy();
 
         if (isFinishing()) {
-            Log.d(TAG, "onDestroy-Finishing");
+            /*Log.d(TAG, "onDestroy-Finishing");*/
             if (isService) {
                 boolean tmp = isPreview;
                 MeasureStop();
@@ -325,7 +330,9 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
         binding.btnPreview.setSelected(isPreview);
         binding.btnWatchstop.setSelected(isWatch);
 
-        binding.txtLeadoff.setVisibility(View.INVISIBLE);
+        txtReadOffs[device].setVisibility(View.INVISIBLE);
+        /*binding.txtLeadoff.setVisibility(View.INVISIBLE);
+        binding.txtLeadoff2.setVisibility(View.INVISIBLE);*/
 
         if (isService) {
             switch (isState[device]) {
@@ -379,9 +386,60 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
             binding.btnWatchstop.setEnabled(false);
             binding.btnAllstop.setEnabled(false);
             binding.btnPreview.setEnabled(true);
+
         }
 
-        if (fragMeasure[device].GetEnable(0)) {
+
+        if (device == 0) {
+            if (fragMeasure[device].GetEnable(0)) {
+                binding.txtEnableAcc.setTextColor(
+                        ContextCompat.getColor(this, R.color.EnableBtnTextSel));
+            } else {
+                binding.txtEnableAcc.setTextColor(
+                        ContextCompat.getColor(this, R.color.EnableBtnTextNotSel));
+            }
+            if (fragMeasure[device].GetEnable(1)) {
+                binding.txtEnableGyro.setTextColor(
+                        ContextCompat.getColor(this, R.color.EnableBtnTextSel));
+            } else {
+                binding.txtEnableGyro.setTextColor(
+                        ContextCompat.getColor(this, R.color.EnableBtnTextNotSel));
+            }
+            if (fragMeasure[device].GetEnable(2)) {
+                binding.txtEnableEmg.setTextColor(
+                        ContextCompat.getColor(this, R.color.EnableBtnTextSel));
+            } else {
+                binding.txtEnableEmg.setTextColor(
+                        ContextCompat.getColor(this, R.color.EnableBtnTextNotSel));
+            }
+        }else {
+            if (fragMeasure[device].GetEnable(0)) {
+                binding.txtEnableAcc2.setTextColor(
+                        ContextCompat.getColor(this, R.color.EnableBtnTextSel));
+            } else {
+                binding.txtEnableAcc2.setTextColor(
+                        ContextCompat.getColor(this, R.color.EnableBtnTextNotSel));
+            }
+            if (fragMeasure[device].GetEnable(1)) {
+                binding.txtEnableGyro2.setTextColor(
+                        ContextCompat.getColor(this, R.color.EnableBtnTextSel));
+            } else {
+                binding.txtEnableGyro2.setTextColor(
+                        ContextCompat.getColor(this, R.color.EnableBtnTextNotSel));
+            }
+            if (fragMeasure[device].GetEnable(2)) {
+                binding.txtEnableEmg2.setTextColor(
+                        ContextCompat.getColor(this, R.color.EnableBtnTextSel));
+            } else {
+                binding.txtEnableEmg2.setTextColor(
+                        ContextCompat.getColor(this, R.color.EnableBtnTextNotSel));
+            }
+        }
+
+
+
+
+        /*if (fragMeasure[device].GetEnable(0)) {
 
             binding.txtEnableAcc.setTextColor(
                     ContextCompat.getColor(this, R.color.EnableBtnTextSel));
@@ -426,7 +484,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
         } else {
             binding.txtEnableEmg2.setTextColor(
                     ContextCompat.getColor(this, R.color.EnableBtnTextNotSel));
-        }
+        }*/
 
 
         txtAccMaxes[device].setText(String.format("%.1f", fragMeasure[device].GetAccMax()));
@@ -444,13 +502,12 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
         binding.txtEmgMax.setText(String.format("%.0f", fragMeasure[device].GetEMGMax()));
         binding.txtEmgMin.setText(String.format("%.0f", fragMeasure[device].GetEMGMin()));*/
 
-        SetTimeRange(0);
-        SetTimeRange(1);
+        SetTimeRange(device);
+        //SetTimeRange(1);
     }
 
     @SuppressLint({"DefaultLocale", "SetTextI18n"})
     private void SetTimeRange(int deviceNum) {
-
 
         if (!hasData) {
             txtTimeMins[deviceNum].setText("0.00");
@@ -492,10 +549,23 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
         }
 
-        if (isStart && handleflag == 2) {
 
-            /*defaultDialog = new DefaultDialog(this, defaultDialogclose, "알림", "측정결과를 저장하시겠습니까?");
-            defaultDialog.show();*/
+        if (isStart) {
+
+            if (handleflag == 2 || !isAlarm){
+                defaultDialog = new DefaultDialog(this, () -> {
+                    UserInfo.getInstance().watchCnt = cntWatch;
+                    UserInfo.getInstance().spacial = binding.testNameEdt.getText().toString();
+                    fragMeasure[0].SaveData("ch1", MeasureActivity.this, recordAdapter.getItems());
+                }, "알림", "측정결과를 저장하시겠습니까?");
+                defaultDialog.show();
+            }
+        }
+
+        /*if (isStart && handleflag == 2) {
+
+            *//*defaultDialog = new DefaultDialog(this, defaultDialogclose, "알림", "측정결과를 저장하시겠습니까?");
+            defaultDialog.show();*//*
 
             defaultDialog = new DefaultDialog(this, () -> {
                 UserInfo.getInstance().watchCnt = cntWatch;
@@ -505,7 +575,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
             defaultDialog.show();
 
 
-        }
+        }*/
 
         isStart = false;
         isPreview = false;
@@ -609,11 +679,16 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                                     avgLeadoff[deviceIndex] += data.BPF_DC[i];
                                 }
                                 avgLeadoff[deviceIndex] /= (float) BTService.PACKET_SAMPLE_NUM;
-                                if (avgLeadoff[deviceIndex] > thresholdLeadoff[deviceIndex] && (isPreview || isStart) && fragMeasure[deviceIndex].GetEnable(2)) {
-
-                                    binding.txtLeadoff.setVisibility(View.VISIBLE);
+                                if (avgLeadoff[deviceIndex] > thresholdLeadoff[deviceIndex] && (isPreview || isStart)
+                                        && fragMeasure[deviceIndex].GetEnable(2)) {
+                                    //Log.wtf("LEADOFF", "devide num " + deviceIndex);
+                                    txtReadOffs[deviceIndex].setVisibility(View.VISIBLE);
+                                    //binding.txtLeadoff.setVisibility(View.VISIBLE);
                                     UserInfo.getInstance().leadoff = true;
-                                } else binding.txtLeadoff.setVisibility(View.INVISIBLE);
+                                } else {
+                                    txtReadOffs[deviceIndex].setVisibility(View.INVISIBLE);
+                                    //binding.txtLeadoff.setVisibility(View.INVISIBLE);
+                                }
 
                                 if (!fragMeasure[deviceIndex].Add(data)) {
                                     MeasureStop();
@@ -738,10 +813,10 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
             Log.wtf("11111111111", "22222222222");
 
-            timeThread = new TimeThread[powerStatus.length];
+            //timeThread = new TimeThread[powerStatus.length];
             UserInfo.getInstance().measureTime = new Date(System.currentTimeMillis());
-
             for (int i = 0; i < powerStatus.length; i++) {
+                timeThread[i] = new TimeThread(i);
                 if (powerStatus[i] != BTService.POWER_BATT) {
                     Toast.makeText(santeApps[i], "USB연결중에는 측정할 수 없습니다.", Toast.LENGTH_SHORT).show();
                 } else if (isState[i] == BTService.STATE_CONNECTED) {
@@ -838,22 +913,27 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
                         SetTimeRange(i);
 
-                        btService.SetEMGFilter(santeApps[i].GetEMGNotch(i), santeApps[i].GetEMGHPF(i), santeApps[i].GetEMGLPF(i), 0);
+                        /*btService.SetEMGFilter(santeApps[i].GetEMGNotch(i), santeApps[i].GetEMGHPF(i), santeApps[i].GetEMGLPF(i), 0);
                         btService.SetAccFilter(santeApps[i].GetAccHPF(i), santeApps[i].GetAccLPF(i), 0);
-                        btService.SetGyroFilter(santeApps[i].GetGyroHPF(i), santeApps[i].GetGyroLPF(i), 0);
+                        btService.SetGyroFilter(santeApps[i].GetGyroHPF(i), santeApps[i].GetGyroLPF(i), 0);*/
 
-                        btService.Start(0);
+                        //btService.Start(0);
+
+                        btService.SetEMGFilter(santeApps[i].GetEMGNotch(i), santeApps[i].GetEMGHPF(i), santeApps[i].GetEMGLPF(i), i);
+                        btService.SetAccFilter(santeApps[i].GetAccHPF(i), santeApps[i].GetAccLPF(i), i);
+                        btService.SetGyroFilter(santeApps[i].GetGyroHPF(i), santeApps[i].GetGyroLPF(i), i);
+                        btService.Start(i);
                     }
                 } else {
                     if (isState[i] == BTService.STATE_CONNECTED && !isStart) {
                         btService.Stop(i);
                     }
                 }
-
+                UpdateUI(i);
             }
 
-            UpdateUI(0);
-            UpdateUI(1);
+            /*UpdateUI(0);
+            UpdateUI(1);*/
         });
 
 

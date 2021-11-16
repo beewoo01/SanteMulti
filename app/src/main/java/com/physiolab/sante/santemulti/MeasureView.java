@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -305,6 +306,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
             }
 
             if (EMGEnable) {
+                //Log.wtf("EMGEnable!!!", "1111111111");
                 if (EMGCount == 0) {
                     yPos = bufferGraph.getHeight() * ((EMGYMax - EMGData[EMGCount]) / (EMGYMax - EMGYMin));
                     xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) EMGCount / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
@@ -330,6 +332,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 }
                 bufferCanvas.drawPath(path, EMGPnt);
             }
+
 
 
             //if (GyroEnable)
@@ -441,6 +444,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
             int xMaxCount;
             float yPos;
             float xPos;
+            //Log.wtf("EMGEnable!!!", String.valueOf(EMGEnable));
 
             bufferCanvas.drawColor(getResources().getColor(android.R.color.transparent), PorterDuff.Mode.SRC);
 
@@ -456,6 +460,8 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 path.moveTo(xPos, yPos);
 
                 for (int i = xMinCount + 1; i < xMaxCount; i++) {
+                    /*Log.wtf("EMGEnable!!!", "여기옴?just11111111");
+                    Log.wtf("EMGEnable!!!i ", String.valueOf(i));*/
                     yPos = bufferGraph.getHeight() * ((EMGYMax - EMGData[i]) / (EMGYMax - EMGYMin));
                     xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) i / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
 
@@ -465,7 +471,8 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
             }
 
             else if (EMGEnable && EMGRMSEnable) {
-                //Log.wtf("EMGEnable!!!", String.valueOf(EMGEnable));
+                /*Log.wtf("EMGEnable!!!", String.valueOf(EMGEnable));
+                Log.wtf("EMGEnable!!!", "여기옴?");*/
                 xMinCount = (int) Math.max(Math.floor((double) TimeStart * (double) BTService.SAMPLE_RATE), 0.0);
                 xMaxCount = (int) Math.min(Math.ceil((double) (TimeStart + TimeRange) * (double) BTService.SAMPLE_RATE), (double) EMGCount);
 
@@ -477,6 +484,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 path.moveTo(xPos, yPos);
 
                 for (int i = xMinCount + 1; i < xMaxCount; i++) {
+                    //Log.wtf("EMGEnable!!!", "여기옴?11111111");
                     yPos = bufferGraph.getHeight() * ((EMGYMax - RMS(EMGData,600,i)) / (EMGYMax - EMGYMin));
                     xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) i / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
 
@@ -812,7 +820,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
     //폴더 만들기
     private void CreateFolder() {
-        File f = new File(getContext().getExternalFilesDir(null) + "/I-Motion/");
+        File f = new File(getContext().getExternalFilesDir(null) + "/I-Motion Lab/");
         //File f = new File(getContext().getFilesDir(), "/Sante/");
         //File f = new File(getContext().getExternalFilesDir(null) + "/Sante/");
 
@@ -1126,9 +1134,20 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
     private void saveCSV(String wearingPart, ArrayList<String> timeLab){
         try {
-            File exportFile = new File(getContext().getExternalFilesDir(null) + "/I-Motion/" + export);
+            File exportFile = new File(getContext().getExternalFilesDir(null) + "/I-Motion Lab/" + export);
             FileOutputStream fos = new FileOutputStream(exportFile);
-            Writer out = new OutputStreamWriter(fos, "UTF-8");
+            Writer out = new OutputStreamWriter(fos, "EUC-KR");
+
+            //BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(exportFile)));
+            /*bw.write((BTService.Time_Offset + UserInfo.getInstance().measureTime.getTime() * 10000L) +
+                    "," + UserInfo.getInstance().gender + "," + UserInfo.getInstance().birth + ","
+                    + UserInfo.getInstance().height + ", " + UserInfo.getInstance().weight + "," + UserInfo.getInstance().alarm
+                    + EMGCount + ", " + "" + "," + "" + "," + "" + "," + "" + "," + "" + "," + "" + "," + "" + "," + "" + "," + "" + "," + "" + "," +
+                    "" + "," + "" + "," + "" + "," + "" + "," + "" + "," + "" + "," + "" + "," + "" + "," + "" + "," + "" + "," +
+            );
+
+             bw.write("/");*/
+
             CSVWriter writer = new CSVWriter(out);
 
             List<String[]> data = new ArrayList<>();
@@ -1147,6 +1166,13 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
                 data.add(realRaay);
 
+            }else if (timeLab.size() == 0) {
+                timeLab.add("");
+                timeLab.add("");
+                String[] realRaay = new String[timeLab.size()];
+                realRaay = timeLab.toArray(realRaay);
+
+                data.add(realRaay);
             }
 
             String LINE_SEPERATOR = System.getProperty("line.separator");
@@ -1212,7 +1238,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         String outputStr = "";
         String str = "";
 
-        File logFile = new File(getContext().getExternalFilesDir(null), "/I-Motion/" + "/Sante_TUG.log");
+        File logFile = new File(getContext().getExternalFilesDir(null), "/I-Motion Lab/" + "/Sante_TUG.log");
 
 
         if (!logFile.exists()) {
@@ -1295,7 +1321,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         CreateFolder();
 
 
-        File logFile = new File(getContext().getExternalFilesDir(null) + "/I-Motion/" + "/Sante_TUG.log");
+        File logFile = new File(getContext().getExternalFilesDir(null) + "/I-Motion Lab/" + "/Sante_TUG.log");
 
         FileOutputStream fileOutput = null;
         BufferedWriter bufWriter = null;
@@ -1362,11 +1388,16 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
     public float RMS(float[] EMGData, int m,int count) {
         float result = 0;
+        //Log.wtf("EMGEnable!!!", "여기옴?222222222");
         if (count > 0) {
+            /*Log.wtf("EMGEnable!!!", "여기옴?333333333");
+            Log.wtf("RMS1 MM", String.valueOf(m));*/
             for (int i = 0; i < m; i++) {
-                if(count <m)
+                if(count < m)
                     break;
                 result += Math.pow(EMGData[count - (m - i)], 2);
+                /*Log.wtf("RMS1 result i", String.valueOf(i));
+                Log.wtf("RMS1 result", String.valueOf(result));*/
             }
             //result = (float) Math.sqrt(result) / m;
             result = (float) Math.sqrt(result/m);

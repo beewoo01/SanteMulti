@@ -46,7 +46,7 @@ public class SanteApp extends Application {
         public final float AccMin = -6.0f;
 
         public final float GyroMax = 800.0f;
-        public final float GyroMin = -400.0f;
+        public final float GyroMin = -800.0f;
 
         public final float EMGFullMax = 200000.0f;
         public final float EMGFullMin = -200000.0f;

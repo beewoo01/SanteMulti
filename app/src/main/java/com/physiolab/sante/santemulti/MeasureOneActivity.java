@@ -385,7 +385,7 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
             binding.btnPreview.setEnabled(true);
         }
 
-        if (fragMeasure.GetEnable(device)) {
+        if (fragMeasure.GetEnable(0)) {
 
             binding.txtEnableAcc.setTextColor(
                     ContextCompat.getColor(this, R.color.EnableBtnTextSel));
@@ -400,7 +400,7 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
             binding.txtEnableGyro.setTextColor(
                     ContextCompat.getColor(this, R.color.EnableBtnTextNotSel));
         }
-        if (fragMeasure.GetEnable(device)) {
+        if (fragMeasure.GetEnable(2)) {
             binding.txtEnableEmg.setTextColor(
                     ContextCompat.getColor(this, R.color.EnableBtnTextSel));
         } else {
@@ -728,12 +728,30 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
 
 
     private void MeasureStop() {
+        Log.wtf("MeasureStop", "111111111111");
         if (isStart | isPreview) {
+            Log.wtf("MeasureStop", "222222222");
             btService.Stop(device);
 
         }
+        Log.wtf("MeasureStop", "333333333");
+        Log.wtf("MeasureStop isStart", String.valueOf(isStart));
+        Log.wtf("MeasureStop handleflag", String.valueOf(handleflag));
+        Log.wtf("MeasureStop isAlarm", String.valueOf(isAlarm));
+        if (isStart){
+            if (handleflag == 2 || !isAlarm) {
+                Log.wtf("MeasureStop", "444444444");
 
-        if (isStart && handleflag == 2) {
+                defaultDialog = new DefaultDialog(this, () -> {
+                    UserInfo.getInstance().watchCnt = cntWatch;
+                    UserInfo.getInstance().spacial = binding.testNameEdt.getText().toString();
+                    fragMeasure.SaveData("ch1", MeasureOneActivity.this, recordAdapter.getItems());
+                }, "알림", "측정결과를 저장하시겠습니까?");
+                defaultDialog.show();
+            }
+        }
+        /*if (isStart && handleflag == 2) {
+            Log.wtf("MeasureStop", "444444444");
 
             defaultDialog = new DefaultDialog(this, () -> {
                 UserInfo.getInstance().watchCnt = cntWatch;
@@ -742,14 +760,7 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
             }, "알림", "측정결과를 저장하시겠습니까?");
             defaultDialog.show();
 
-            /*defaultDialog = new DefaultDialog(this, v -> {
-                UserInfo.getInstance().watchCnt = cntWatch;
-                UserInfo.getInstance().spacial = binding.testNameEdt.getText().toString();
-                fragMeasure.SaveData("ch1", MeasureOneActivity.this, recordAdapter.getItems());
-            }, "알림", "측정결과를 저장하시겠습니까?");
-            defaultDialog.show();*/
-
-        }
+        }*/
 
         isStart = false;
         isPreview = false;
