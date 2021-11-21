@@ -1015,6 +1015,8 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
                                     binding.txtLeadoff.setVisibility(View.VISIBLE);
                                     UserInfo.getInstance().leadoff = true;
 
+
+
                                 } else binding.txtLeadoff.setVisibility(View.INVISIBLE);
 
                                 if (!fragMeasure.Add(data)) {

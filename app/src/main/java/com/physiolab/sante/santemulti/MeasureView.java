@@ -981,7 +981,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
 
     //CSV 파일 저장
-    public void SaveData(String wearingPart, Activity activity, ArrayList<String> timeLab) {
+    public void SaveData(String wearingPart, Activity activity, ArrayList<String> timeLab, String firstTime) {
         Log.wtf("SaveData", "4444444444444444" + wearingPart);
         listener = (SaveFileListener) activity;
 
@@ -1017,7 +1017,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         //CreateFolder();
 
 
-        saveCSV(wearingPart, timeLab);
+        saveCSV(wearingPart, timeLab, firstTime);
 
 
         /*try {
@@ -1134,7 +1134,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
     }
 
-    private void saveCSV(String wearingPart, ArrayList<String> timeLab){
+    private void saveCSV(String wearingPart, ArrayList<String> timeLab, String firstTime){
         try {
             File exportFile = new File(getContext().getExternalFilesDir(null) + "/I-Motion Lab/" + export);
             FileOutputStream fos = new FileOutputStream(exportFile);
@@ -1157,7 +1157,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
             data.add(new String[]{String.valueOf(BTService.Time_Offset + UserInfo.getInstance().measureTime.getTime() * 10000L)
                     , String.valueOf(UserInfo.getInstance().gender), UserInfo.getInstance().birth,
                     UserInfo.getInstance().height, UserInfo.getInstance().weight, String.valueOf(UserInfo.getInstance().alarm),
-                    String.valueOf(EMGCount), "", "", "", "", "", "", "", "", "", "",
+                    String.valueOf(EMGCount),firstTime,  "", "", "", "", "", "", "", "", "", "",
                     "", "", "", "", "", "", "", "", "", ""
             });
 

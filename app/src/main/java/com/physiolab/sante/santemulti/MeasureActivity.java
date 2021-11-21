@@ -681,13 +681,11 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                                 avgLeadoff[deviceIndex] /= (float) BTService.PACKET_SAMPLE_NUM;
                                 if (avgLeadoff[deviceIndex] > thresholdLeadoff[deviceIndex] && (isPreview || isStart)
                                         && fragMeasure[deviceIndex].GetEnable(2)) {
-                                    //Log.wtf("LEADOFF", "devide num " + deviceIndex);
                                     txtReadOffs[deviceIndex].setVisibility(View.VISIBLE);
-                                    //binding.txtLeadoff.setVisibility(View.VISIBLE);
                                     UserInfo.getInstance().leadoff = true;
                                 } else {
                                     txtReadOffs[deviceIndex].setVisibility(View.INVISIBLE);
-                                    //binding.txtLeadoff.setVisibility(View.INVISIBLE);
+
                                 }
 
                                 if (!fragMeasure[deviceIndex].Add(data)) {

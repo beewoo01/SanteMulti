@@ -1,9 +1,11 @@
 package com.physiolab.sante.santemulti;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +17,11 @@ import androidx.fragment.app.Fragment;
 import com.physiolab.sante.BlueToothService.BTService;
 import com.physiolab.sante.ST_DATA_PROC;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MeasureFragment extends Fragment {
     private static final String TAG = "Fragment-Monitor";
@@ -31,6 +37,8 @@ public class MeasureFragment extends Fragment {
     private final float[][] GyroData = new float[3][(BTService.SAMPLE_RATE / 10) * 60 * 5];
     private int EMGCount = 0;
     private int dataCount = 0;
+    private boolean isFirst = true;
+    private String firstDataTime = null;
 
     public static MeasureFragment newInstance() {
         return new MeasureFragment();
@@ -57,7 +65,15 @@ public class MeasureFragment extends Fragment {
         mView.Init();
     }
 
+    @SuppressLint("SimpleDateFormat")
     public boolean Add(ST_DATA_PROC data) {
+        if (isFirst) {
+            long time = System.currentTimeMillis();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm:ss.SSSZ");
+            firstDataTime = sdf.format(time);
+            Log.wtf("ifFirst", firstDataTime);
+            isFirst = false;
+        }
         for (int i = 0; i < BTService.PACKET_SAMPLE_NUM; i++) {
             if (EMGCount >= BTService.SAMPLE_RATE * 60 * 5) return false;
 
@@ -176,7 +192,7 @@ public class MeasureFragment extends Fragment {
     public void SaveData(String wearingPart, Activity activity, ArrayList<String> timLab) {
         Log.wtf("SaveData", "333333333");
         //mView.SaveData(activity, info, context, timLab, progressDialog);
-        mView.SaveData(wearingPart, activity, timLab);
+        mView.SaveData(wearingPart, activity, timLab, firstDataTime);
 
 
     }
