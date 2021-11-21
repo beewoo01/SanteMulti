@@ -25,6 +25,7 @@ public class MeasureFragment extends Fragment {
 
     private final float[] EMGData = new float[BTService.SAMPLE_RATE * 60 * 5];
     private final double[] RMSData = new double[BTService.SAMPLE_RATE * 60 * 5];
+    private final double[] SampleRMSData = new double[BTService.SAMPLE_RATE * 60 * 5];
     private final float[] LeadOffData = new float[BTService.SAMPLE_RATE * 60 * 5];
     private final float[][] AccData = new float[3][(BTService.SAMPLE_RATE / 10) * 60 * 5];
     private final float[][] GyroData = new float[3][(BTService.SAMPLE_RATE / 10) * 60 * 5];
@@ -41,7 +42,7 @@ public class MeasureFragment extends Fragment {
         Log.d(TAG, "onCreateView");
 
         mView = new MeasureView(getActivity());
-        mView.SetData(EMGData, RMSData, LeadOffData, AccData, GyroData);
+        mView.SetData(EMGData, RMSData, LeadOffData, AccData, GyroData, SampleRMSData);
 
         return mView;
     }

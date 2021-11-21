@@ -247,6 +247,7 @@ public class MainActivity extends AppCompatActivity {
             deviceIndex=index;
         }
 
+        @SuppressLint("DefaultLocale")
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
@@ -583,6 +584,7 @@ public class MainActivity extends AppCompatActivity {
         startTimerTask();
     }
 
+    @SuppressLint({"SetTextI18n", "DefaultLocale"})
     private void UpdateUI()
     {
         for(int i=0;i<2;i++)
