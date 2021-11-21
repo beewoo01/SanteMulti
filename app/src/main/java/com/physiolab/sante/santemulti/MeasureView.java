@@ -63,6 +63,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
     private float[][] GyroData = null;
 
     private double[] RMSData = null;
+    private double[] SampleRMSData = null;
 
 
     private int EMGCount = 0;
@@ -172,9 +173,10 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         Refresh();
     }
 
-    public void SetData(float[] emg, double[] rms, float[] leadoff, float[][] acc, float[][] gyro) {
+    public void SetData(float[] emg, double[] rms, float[] leadoff, float[][] acc, float[][] gyro, double[] sampleRmsData) {
         EMGData = emg;
         RMSData = rms;
+        SampleRMSData = sampleRmsData;
         LeadOffData = leadoff;
         AccData = acc;
         GyroData = gyro;
@@ -1192,6 +1194,44 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 result = (float) (Math.floor(time * 10000)/10000);
 
                 double rmsData = RMSData[i];
+
+
+                double sampleRMSData = SampleRMSData[i];
+                /*int xMinCount = (int) Math.max(Math.floor((double) TimeStart * (double) BTService.SAMPLE_RATE), 0.0);
+                int xMaxCount = (int) Math.min(
+                        Math.ceil(
+                                (double) (TimeStart + TimeRange) * (double) BTService.SAMPLE_RATE
+                        ), (double) EMGCount);
+
+                for (int j = xMinCount + 1; j < xMaxCount; j++) {
+                    //Log.wtf("EMGEnable!!!", "여기옴?11111111");
+                    sampleRMSData = bufferGraph.getHeight() * ((EMGYMax - RMS(EMGData,600,j)) / (EMGYMax - EMGYMin));
+
+                }*/
+
+
+
+                /*xMinCount = (int) Math.max(Math.floor((double) TimeStart * (double) BTService.SAMPLE_RATE), 0.0);
+                xMaxCount = (int) Math.min(Math.ceil((double) (TimeStart + TimeRange) * (double) BTService.SAMPLE_RATE), (double) EMGCount);
+
+                path.reset();
+
+                yPos = bufferGraph.getHeight() * ((EMGYMax - EMGData[xMinCount]) / (EMGYMax - EMGYMin));
+                xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) xMinCount / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
+
+                path.moveTo(xPos, yPos);
+
+                for (int i = xMinCount + 1; i < xMaxCount; i++) {
+                    //Log.wtf("EMGEnable!!!", "여기옴?11111111");
+                    yPos = bufferGraph.getHeight() * ((EMGYMax - RMS(EMGData,600,i)) / (EMGYMax - EMGYMin));
+                    xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) i / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
+
+                    path.lineTo(xPos, yPos);
+                }
+                bufferCanvas.drawPath(path, EMGPnt);*/
+
+                sampleRMSData = SampleRMS(EMGData, i);
+
                 float fdata0 = AccData[0][tmp];
                 float fdata1 = AccData[1][tmp];
                 float fdata2 = AccData[2][tmp];
@@ -1212,7 +1252,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 data.add(new String[]{ putData, Float.toString(fdata0), Float.toString(fdata1),
                         Float.toString(fdata2), Float.toString(fdata3), Float.toString(fdata4),
                         Float.toString(fdata5),  Float.toString(fdata6), Float.toString(fdata7),
-                        Double.toString(rmsData)
+                        Double.toString(rmsData), Double.toString(sampleRMSData)
                 });
                 //Log.d("time?????", String.valueOf(time));
                 time += 0.0005F;
@@ -1396,15 +1436,39 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 if(count < m)
                     break;
                 result += Math.pow(EMGData[count - (m - i)], 2);
-                /*Log.wtf("RMS1 result i", String.valueOf(i));
-                Log.wtf("RMS1 result", String.valueOf(result));*/
             }
-            //result = (float) Math.sqrt(result) / m;
             result = (float) Math.sqrt(result/m);
             return result;
 
         }
         else return 0;
+
+    }
+
+
+    public double SampleRMS(float[] EMGData, int few) {
+        double result = 0;
+        if (few < 5){
+            //int sub =
+            for (int i = 0; i < 10; i++){
+                result += Math.pow(EMGData[i], 2);
+            }
+            result = (double) Math.sqrt(result/11);
+            return result;
+        }else if (EMGData.length-5 < few){
+            for (int i = EMGData.length-10; i < EMGData.length; i++){
+                result += Math.pow(EMGData[i], 2);
+            }
+            result = (double) Math.sqrt(result/11);
+            return result;
+        } else {
+            for (int i = few-5; i < few+6; i++){
+                result += Math.pow(EMGData[i], 2);
+            }
+
+            result = (double) Math.sqrt(result/11);
+            return result;
+        }
 
     }
 }
