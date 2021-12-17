@@ -110,12 +110,16 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
             isState = btService.getState(device);
 
             if (isPreview) {
-
-                if (powerStatus != BTService.POWER_BATT) {
+                if (powerStatus == BTService.POWER_BATT || powerStatus == BTService.POWER_USB_FULL_CHARGE) {
                     Toast.makeText(santeApps, "USB연결중에는 측정할 수 없습니다.", Toast.LENGTH_SHORT).show();
                     isPreview = false;
                     santeApps.SetPreview(isPreview, device);
-                } else if (isState == BTService.STATE_CONNECTED && !isStart) {
+                }
+                /*if (powerStatus != BTService.POWER_BATT) {
+                    Toast.makeText(santeApps, "USB연결중에는 측정할 수 없습니다.", Toast.LENGTH_SHORT).show();
+                    isPreview = false;
+                    santeApps.SetPreview(isPreview, device);
+                }*/ else if (isState == BTService.STATE_CONNECTED && !isStart) {
 
                     cntIgnore = 25;
                     SetWatch(0);
@@ -212,6 +216,7 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
         /*isAlarm = santeApps.GetAlarm();
         isPreview = santeApps.GetPreview();*/
         hasData = false;
+        Log.wtf("getLeadOFF", String.valueOf(santeApps.GetLeadOff(device)));
         thresholdLeadoff = santeApps.GetLeadOff(device) * 100.0f + 200.0f;
 
 
@@ -866,6 +871,7 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
                 Log.wtf("쓰레드", "111정지");
 
 
+
                 if (powerStatus != BTService.POWER_BATT) {
                     Toast.makeText(santeApps, "USB연결중에는 측정할 수 없습니다.", Toast.LENGTH_SHORT).show();
                 } else if (isState == BTService.STATE_CONNECTED) {
@@ -976,6 +982,7 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
                     {
                         //isUSBPower = false;
                         powerStatus = BTService.POWER_BATT;
+
                     } else if (msg.arg2 == 2)   //USB 전원사용 - 완충됨
                     {
                         //isUSBPower = true;
@@ -1009,13 +1016,10 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
                                     avgLeadoff += data.BPF_DC[i];
                                 }
                                 avgLeadoff /= (float) BTService.PACKET_SAMPLE_NUM;
-                                if (avgLeadoff > thresholdLeadoff && (isPreview || isStart)
-                                        && fragMeasure.GetEnable(2)) {
+                                if (avgLeadoff > thresholdLeadoff && (isPreview || isStart) && fragMeasure.GetEnable(2)) {
 
                                     binding.txtLeadoff.setVisibility(View.VISIBLE);
                                     UserInfo.getInstance().leadoff = true;
-
-
 
                                 } else binding.txtLeadoff.setVisibility(View.INVISIBLE);
 
@@ -1031,6 +1035,10 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
                                     SetTimeRange();
                                 }
 
+                                /*if (powerStatus == BTService.POWER_BATT || powerStatus == BTService.POWER_USB_FULL_CHARGE) {
+                                    Toast.makeText(santeApps, "USB연결중에는 측정할 수 없습니다.", Toast.LENGTH_SHORT).show();
+                                    MeasureStop();
+                                }*/
                                 if (powerStatus != BTService.POWER_BATT) {
                                     Toast.makeText(santeApps, "USB연결중에는 측정할 수 없습니다.", Toast.LENGTH_SHORT).show();
                                     MeasureStop();

@@ -11,21 +11,24 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity android:name=".ScanActivity"
             android:screenOrientation="landscape"
             android:windowSoftInputMode="adjustResize|adjustPan|stateAlwaysHidden"
             />
+
         <activity android:name=".SelectActivity"
             android:screenOrientation="landscape"
             android:windowSoftInputMode="adjustResize|adjustPan|stateAlwaysHidden"
             android:theme="@style/AppTheme2"
-            >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity android:name=".Connect_1chActivity"
             android:screenOrientation="landscape"
             android:windowSoftInputMode="adjustResize|adjustPan|stateAlwaysHidden"
@@ -39,24 +42,29 @@
             </intent-filter>
             -->
         </activity>
+
         <activity
             android:name=".MeasureOneActivity"
             android:launchMode="standard"
             android:screenOrientation="landscape"
             android:windowSoftInputMode="adjustResize|adjustPan|stateAlwaysHidden" />
+
         <activity
             android:name="com.physiolab.sante.PopupActivity"
             android:launchMode="standard"
             android:screenOrientation="landscape" />
+
         <activity
             android:name="com.physiolab.sante.PopupTimeActivity"
             android:launchMode="standard"
             android:screenOrientation="landscape" />
+
         <activity
             android:name=".MeasureActivity"
             android:launchMode="standard"
             android:screenOrientation="landscape"
             android:windowSoftInputMode="adjustResize|adjustPan|stateAlwaysHidden" />
+
         <activity
             android:name=".MainActivity"
             android:launchMode="standard"
@@ -70,6 +78,7 @@
             </intent-filter>
             -->
         </activity>
+
         <activity
             android:name=".MainTestActivity"
             android:launchMode="standard"
@@ -89,6 +98,7 @@
             android:name="com.physiolab.sante.BlueToothService.BTService"
             android:enabled="true"
             android:exported="false" />
+
     </application>
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />

@@ -36,6 +36,7 @@ public class MeasureFragment extends Fragment {
     private final float[][] AccData = new float[3][(BTService.SAMPLE_RATE / 10) * 60 * 5];
     private final float[][] GyroData = new float[3][(BTService.SAMPLE_RATE / 10) * 60 * 5];
     private int EMGCount = 0;
+    private int RMSCount = 0;
     private int dataCount = 0;
     private boolean isFirst = true;
     private String firstDataTime = null;
@@ -67,6 +68,7 @@ public class MeasureFragment extends Fragment {
 
     @SuppressLint("SimpleDateFormat")
     public boolean Add(ST_DATA_PROC data) {
+
         if (isFirst) {
             long time = System.currentTimeMillis();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm:ss.SSSZ");
@@ -74,6 +76,7 @@ public class MeasureFragment extends Fragment {
             Log.wtf("ifFirst", firstDataTime);
             isFirst = false;
         }
+
         for (int i = 0; i < BTService.PACKET_SAMPLE_NUM; i++) {
             if (EMGCount >= BTService.SAMPLE_RATE * 60 * 5) return false;
 
@@ -85,6 +88,7 @@ public class MeasureFragment extends Fragment {
 
 
             EMGCount++;
+            RMSCount++;
         }
 
         for (int i = 0; i < BTService.PACKET_SAMPLE_NUM / 10; i++) {
@@ -97,7 +101,8 @@ public class MeasureFragment extends Fragment {
             dataCount++;
         }
 
-        mView.SetCount(EMGCount, dataCount);
+        //mView.SetCount(EMGCount, dataCount);
+        mView.SetCount(EMGCount, dataCount, RMSCount);
         return true;
     }
 

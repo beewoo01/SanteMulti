@@ -67,7 +67,8 @@ public class SanteApp extends Application {
 
         public final float TimeMinimumRange = 2.0f;
 
-        public final int LeadOff = 2;
+        //public final int LeadOff = 2;
+        public final int LeadOff = 6;
     }
 
 

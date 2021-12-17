@@ -60,7 +60,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
     private boolean isStart = false;
 
     private final int[] isState = new int[]{BTService.STATE_NONE, BTService.STATE_NONE};
-    private final int[] powerStatus = new int[]{BTService.POWER_NONE, BTService.POWER_NONE};
+    private final int[] powerStatus = new int[]{BTService.POWER_BATT, BTService.POWER_BATT};
 
     private final float[] avgLeadoff = new float[]{0, 0};
     private final float[] thresholdLeadoff = new float[]{0, 0};
@@ -124,11 +124,16 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
             if (isPreview) {
                 for (int i = 0; i < isState.length; i++) {
-                    if (powerStatus[i] != BTService.POWER_BATT) {
+                    if (powerStatus[i] == BTService.POWER_USB_FULL_CHARGE || powerStatus[i] == BTService.POWER_USB_CHARGING) {
                         Toast.makeText(santeApps[i], "USB연결중에는 측정할 수 없습니다.", Toast.LENGTH_SHORT).show();
                         isPreview = false;
                         santeApps[i].SetPreview(isPreview, i);
-                    } else if (isState[i] == BTService.STATE_CONNECTED && !isStart) {
+                    }
+                    /*if (powerStatus[i] != BTService.POWER_BATT) {
+                        Toast.makeText(santeApps[i], "USB연결중에는 측정할 수 없습니다.", Toast.LENGTH_SHORT).show();
+                        isPreview = false;
+                        santeApps[i].SetPreview(isPreview, i);
+                    }*/ else if (isState[i] == BTService.STATE_CONNECTED && !isStart) {
 
                         cntIgnore = 25;
                         SetWatch(0);
@@ -199,39 +204,30 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
         screen = new ScreenSize();
         screen.getStandardSize(this);
 
-        //binding.testNameEdt.setText(UserInfo.getInstance().memo);
-
 
         binding.backContainer.setOnClickListener(v -> finish());
         binding.dropdownMenuBtn.setVisibility(View.VISIBLE);
-        //findViewById(R.id.dropdown_menu_btn).setVisibility(View.VISIBLE);
 
         binding.recordRecyclerview.setAdapter(recordAdapter);
         binding.recordRecyclerview.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         binding.recordRecyclerview.setHasFixedSize(true);
 
         binding.btnSectionRecord.setOnClickListener(v -> {
-            ////String record = txtWatchSecond.getText().toString();
             binding.recordBackground.setBackground(ContextCompat.getDrawable(this, R.drawable.button_08));
-            //findViewById(R.id.record_background).setBackground(ContextCompat.getDrawable(this, R.drawable.button_08));
-            ////((TextView)findViewById(R.id.txt_watch_second)).setTextColor(ContextCompat.getColor(this, R.color.mainColor));
             binding.txtWatchSecond.setTextColor(ContextCompat.getColor(this, R.color.mainColor));
             binding.dropdownMenuBtn.setVisibility(View.VISIBLE);
-            //findViewById(R.id.dropdown_menu_btn).setVisibility(View.VISIBLE);
             recordAdapter.addTime(binding.txtWatchSecond.getText().toString());
 
         });
-
-        //LinearLayout child = findViewById(R.id.spinner_layout_background);
 
         binding.recordBackground.setOnClickListener(v -> {
             showRecord(binding.spinnerLayoutBackground.getVisibility() == View.VISIBLE);
         });
 
-
         santeApps = new SanteApp[]{
                 (SanteApp) this.getApplication(),
-                (SanteApp) this.getApplication()};
+                (SanteApp) this.getApplication()
+        };
 
 
         InitControl();
@@ -242,8 +238,6 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
         isPreview = santeApps[0].GetPreview(0) && santeApps[1].GetPreview(1);
 
-        /*isAlarm = santeApps.GetAlarm();
-        isPreview = santeApps.GetPreview();*/
         hasData = false;
         thresholdLeadoff[0] = santeApps[0].GetLeadOff(0) * 100.0f + 200.0f;
         thresholdLeadoff[1] = santeApps[1].GetLeadOff(1) * 100.0f + 200.0f;
@@ -274,11 +268,10 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
     @Override
     protected void onDestroy() {
-        /*Log.d(TAG, "onDestroy");*/
         super.onDestroy();
 
         if (isFinishing()) {
-            /*Log.d(TAG, "onDestroy-Finishing");*/
+
             if (isService) {
                 boolean tmp = isPreview;
                 MeasureStop();
@@ -377,16 +370,10 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                     break;
             }
         } else {
-            Log.d(TAG, "UpdateUI - no service");
-
-//            devState.setBackgroundColor(getResources().getColor(R.color.DeviceStateDisconnect));
-
-
             binding.btnStart.setEnabled(false);
             binding.btnWatchstop.setEnabled(false);
             binding.btnAllstop.setEnabled(false);
             binding.btnPreview.setEnabled(true);
-
         }
 
 
@@ -412,7 +399,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                 binding.txtEnableEmg.setTextColor(
                         ContextCompat.getColor(this, R.color.EnableBtnTextNotSel));
             }
-        }else {
+        } else {
             if (fragMeasure[device].GetEnable(0)) {
                 binding.txtEnableAcc2.setTextColor(
                         ContextCompat.getColor(this, R.color.EnableBtnTextSel));
@@ -437,70 +424,12 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
         }
 
 
-
-
-        /*if (fragMeasure[device].GetEnable(0)) {
-
-            binding.txtEnableAcc.setTextColor(
-                    ContextCompat.getColor(this, R.color.EnableBtnTextSel));
-        } else {
-            binding.txtEnableAcc.setTextColor(
-                    ContextCompat.getColor(this, R.color.EnableBtnTextNotSel));
-        }
-        if (fragMeasure[device].GetEnable(1)) {
-            binding.txtEnableGyro.setTextColor(
-                    ContextCompat.getColor(this, R.color.EnableBtnTextSel));
-        } else {
-            binding.txtEnableGyro.setTextColor(
-                    ContextCompat.getColor(this, R.color.EnableBtnTextNotSel));
-        }
-        if (fragMeasure[device].GetEnable(2)) {
-            binding.txtEnableEmg.setTextColor(
-                    ContextCompat.getColor(this, R.color.EnableBtnTextSel));
-        } else {
-            binding.txtEnableEmg.setTextColor(
-                    ContextCompat.getColor(this, R.color.EnableBtnTextNotSel));
-        }
-
-
-        if (fragMeasure[device].GetEnable(1)) {
-
-            binding.txtEnableAcc2.setTextColor(
-                    ContextCompat.getColor(this, R.color.EnableBtnTextSel));
-        } else {
-            binding.txtEnableAcc2.setTextColor(
-                    ContextCompat.getColor(this, R.color.EnableBtnTextNotSel));
-        }
-        if (fragMeasure[device].GetEnable(1)) {
-            binding.txtEnableGyro2.setTextColor(
-                    ContextCompat.getColor(this, R.color.EnableBtnTextSel));
-        } else {
-            binding.txtEnableGyro2.setTextColor(
-                    ContextCompat.getColor(this, R.color.EnableBtnTextNotSel));
-        }
-        if (fragMeasure[device].GetEnable(2)) {
-            binding.txtEnableEmg2.setTextColor(
-                    ContextCompat.getColor(this, R.color.EnableBtnTextSel));
-        } else {
-            binding.txtEnableEmg2.setTextColor(
-                    ContextCompat.getColor(this, R.color.EnableBtnTextNotSel));
-        }*/
-
-
         txtAccMaxes[device].setText(String.format("%.1f", fragMeasure[device].GetAccMax()));
         txtAccMins[device].setText(String.format("%.1f", fragMeasure[device].GetAccMin()));
         txtGyroMaxes[device].setText(String.format("%.1f", fragMeasure[device].GetGyroMax()));
         txtGyroMins[device].setText(String.format("%.1f", fragMeasure[device].GetGyroMin()));
         txtEmgMaxes[device].setText(String.format("%.0f", fragMeasure[device].GetEMGMax()));
         txtEmgMins[device].setText(String.format("%.0f", fragMeasure[device].GetEMGMin()));
-
-        /*binding.txtAccMax.setText(String.format("%.1f", fragMeasure[device].GetAccMax()));
-        binding.txtAccMin.setText(String.format("%.1f", fragMeasure[device].GetAccMin()));
-        binding.txtGyroMax.setText(String.format("%.1f", fragMeasure[device].GetGyroMax()));
-        binding.txtGyroMin.setText(String.format("%.1f", fragMeasure[device].GetGyroMin()));
-
-        binding.txtEmgMax.setText(String.format("%.0f", fragMeasure[device].GetEMGMax()));
-        binding.txtEmgMin.setText(String.format("%.0f", fragMeasure[device].GetEMGMin()));*/
 
         SetTimeRange(device);
         //SetTimeRange(1);
@@ -552,7 +481,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
         if (isStart) {
 
-            if (handleflag == 2 || !isAlarm){
+            if (handleflag == 2 || !isAlarm) {
                 defaultDialog = new DefaultDialog(this, () -> {
                     UserInfo.getInstance().watchCnt = cntWatch;
                     UserInfo.getInstance().spacial = binding.testNameEdt.getText().toString();
@@ -561,21 +490,6 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                 defaultDialog.show();
             }
         }
-
-        /*if (isStart && handleflag == 2) {
-
-            *//*defaultDialog = new DefaultDialog(this, defaultDialogclose, "알림", "측정결과를 저장하시겠습니까?");
-            defaultDialog.show();*//*
-
-            defaultDialog = new DefaultDialog(this, () -> {
-                UserInfo.getInstance().watchCnt = cntWatch;
-                UserInfo.getInstance().spacial = binding.testNameEdt.getText().toString();
-                fragMeasure[0].SaveData("ch1", MeasureActivity.this, recordAdapter.getItems());
-            }, "알림", "측정결과를 저장하시겠습니까?");
-            defaultDialog.show();
-
-
-        }*/
 
         isStart = false;
         isPreview = false;
@@ -645,14 +559,18 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                     if (msg.arg2 == 1) //배터리 전원 사용
                     {
                         //isUSBPower = false;
+                        //powerStatus[deviceIndex] = BTService.POWER_BATT;
+                        //Log.wtf("MESSAGE_DEVICE_INFO", "배터리 전원 사용");
                         powerStatus[deviceIndex] = BTService.POWER_BATT;
                     } else if (msg.arg2 == 2)   //USB 전원사용 - 완충됨
                     {
                         //isUSBPower = true;
+                        //Log.wtf("MESSAGE_DEVICE_INFO", "USB 전원사용 - 완충됨");
                         powerStatus[deviceIndex] = BTService.POWER_USB_FULL_CHARGE;
                     } else if (msg.arg2 == 3)   //USB 전원사용 - 충전중
                     {
                         //isUSBPower = true;
+                        //Log.wtf("MESSAGE_DEVICE_INFO", "USB 전원사용 - 충전중");
                         powerStatus[deviceIndex] = BTService.POWER_USB_CHARGING;
                         //powerStatus[deviceIndex] = POWER_USB_CHARGING;
                     }
@@ -683,9 +601,9 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                                         && fragMeasure[deviceIndex].GetEnable(2)) {
                                     txtReadOffs[deviceIndex].setVisibility(View.VISIBLE);
                                     UserInfo.getInstance().leadoff = true;
+
                                 } else {
                                     txtReadOffs[deviceIndex].setVisibility(View.INVISIBLE);
-
                                 }
 
                                 if (!fragMeasure[deviceIndex].Add(data)) {
@@ -700,10 +618,13 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                                     SetTimeRange(deviceIndex);
                                 }
 
-                                if (powerStatus[deviceIndex] != BTService.POWER_BATT) {
+                                if (powerStatus[deviceIndex] == BTService.POWER_USB_FULL_CHARGE || powerStatus[deviceIndex] == BTService.POWER_USB_CHARGING) {
                                     Toast.makeText(santeApps[deviceIndex], "USB연결중에는 측정할 수 없습니다.", Toast.LENGTH_SHORT).show();
                                     MeasureStop();
                                 }
+                                /*if (powerStatus[deviceIndex] != BTService.POWER_BATT) {
+
+                                }*/
 
                             }
 
@@ -813,11 +734,74 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
             //timeThread = new TimeThread[powerStatus.length];
             UserInfo.getInstance().measureTime = new Date(System.currentTimeMillis());
-            for (int i = 0; i < powerStatus.length; i++) {
+            timeThread[0] = new TimeThread(0);
+            timeThread[1] = new TimeThread(1);
+            if (powerStatus[0] == BTService.POWER_USB_FULL_CHARGE || powerStatus[0] == BTService.POWER_USB_CHARGING
+                    || powerStatus[1] == BTService.POWER_USB_FULL_CHARGE || powerStatus[1] == BTService.POWER_USB_CHARGING) {
+
+                Toast.makeText(this, "USB연결중에는 측정할 수 없습니다.", Toast.LENGTH_SHORT).show();
+
+            }else if (isState[0] == BTService.STATE_CONNECTED && isState[1] == BTService.STATE_CONNECTED) {
+                if (isPreview && !isStart) {
+                    btService.Stop(0);
+                    btService.Stop(1);
+                }
+
+                isPreview = false;
+
+                isStart = true;
+
+                hasData = true;
+
+                if (isAlarm) cntWatch = BTService.SAMPLE_RATE * -3;
+                else cntWatch = 0;
+
+
+                isWatch = true;
+                SetWatch(cntWatch);
+                fragMeasure[0].Init();
+                fragMeasure[1].Init();
+                SetTimeRange(0);
+                SetTimeRange(1);
+
+                long now = System.currentTimeMillis();
+                UserInfo.getInstance().measureTime = new Date(now);
+                UserInfo.getInstance().alarm = isAlarm;
+                UserInfo.getInstance().watchCnt = 0;
+
+                cntIgnore = 25;
+
+                btService.SetEMGFilter(santeApps[0].GetEMGNotch(0), santeApps[0].GetEMGHPF(0), santeApps[0].GetEMGLPF(0), 0);
+                btService.SetEMGFilter(santeApps[1].GetEMGNotch(1), santeApps[1].GetEMGHPF(1), santeApps[1].GetEMGLPF(1), 1);
+                btService.SetAccFilter(santeApps[0].GetAccHPF(0), santeApps[0].GetAccLPF(0), 0);
+                btService.SetAccFilter(santeApps[1].GetAccHPF(1), santeApps[1].GetAccLPF(1), 1);
+                btService.SetGyroFilter(santeApps[0].GetGyroHPF(0), santeApps[0].GetGyroLPF(0), 0);
+                btService.SetGyroFilter(santeApps[1].GetGyroHPF(1), santeApps[1].GetGyroLPF(1), 1);
+
+                btService.Start(0);
+                btService.Start(1);
+
+                if (isAlarm) {
+                    timeThread[0] = new TimeThread(0);
+                    timeThread[1] = new TimeThread(1);
+                    handleflag = 0;
+                    timeThread[0].sendEmptyMessage(0);
+                    timeThread[1].sendEmptyMessage(0);
+
+                }
+                UpdateUI(0);
+                UpdateUI(1);
+            }
+
+            /*for (int i = 0; i < powerStatus.length; i++) {
                 timeThread[i] = new TimeThread(i);
-                if (powerStatus[i] != BTService.POWER_BATT) {
+                if (powerStatus[i] == BTService.POWER_USB_FULL_CHARGE || powerStatus[i] == BTService.POWER_USB_CHARGING) {
                     Toast.makeText(santeApps[i], "USB연결중에는 측정할 수 없습니다.", Toast.LENGTH_SHORT).show();
-                } else if (isState[i] == BTService.STATE_CONNECTED) {
+                }
+                *//*if (powerStatus[i] != BTService.POWER_BATT) {
+                    Toast.makeText(santeApps[i], "USB연결중에는 측정할 수 없습니다.", Toast.LENGTH_SHORT).show();
+                }*//*
+                else if (isState[i] == BTService.STATE_CONNECTED) {
                     if (isPreview && !isStart) {
                         btService.Stop(i);
                     }
@@ -858,7 +842,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
                 }
                 UpdateUI(i);
-            }
+            }*/
 
         });
 
@@ -898,11 +882,16 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
             for (int i = 0; i < powerStatus.length; i++) {
                 if (isPreview) {
 
-                    if (powerStatus[i] != BTService.POWER_BATT) {
+                    if (powerStatus[i] == BTService.POWER_USB_FULL_CHARGE || powerStatus[i] == BTService.POWER_USB_CHARGING) {
                         Toast.makeText(santeApps[i], "USB연결중에는 측정할 수 없습니다.", Toast.LENGTH_SHORT).show();
                         isPreview = false;
                         santeApps[i].SetPreview(isPreview, i);
-                    } else if (isState[i] == BTService.STATE_CONNECTED && !isStart) {
+                    }
+                    /*if (powerStatus[i] != BTService.POWER_BATT) {
+                        Toast.makeText(santeApps[i], "USB연결중에는 측정할 수 없습니다.", Toast.LENGTH_SHORT).show();
+                        isPreview = false;
+                        santeApps[i].SetPreview(isPreview, i);
+                    }*/ else if (isState[i] == BTService.STATE_CONNECTED && !isStart) {
                         cntIgnore = 25;
                         SetWatch(0);
                         fragMeasure[i].Init();
@@ -1234,6 +1223,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
 
     //타이머 핸들러 김인호
+    @SuppressLint("HandlerLeak")
     class TimeThread extends Handler {
 
         private int deviceNum = -1;
@@ -1282,7 +1272,8 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                     if (sum > 4) {
 
                         MeasureStop();
-                        fragMeasure[deviceNum].setGyroData(count);
+                        fragMeasure[0].setGyroData(count);
+                        fragMeasure[1].setGyroData(count);
 
                         Toast toast = Toast.makeText(getApplicationContext(), "message", Toast.LENGTH_SHORT);
 
@@ -1311,8 +1302,58 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
             } else if (msg.what == 1) {// 움직여서 종료
                 Log.wtf("쓰레드", "111정지");
 
+                if (powerStatus[0] != BTService.POWER_BATT || powerStatus[1] != BTService.POWER_BATT) {
+                    Toast.makeText(santeApps[deviceNum], "USB연결중에는 측정할 수 없습니다.", Toast.LENGTH_SHORT).show();
+                } else if (isState[0] == BTService.STATE_CONNECTED && isState[1] == BTService.STATE_CONNECTED) {
+                    if (isPreview && !isStart) {
+                        btService.Stop(deviceNum);
+                    }
+                    isPreview = false;
 
-                if (powerStatus[deviceNum] != BTService.POWER_BATT) {
+                    isStart = true;
+
+                    hasData = true;
+
+                    if (isAlarm) cntWatch = BTService.SAMPLE_RATE * -3;
+                    else cntWatch = 0;
+
+                    isWatch = true;
+                    SetWatch(cntWatch);
+                    fragMeasure[deviceNum].Init();
+                    SetTimeRange(deviceNum);
+
+                    long now = System.currentTimeMillis();
+                    UserInfo.getInstance().measureTime = new Date(now);
+                    UserInfo.getInstance().alarm = isAlarm;
+                    UserInfo.getInstance().watchCnt = 0;
+
+
+                    cntIgnore = 25;
+
+
+                    btService.SetEMGFilter(santeApps[deviceNum].GetEMGNotch(deviceNum), santeApps[deviceNum].GetEMGHPF(deviceNum), santeApps[deviceNum].GetEMGLPF(deviceNum), deviceNum);
+                    btService.SetAccFilter(santeApps[deviceNum].GetAccHPF(deviceNum), santeApps[deviceNum].GetAccLPF(deviceNum), deviceNum);
+                    btService.SetGyroFilter(santeApps[deviceNum].GetGyroHPF(deviceNum), santeApps[deviceNum].GetGyroLPF(deviceNum), deviceNum);
+
+                    btService.Start(0);
+                    btService.Start(1);
+
+                }
+
+                UpdateUI(0);
+                UpdateUI(1);
+
+                handleflag = 0;
+                ope_cnt = 3;
+                sendEmptyMessageDelayed(0, 1000);
+
+
+
+
+
+
+
+               /* if (powerStatus[deviceNum] != BTService.POWER_BATT) {
                     Toast.makeText(santeApps[deviceNum], "USB연결중에는 측정할 수 없습니다.", Toast.LENGTH_SHORT).show();
                 } else if (isState[deviceNum] == BTService.STATE_CONNECTED) {
                     if (isPreview && !isStart) {
@@ -1352,7 +1393,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
                 handleflag = 0;
                 ope_cnt = 3;
-                sendEmptyMessageDelayed(0, 1000);
+                sendEmptyMessageDelayed(0, 1000);*/
 
             } else if (msg.what == 2) {//정상 진행 종료
                 Log.wtf("쓰레드", "2222정지");

@@ -66,7 +66,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar_layout"
-        app:layout_constraintBottom_toTopOf="@id/bottom_logo"
+        app:layout_constraintBottom_toBottomOf="parent"
         >
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -350,7 +350,7 @@
                 android:id="@+id/btn_right_device_open"
                 style="?android:attr/borderlessButtonStyle"
                 android:layout_width="0dp"
-                android:layout_height="@dimen/_25sdp"
+                android:layout_height="@dimen/_20sdp"
                 android:layout_marginTop="@dimen/_5sdp"
                 android:layout_marginEnd="@dimen/_5sdp"
                 android:background="@drawable/button_05"
@@ -385,7 +385,7 @@
                 android:id="@+id/btn_left_device_open"
                 style="?android:attr/borderlessButtonStyle"
                 android:layout_width="0dp"
-                android:layout_height="@dimen/_25sdp"
+                android:layout_height="@dimen/_20sdp"
                 android:layout_marginTop="@dimen/_5sdp"
                 android:layout_marginEnd="@dimen/_5sdp"
 
@@ -442,12 +442,12 @@
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:textSize="@dimen/_13sdp"
+                android:layout_marginBottom="@dimen/_10sdp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/connect_all"
                 app:layout_constraintVertical_chainStyle="packed"
-
                 />
 
 
@@ -561,14 +561,4 @@
     </LinearLayout>
 
 
-    <ImageView
-        android:id="@+id/bottom_logo"
-        android:layout_width="@dimen/_60sdp"
-        android:layout_height="@dimen/_30sdp"
-        android:src="@drawable/signature"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/content_container"
-        />
 </androidx.constraintlayout.widget.ConstraintLayout>

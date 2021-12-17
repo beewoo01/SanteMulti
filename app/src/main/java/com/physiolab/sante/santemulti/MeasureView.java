@@ -4,9 +4,6 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.ContentProvider;
-import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -14,10 +11,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
-import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -32,13 +26,10 @@ import com.physiolab.sante.UserInfo;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -68,7 +59,12 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
     private int EMGCount = 0;
     private int dataCount = 0;
+    private int RMSCount = 0;
     private double diff = 0;
+
+    private float RMSMax = 1000.0f;
+    private float RMSMin = -1000.0f;
+    /** 우선 MIN, MAX EMG와 동일하게*/
 
     private float EMGYMax = 1000.0f;
     private float EMGYMin = -1000.0f;
@@ -94,6 +90,9 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
     private Paint EMGPnt;
     private Paint[] AccPnt = new Paint[3];
     private Paint[] GyroPnt = new Paint[3];
+
+    /* RMS Graph */
+    private Paint RMSPnt;
 
     private boolean isRedraw = false;
     //private DefaultDialog defaultDialog;
@@ -129,6 +128,10 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         EMGPnt.setColor(getResources().getColor(R.color.GraphEMG));
         EMGPnt.setStyle(Paint.Style.STROKE);
 
+        RMSPnt = new Paint();
+        RMSPnt.setColor(getResources().getColor(R.color.GraphRMS));
+        RMSPnt.setStrokeWidth(2.0f);
+        RMSPnt.setStyle(Paint.Style.STROKE);
 
         AccPnt[0] = new Paint();
         AccPnt[0].setColor(getResources().getColor(R.color.GraphAccX));
@@ -181,6 +184,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         AccData = acc;
         GyroData = gyro;
         EMGCount = 0;
+        RMSCount = 0;
         dataCount = 0;
         diff = 0.0;
         TimeStart = 0.0f;
@@ -278,7 +282,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         Refresh();
     }
 
-    public void SetCount(int emg, int data) {
+    public void SetCount(int emg, int data, int rms) {
         int refresh = 4;
 
         synchronized (bufferCanvas) {
@@ -333,6 +337,33 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                     path.lineTo(xPos, yPos);
                 }
                 bufferCanvas.drawPath(path, EMGPnt);
+            }
+
+            if (EMGRMSEnable) {
+                if (RMSCount == 0) {
+                    yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[RMSCount]) / (RMSMax - RMSMin)));
+                    xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) RMSCount / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
+
+                    path.moveTo(xPos, yPos);
+                } else {
+                    yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[RMSCount - refresh]) / (RMSMax - RMSMin)));
+                    xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) (RMSCount - refresh) / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
+                    path.moveTo(xPos, yPos);
+
+                    for (int i = refresh - 1; i > 0; i--) {
+                        yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[RMSCount - i]) / (RMSMax - RMSMin)));
+                        xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) (RMSCount - i) / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
+                        path.lineTo(xPos, yPos);
+                    }
+                }
+
+                for (int i = RMSCount; i < emg; i++) {
+                    yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[i]) / (RMSMax - RMSMin)));
+                    xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) i / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
+
+                    path.lineTo(xPos, yPos);
+                }
+                bufferCanvas.drawPath(path, RMSPnt);
             }
 
 
@@ -413,6 +444,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
         EMGCount = emg;
         dataCount = data;
+        RMSCount = rms;
 
     }
 
@@ -493,6 +525,31 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                     path.lineTo(xPos, yPos);
                 }
                 bufferCanvas.drawPath(path, EMGPnt);
+            }
+
+            if (EMGRMSEnable) {
+                Log.wtf("EMGRMSEnable", "true");
+                xMinCount = (int) Math.max(Math.floor((double) TimeStart * (double) BTService.SAMPLE_RATE), 0.0);
+                xMaxCount = (int) Math.min(Math.ceil((double) (TimeStart + TimeRange) * (double) BTService.SAMPLE_RATE), (double) RMSCount);
+
+                path.reset();
+
+                yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[xMinCount]) / (RMSMax - RMSMin)));
+                xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) xMinCount / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
+
+                path.moveTo(xPos, yPos);
+
+                for (int i = xMinCount + 1; i < xMaxCount; i++) {
+                    /*Log.wtf("EMGEnable!!!", "여기옴?just11111111");
+                    Log.wtf("EMGEnable!!!i ", String.valueOf(i));*/
+                    yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[i]) / (RMSMax - RMSMin)));
+                    xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) i / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
+
+                    path.lineTo(xPos, yPos);
+                }
+                bufferCanvas.drawPath(path, RMSPnt);
+            }else {
+                Log.wtf("EMGRMSEnable", "false");
             }
 
             //if(GyroEnable)
@@ -1252,8 +1309,14 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 data.add(new String[]{ putData, Float.toString(fdata0), Float.toString(fdata1),
                         Float.toString(fdata2), Float.toString(fdata3), Float.toString(fdata4),
                         Float.toString(fdata5),  Float.toString(fdata6), Float.toString(fdata7),
-                        Double.toString(rmsData), Double.toString(sampleRMSData)
+                        Double.toString(sampleRMSData)
                 });
+
+                /*data.add(new String[]{ putData, Float.toString(fdata0), Float.toString(fdata1),
+                        Float.toString(fdata2), Float.toString(fdata3), Float.toString(fdata4),
+                        Float.toString(fdata5),  Float.toString(fdata6), Float.toString(fdata7),
+                        Double.toString(rmsData), Double.toString(sampleRMSData)
+                });*/
                 //Log.d("time?????", String.valueOf(time));
                 time += 0.0005F;
             }
@@ -1421,9 +1484,6 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
         return rms_mvc;
     }
-
-
-
 
 
     public float RMS(float[] EMGData, int m,int count) {
