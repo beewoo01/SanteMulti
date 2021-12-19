@@ -851,10 +851,8 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
                         fragMeasure.setGyroData(count);
 
                         Toast toast = Toast.makeText(getApplicationContext(), "message", Toast.LENGTH_SHORT);
-
                         toast.setDuration(Toast.LENGTH_SHORT);
                         toast.setGravity(Gravity.CENTER, 0, 0);
-
                         toast.setText("소리가 나기 전 움직임이 포착되었습니다.\n계속 움직임이 포착되면 주의를 주세요.");
                         toast.show();
 
