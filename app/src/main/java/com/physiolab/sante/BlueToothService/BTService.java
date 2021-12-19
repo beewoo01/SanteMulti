@@ -349,6 +349,7 @@ public class BTService extends Service {
     //데이터획득 명령을 보냄
     public void Start(int index)
     {
+        Log.wtf("", "");
         if (index>=MaxDeviceIndex) return;
 
         AddCmd(btFwk[index], CMD_BLU_D2P_DATA_REALTIME_START, 0);

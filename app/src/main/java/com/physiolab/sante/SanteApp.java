@@ -27,9 +27,11 @@ public class SanteApp extends Application {
     {
         public final int AccHPF = 0;
         public final int AccLPF = 0;
+        //Acc = 가속도
 
         public final int GyroHPF = 0;
         public final int GyroLPF = 0;
+        //Gyro
 
         public final int EMGNotch = 0;
 
@@ -38,6 +40,7 @@ public class SanteApp extends Application {
         public final int EMGLPF = 0;
 
         public final int EMGRMS = 2;
+        //EMG = 근전도 인듯
 
         public final float EMGMax = 1000.0f;
         public final float EMGMin = -1000.0f;

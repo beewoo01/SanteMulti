@@ -121,12 +121,11 @@ public class MainTestActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
 
-
         CheckPermission();
         InitControl();
         updateUI();
 
-        binding.btnDeviceMeasure.setOnClickListener( v -> {
+        binding.btnDeviceMeasure.setOnClickListener(v -> {
             Log.wtf("btnDeviceMeasure", "Click");
             isVail();
             /*if (isState[0] == STATE_NONE && isState[1] == STATE_NONE){
@@ -160,30 +159,43 @@ public class MainTestActivity extends AppCompatActivity {
 
     }
 
-    private void isVail(){
-        if (isState[0] == STATE_NONE || isState[1] == STATE_NONE){
+    private void isVail() {
+        if (isState[0] == STATE_NONE || isState[1] == STATE_NONE) {
             showToast("기기를 연결해주세요");
             return;
-        }else if (TextUtils.isEmpty(binding.nameEdt.getText().toString()) || binding.nameEdt.getText().toString().length() < 1){
+        } else if (TextUtils.isEmpty(binding.nameEdt.getText().toString()) || binding.nameEdt.getText().toString().length() < 1) {
             showToast("측정자이름을 입력해주세요");
             return;
-        }else if (TextUtils.isEmpty(binding.heightEdt.getText().toString()) || binding.heightEdt.getText().toString().length() < 1){
+        }
+
+        if (TextUtils.isEmpty(binding.heightEdt.getText().toString())
+                || binding.heightEdt.getText().toString().length() < 1) {
             binding.heightEdt.setText("100");
-            //showToast("측정자 키를 입력해주세요");
-        }else if (TextUtils.isEmpty(binding.birthEdt.getText().toString()) || binding.birthEdt.getText().toString().length() < 1){
+            //UserInfo.getInstance().height = "100";
+        }
+
+
+        if (TextUtils.isEmpty(binding.birthEdt.getText().toString()) || binding.birthEdt.getText().toString().length() < 1) {
+            Log.wtf("isVail", "birthEdt null" );
             binding.birthEdt.setText("19000101");
             //showToast("측정자 생년월일을 입력해주세요");
-        }else if (TextUtils.isEmpty(binding.weightEdt.getText().toString()) || binding.weightEdt.getText().toString().length() < 1){
+        }
+
+        if (TextUtils.isEmpty(binding.weightEdt.getText().toString()) || binding.weightEdt.getText().toString().length() < 1) {
+             Log.wtf("isVail", "weightEdt null" );
             binding.weightEdt.setText("10");
             //showToast("측정자 몸무게를 입력해주세요");
-        }else if (!binding.rbMale.isChecked() && !binding.rbFemale.isChecked()){
+        }
+
+        if (!binding.rbMale.isChecked() && !binding.rbFemale.isChecked()) {
+            Log.wtf("isVail", "rbMale null" );
             binding.rbMale.setChecked(true);
             //showToast("측정자 성별을 선택해주세요");
         }
         moveMeasure();
     }
 
-    private void moveMeasure(){
+    private void moveMeasure() {
         boolean infoGender = binding.rbMale.isChecked();
         Intent intent = new Intent(MainTestActivity.this, MeasureActivity.class);
         UserInfo.getInstance().name = binding.nameEdt.getText().toString();
@@ -253,7 +265,7 @@ public class MainTestActivity extends AppCompatActivity {
         }
     };
 
-    private void showToast(String msg){
+    private void showToast(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
@@ -332,7 +344,7 @@ public class MainTestActivity extends AppCompatActivity {
         binding.birthEdt.addTextChangedListener(textWatcher);
 
 
-        binding.backContainer.setOnClickListener( v -> finish());
+        binding.backContainer.setOnClickListener(v -> finish());
 
         binding.rbMale.setOnClickListener(v -> {
             // TextView 클릭될 시 할 코드작성
@@ -349,7 +361,7 @@ public class MainTestActivity extends AppCompatActivity {
         });
 
         btn_connect[0].setOnClickListener(v -> {
-            Log.wtf("btn_connet 0" , "onCLICK");
+            Log.wtf("btn_connet 0", "onCLICK");
             if (isState[0] == STATE_NONE) {
                 String deviceAddress = "";
                 Object selObj = null;
@@ -375,8 +387,8 @@ public class MainTestActivity extends AppCompatActivity {
 
         });
 
-        btn_disConnect[0].setOnClickListener( v -> {
-            if (isState[0] == STATE_CONNECTED){
+        btn_disConnect[0].setOnClickListener(v -> {
+            if (isState[0] == STATE_CONNECTED) {
                 if (btService != null) btService.Close(0);
             }
         });
@@ -407,8 +419,8 @@ public class MainTestActivity extends AppCompatActivity {
             updateUI();
         });
 
-        btn_disConnect[1].setOnClickListener( v -> {
-            if (isState[1] == STATE_CONNECTED){
+        btn_disConnect[1].setOnClickListener(v -> {
+            if (isState[1] == STATE_CONNECTED) {
                 if (btService != null) btService.Close(1);
             }
         });
@@ -528,8 +540,8 @@ public class MainTestActivity extends AppCompatActivity {
         for (Iterator<BluetoothDevice> it = devices.iterator(); it.hasNext(); ) {
 
             BluetoothDevice f = it.next();
-            Log.wtf("pairedList for name", f.getName());
-            Log.wtf("pairedList for address", f.getAddress());
+            /*Log.wtf("pairedList for name", f.getName());
+            Log.wtf("pairedList for address", f.getAddress());*/
             pairedList.add(f);
             deviceAddress[cnt++] = f.getAddress();
         }
@@ -679,8 +691,6 @@ public class MainTestActivity extends AppCompatActivity {
             }
 
 
-
-
             return false;
         } else {
             return true;
@@ -691,7 +701,7 @@ public class MainTestActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Log.wtf("onResume", "OnRESUME");
-        if (addedDeviceAddress != null){
+        if (addedDeviceAddress != null) {
             UpdateSerial();
             //BTCheck();
         }
@@ -720,6 +730,9 @@ public class MainTestActivity extends AppCompatActivity {
             Toast.makeText(this, "Bluetooth를 지원하지 않은 단말기 입니다.", Toast.LENGTH_SHORT).show();
         } else {
             if (bluetoothAdapter.isEnabled()) {
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+                    return;
+                }
                 if (bluetoothAdapter.isDiscovering()) {
                     Toast.makeText(this, "장치 검색중입니다...", Toast.LENGTH_SHORT).show();
                 } else {
@@ -738,13 +751,11 @@ public class MainTestActivity extends AppCompatActivity {
     ActivityResultLauncher<Intent> resultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
-                if (result.getResultCode() == RESULT_OK){
+                if (result.getResultCode() == RESULT_OK) {
                     checkBluetoothState();
                 }
             }
     );
-
-
 
 
     @SuppressLint("SetTextI18n")
@@ -778,6 +789,8 @@ public class MainTestActivity extends AppCompatActivity {
 
                 int batt = Math.round(battLevel[i] * 20);
 
+                //Log.wtf("battLevel batt" + i, String.valueOf(batt));
+
                 battTxv[i].setText(batt + "%");
 
 
@@ -807,7 +820,7 @@ public class MainTestActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        switch (requestCode){
+        switch (requestCode) {
             case 11:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(this, "Access coarse location allowed. You can scan Bluetooth devices", Toast.LENGTH_SHORT).show();
@@ -839,7 +852,7 @@ public class MainTestActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == 11){
+        if (requestCode == 11) {
             checkBluetoothState();
         }
     }
@@ -935,6 +948,8 @@ public class MainTestActivity extends AppCompatActivity {
                     break;
                 case MESSAGE_DEVICE_INFO:
                     battLevel[deviceIndex] = ((float) msg.arg1) / 1000.0f;
+
+                    //Log.wtf("battLevel" + deviceIndex, String.valueOf(battLevel[deviceIndex]));
 
                     if (msg.arg2 == 1) //배터리 전원 사용
                     {

@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 
 import com.physiolab.sante.BlueToothService.BTService;
 import com.physiolab.sante.ST_DATA_PROC;
+import com.physiolab.sante.SanteApp;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,7 +39,6 @@ public class MeasureFragment extends Fragment {
     private int EMGCount = 0;
     private int RMSCount = 0;
     private int dataCount = 0;
-    private boolean isFirst = true;
     private String firstDataTime = null;
 
     public static MeasureFragment newInstance() {
@@ -59,6 +59,7 @@ public class MeasureFragment extends Fragment {
     public void Init() {
         EMGCount = 0;
         dataCount = 0;
+        RMSCount = 0;
 //        EMGData = new float[BTService.SAMPLE_RATE * 60 * 5];
 //        LeadOffData = new float[BTService.SAMPLE_RATE * 60 * 5];
 //        AccData = new float[3][(BTService.SAMPLE_RATE / 10) * 60 * 5];
@@ -68,14 +69,14 @@ public class MeasureFragment extends Fragment {
 
     @SuppressLint("SimpleDateFormat")
     public boolean Add(ST_DATA_PROC data) {
-
+        /*//여기 있을게 아니라 측정소에 있어야 겠네
         if (isFirst) {
             long time = System.currentTimeMillis();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm:ss.SSSZ");
             firstDataTime = sdf.format(time);
             Log.wtf("ifFirst", firstDataTime);
             isFirst = false;
-        }
+        }*/
 
         for (int i = 0; i < BTService.PACKET_SAMPLE_NUM; i++) {
             if (EMGCount >= BTService.SAMPLE_RATE * 60 * 5) return false;
@@ -107,6 +108,14 @@ public class MeasureFragment extends Fragment {
     }
 
 
+
+    public void SetFirstDataTime(String firstDataTime){
+        this.firstDataTime = firstDataTime;
+    };
+
+    public String GetFirstDataTime() {
+        return firstDataTime;
+    }
 
 
     public void SetAccRange(float max, float min) {
@@ -194,10 +203,11 @@ public class MeasureFragment extends Fragment {
         mView.NextPage();
     }
 
-    public void SaveData(String wearingPart, Activity activity, ArrayList<String> timLab) {
+    public void SaveData(String wearingPart, Activity activity
+            , ArrayList<String> timLab, SanteApp santeApp) {
         Log.wtf("SaveData", "333333333");
         //mView.SaveData(activity, info, context, timLab, progressDialog);
-        mView.SaveData(wearingPart, activity, timLab, firstDataTime);
+        mView.SaveData(wearingPart, activity, timLab, firstDataTime, santeApp);
 
 
     }

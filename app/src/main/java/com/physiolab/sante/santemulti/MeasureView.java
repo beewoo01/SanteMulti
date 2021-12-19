@@ -22,6 +22,7 @@ import androidx.core.content.ContextCompat;
 
 import com.opencsv.CSVWriter;
 import com.physiolab.sante.BlueToothService.BTService;
+import com.physiolab.sante.SanteApp;
 import com.physiolab.sante.UserInfo;
 
 import java.io.BufferedWriter;
@@ -169,6 +170,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         dataCount = 0;
         diff = 0.0;
         TimeStart = 0.0f;
+        RMSCount = 0;
 //         EMGData = null;
 //        LeadOffData = null;
 //         AccData = null;
@@ -341,29 +343,52 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
             if (EMGRMSEnable) {
                 if (RMSCount == 0) {
+                    //yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[RMSCount]) / (RMSMax - RMSMin)));
                     yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[RMSCount]) / (RMSMax - RMSMin)));
-                    xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) RMSCount / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
+                    //xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) RMSCount / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
+                    xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) RMSCount / (float) (BTService.SAMPLE_RATE / 10)) - TimeStart) / (TimeRange));
 
                     path.moveTo(xPos, yPos);
                 } else {
-                    yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[RMSCount - refresh]) / (RMSMax - RMSMin)));
+                    /*yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[RMSCount - refresh]) / (RMSMax - RMSMin)));
                     xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) (RMSCount - refresh) / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
+                    path.moveTo(xPos, yPos);*/
+
+                    yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[RMSCount - refresh]) / (RMSMax - RMSMin)));
+                    xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) (RMSCount - refresh) / (float) (BTService.SAMPLE_RATE / 10)) - TimeStart) / (TimeRange));
                     path.moveTo(xPos, yPos);
+
+                    /*for (int i = refresh - 1; i > 0; i--) {
+                        yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[RMSCount - i]) / (RMSMax - RMSMin)));
+                        xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) (RMSCount - i) / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
+                        path.lineTo(xPos, yPos);
+                    }*/
 
                     for (int i = refresh - 1; i > 0; i--) {
                         yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[RMSCount - i]) / (RMSMax - RMSMin)));
-                        xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) (RMSCount - i) / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
+                        xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) (RMSCount - i) / (float) (BTService.SAMPLE_RATE / 10)) - TimeStart) / (TimeRange));
                         path.lineTo(xPos, yPos);
                     }
                 }
 
-                for (int i = RMSCount; i < emg; i++) {
+                /*for (int i = RMSCount; i < emg; i++) {
                     yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[i]) / (RMSMax - RMSMin)));
                     xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) i / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
 
                     path.lineTo(xPos, yPos);
+                }*/
+
+                for (int i = RMSCount; i < data; i++) {
+                    yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[i]) / (RMSMax - RMSMin)));
+                    xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) i / (float) (BTService.SAMPLE_RATE / 10)) - TimeStart) / (TimeRange));
+
+                    path.lineTo(xPos, yPos);
                 }
+
+
                 bufferCanvas.drawPath(path, RMSPnt);
+
+
             }
 
 
@@ -529,13 +554,21 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
             if (EMGRMSEnable) {
                 Log.wtf("EMGRMSEnable", "true");
-                xMinCount = (int) Math.max(Math.floor((double) TimeStart * (double) BTService.SAMPLE_RATE), 0.0);
-                xMaxCount = (int) Math.min(Math.ceil((double) (TimeStart + TimeRange) * (double) BTService.SAMPLE_RATE), (double) RMSCount);
+                /*xMinCount = (int) Math.max(Math.floor((double) TimeStart * (double) BTService.SAMPLE_RATE), 0.0);
+                xMaxCount = (int) Math.min(Math.ceil((double) (TimeStart + TimeRange) * (double) BTService.SAMPLE_RATE), (double) RMSCount);*/
+
+                xMinCount = (int) Math.max(Math.floor((double) TimeStart * (double) BTService.SAMPLE_RATE / 10.0), 0.0);
+                xMaxCount = (int) Math.min(Math.ceil((double) (TimeStart + TimeRange) * ((double) BTService.SAMPLE_RATE / 10.0)), (double) RMSCount);
 
                 path.reset();
 
+                /*yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[xMinCount]) / (RMSMax - RMSMin)));
+                xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) xMinCount / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));*/
                 yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[xMinCount]) / (RMSMax - RMSMin)));
-                xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) xMinCount / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
+                xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) xMinCount / ((float) BTService.SAMPLE_RATE / 10.0f)) - TimeStart) / (TimeRange));
+
+
+
 
                 path.moveTo(xPos, yPos);
 
@@ -543,7 +576,8 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                     /*Log.wtf("EMGEnable!!!", "여기옴?just11111111");
                     Log.wtf("EMGEnable!!!i ", String.valueOf(i));*/
                     yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[i]) / (RMSMax - RMSMin)));
-                    xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) i / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
+                    //xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) i / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
+                    xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) i / ((float) BTService.SAMPLE_RATE / 10.0f)) - TimeStart) / (TimeRange));
 
                     path.lineTo(xPos, yPos);
                 }
@@ -1038,7 +1072,9 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
 
     //CSV 파일 저장
-    public void SaveData(String wearingPart, Activity activity, ArrayList<String> timeLab, String firstTime) {
+    public void SaveData(String wearingPart, Activity activity,
+                         ArrayList<String> timeLab, String firstTime,
+                         SanteApp santeApp) {
         Log.wtf("SaveData", "4444444444444444" + wearingPart);
         listener = (SaveFileListener) activity;
 
@@ -1074,7 +1110,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         //CreateFolder();
 
 
-        saveCSV(wearingPart, timeLab, firstTime);
+        saveCSV(wearingPart, timeLab, firstTime, santeApp);
 
 
         /*try {
@@ -1191,7 +1227,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
     }
 
-    private void saveCSV(String wearingPart, ArrayList<String> timeLab, String firstTime){
+    private void saveCSV(String wearingPart, ArrayList<String> timeLab, String firstTime, SanteApp santeApp){
         try {
             File exportFile = new File(getContext().getExternalFilesDir(null) + "/I-Motion Lab/" + export);
             FileOutputStream fos = new FileOutputStream(exportFile);
@@ -1240,9 +1276,26 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 WriteString(data, UserInfo.getInstance().memo.replace(LINE_SEPERATOR, "\r\n"));
             }
 
+            int deviceNum = 0;
+            if (!wearingPart.equals("ch1")) {
+                deviceNum = 1;
+            }
+            String[] defaltSettingData = new String[]{
+                    String.valueOf(santeApp.GetAccHPF(deviceNum)),
+                    String.valueOf(santeApp.GetAccLPF(deviceNum)),
+                    String.valueOf(santeApp.GetGyroHPF(deviceNum)),
+                    String.valueOf(santeApp.GetGyroLPF(deviceNum)),
+                    String.valueOf(santeApp.GetEMGNotch(deviceNum)),
+                    String.valueOf(santeApp.GetEMGHPF(deviceNum)),
+                    String.valueOf(santeApp.GetEMGLPF(deviceNum)),
+                    String.valueOf(santeApp.GetEMGRMS(deviceNum))
+            };
+            data.add(defaltSettingData);
 
             float time = 0F;
             float result;
+
+
 
 
             for (int i = 0; i < EMGCount; i++){

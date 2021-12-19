@@ -43,6 +43,7 @@ import com.physiolab.sante.dialog.DefaultDialog;
 import com.physiolab.sante.santemulti.databinding.ActivityMeasureBinding;
 import com.physiolab.sante.santemulti.databinding.ActivityMeasureOneBinding;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -91,6 +92,8 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
 
     int handleflag = 0;// 0 - > 쓰레드 안돔 // 1 도는중 // 2 다끝나고 진행중
 
+    private boolean isFirst;
+
 
     private ActivityMeasureOneBinding binding;
 
@@ -110,6 +113,7 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
             isState = btService.getState(device);
 
             if (isPreview) {
+                Log.wtf("isPreview", "isPreview");
                 if (powerStatus == BTService.POWER_BATT || powerStatus == BTService.POWER_USB_FULL_CHARGE) {
                     Toast.makeText(santeApps, "USB연결중에는 측정할 수 없습니다.", Toast.LENGTH_SHORT).show();
                     isPreview = false;
@@ -359,6 +363,7 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
                     break;
 
                 case BTService.STATE_CONNECTED:
+                    Log.wtf("STATE_CONNECTED", "STATE_CONNECTED");
 //                    devState.setBackgroundColor(getResources().getColor(R.color.DeviceStateConnect));
                     if (isStart) {
                         Log.d(TAG, "UpdateUI - start");
@@ -737,7 +742,6 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
         if (isStart | isPreview) {
             Log.wtf("MeasureStop", "222222222");
             btService.Stop(device);
-
         }
         Log.wtf("MeasureStop", "333333333");
         Log.wtf("MeasureStop isStart", String.valueOf(isStart));
@@ -750,7 +754,8 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
                 defaultDialog = new DefaultDialog(this, () -> {
                     UserInfo.getInstance().watchCnt = cntWatch;
                     UserInfo.getInstance().spacial = binding.testNameEdt.getText().toString();
-                    fragMeasure.SaveData("ch1", MeasureOneActivity.this, recordAdapter.getItems());
+                    fragMeasure.SaveData("ch1", MeasureOneActivity.this,
+                            recordAdapter.getItems(), santeApps);
                 }, "알림", "측정결과를 저장하시겠습니까?");
                 defaultDialog.show();
             }
@@ -769,6 +774,7 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
 
         isStart = false;
         isPreview = false;
+        isFirst = true;
         santeApps.SetPreview(isPreview, device);
         UpdateUI();
     }
@@ -783,7 +789,8 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
             //String deviceDirection = device == 0 ? "right" : "left";
             UserInfo.getInstance().watchCnt = cntWatch;
             UserInfo.getInstance().spacial = binding.testNameEdt.getText().toString();
-            fragMeasure.SaveData("ch1", MeasureOneActivity.this, recordAdapter.getItems());
+            fragMeasure.SaveData("ch1", MeasureOneActivity.this,
+                    recordAdapter.getItems(), santeApps);
 
         }
     };
@@ -1022,6 +1029,15 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
                                     UserInfo.getInstance().leadoff = true;
 
                                 } else binding.txtLeadoff.setVisibility(View.INVISIBLE);
+
+                                if (isFirst) {
+                                    long time = System.currentTimeMillis();
+                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm:ss.SSSZ");
+                                    String firstDataTime = sdf.format(time);
+                                    fragMeasure.SetFirstDataTime(firstDataTime);
+
+                                    isFirst = false;
+                                }
 
                                 if (!fragMeasure.Add(data)) {
                                     MeasureStop();

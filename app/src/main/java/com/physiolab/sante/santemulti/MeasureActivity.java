@@ -43,6 +43,7 @@ import com.physiolab.sante.UserInfo;
 import com.physiolab.sante.dialog.DefaultDialog;
 import com.physiolab.sante.santemulti.databinding.ActivityMeasureBinding;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -91,6 +92,8 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
     int ope_cnt = 3;
 
     private SoundPool sPool;
+
+    private boolean isFirst = true;
 
 
     int handleflag = 0;// 0 - > 쓰레드 안돔 // 1 도는중 // 2 다끝나고 진행중
@@ -485,7 +488,9 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                 defaultDialog = new DefaultDialog(this, () -> {
                     UserInfo.getInstance().watchCnt = cntWatch;
                     UserInfo.getInstance().spacial = binding.testNameEdt.getText().toString();
-                    fragMeasure[0].SaveData("ch1", MeasureActivity.this, recordAdapter.getItems());
+                    fragMeasure[0].SaveData("ch1",
+                            MeasureActivity.this, recordAdapter.getItems(),
+                            santeApps[0]);
                 }, "알림", "측정결과를 저장하시겠습니까?");
                 defaultDialog.show();
             }
@@ -493,6 +498,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
         isStart = false;
         isPreview = false;
+        isFirst = true;
         santeApps[0].SetPreview(isPreview, 0);
         santeApps[1].SetPreview(isPreview, 1);
         UpdateUI(0);
@@ -506,7 +512,8 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
             Toast.makeText(this, "파일 저장에 성공하였습니다.", Toast.LENGTH_SHORT).show();
         } else {
             //fragMeasure[1].SaveData("left", MeasureActivity.this, recordAdapter.getItems());
-            fragMeasure[1].SaveData("ch2", MeasureActivity.this, recordAdapter.getItems());
+            fragMeasure[1].SaveData("ch2", MeasureActivity.this,
+                    recordAdapter.getItems(), santeApps[1]);
         }
     }
 
@@ -592,6 +599,8 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                         } else {
                             if (cntIgnore > 0) cntIgnore--;
                             else {
+
+
                                 avgLeadoff[deviceIndex] = 0;
                                 for (int i = 0; i < BTService.PACKET_SAMPLE_NUM; i++) {
                                     avgLeadoff[deviceIndex] += data.BPF_DC[i];
@@ -606,6 +615,14 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                                     txtReadOffs[deviceIndex].setVisibility(View.INVISIBLE);
                                 }
 
+                                if (isFirst) {
+                                    long time = System.currentTimeMillis();
+                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm:ss.SSSZ");
+                                    String firstDataTime = sdf.format(time);
+                                    fragMeasure[deviceIndex].SetFirstDataTime(firstDataTime);
+
+                                    isFirst = false;
+                                }
                                 if (!fragMeasure[deviceIndex].Add(data)) {
                                     MeasureStop();
                                 }
@@ -891,7 +908,8 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                         Toast.makeText(santeApps[i], "USB연결중에는 측정할 수 없습니다.", Toast.LENGTH_SHORT).show();
                         isPreview = false;
                         santeApps[i].SetPreview(isPreview, i);
-                    }*/ else if (isState[i] == BTService.STATE_CONNECTED && !isStart) {
+                    }*/
+                    else if (isState[i] == BTService.STATE_CONNECTED && !isStart) {
                         cntIgnore = 25;
                         SetWatch(0);
                         fragMeasure[i].Init();
@@ -1187,7 +1205,8 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
             defaultDialog.dismiss();
             UserInfo.getInstance().watchCnt = cntWatch;
             UserInfo.getInstance().memo = binding.testNameEdt.getText().toString();
-            fragMeasure[0].SaveData("ch1", MeasureActivity.this, recordAdapter.getItems());
+            fragMeasure[0].SaveData("ch1", MeasureActivity.this,
+                    recordAdapter.getItems(), santeApps[0]);
 
 
             Log.wtf("defaultDialogclose", "1111111111111");
@@ -1303,7 +1322,10 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                 Log.wtf("쓰레드", "111정지");
 
                 if (powerStatus[0] != BTService.POWER_BATT || powerStatus[1] != BTService.POWER_BATT) {
-                    Toast.makeText(santeApps[deviceNum], "USB연결중에는 측정할 수 없습니다.", Toast.LENGTH_SHORT).show();
+
+                    Toast.makeText(santeApps[deviceNum],
+                            "USB연결중에는 측정할 수 없습니다.", Toast.LENGTH_SHORT).show();
+
                 } else if (isState[0] == BTService.STATE_CONNECTED && isState[1] == BTService.STATE_CONNECTED) {
                     if (isPreview && !isStart) {
                         btService.Stop(deviceNum);
@@ -1346,12 +1368,6 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                 handleflag = 0;
                 ope_cnt = 3;
                 sendEmptyMessageDelayed(0, 1000);
-
-
-
-
-
-
 
                /* if (powerStatus[deviceNum] != BTService.POWER_BATT) {
                     Toast.makeText(santeApps[deviceNum], "USB연결중에는 측정할 수 없습니다.", Toast.LENGTH_SHORT).show();
@@ -1397,7 +1413,10 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
             } else if (msg.what == 2) {//정상 진행 종료
                 Log.wtf("쓰레드", "2222정지");
-                BeepPlay();
+                if (deviceNum == 0){
+                    BeepPlay();
+                }
+
                 removeMessages(0);
 
             }

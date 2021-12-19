@@ -16,6 +16,7 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -44,6 +45,7 @@ import com.physiolab.sante.dialog.DefaultDialog;
 import com.physiolab.sante.santemulti.databinding.ActivityConnect1chBinding;
 import com.physiolab.sante.santemulti.databinding.ActivityMeasureOneBinding;
 
+import java.io.File;
 import java.util.Set;
 
 import static com.physiolab.sante.BlueToothService.BTService.MESSAGE_COMMAND_RECEIVE;
@@ -252,9 +254,22 @@ public class Connect_1chActivity extends AppCompatActivity {
         });
 
         binding.searchDevice.setOnClickListener( v -> {
-            Intent intent = new Intent(this, ScanActivity.class);
-            intent.putExtra("pairedArray", deviceAddress);
+            Intent intent = new Intent();
+            String sPath =
+                    getExternalFilesDir(null) + "/I-Motion Lab";
+                    //Environment.getExternalStorageState() + "/I-Motion Lab/";
+
+            Uri uri = Uri.parse(sPath);
+            intent.setAction(Intent.ACTION_VIEW);
+            intent.setDataAndType(uri, "*/*");
             startActivity(intent);
+            //intent.setData(uri);
+            //intent.setDataAndType(uri, "resource/folder");
+            //File exportFile = new File(getContext().getExternalFilesDir(null)
+            // + "/I-Motion Lab/" + export);
+            /*Intent intent = new Intent(this, ScanActivity.class);
+            intent.putExtra("pairedArray", deviceAddress);
+            startActivity(intent);*/
         });
 
     }
@@ -267,16 +282,24 @@ public class Connect_1chActivity extends AppCompatActivity {
         }else if (TextUtils.isEmpty(binding.editName.getText().toString()) || binding.editName.getText().toString().length() < 1){
             showToast("측정자이름을 입력해주세요");
             return;
-        }else if (TextUtils.isEmpty(binding.editHeight.getText().toString()) || binding.editHeight.getText().toString().length() < 1){
+        }
+
+        if (TextUtils.isEmpty(binding.editHeight.getText().toString()) || binding.editHeight.getText().toString().length() < 1){
             binding.editHeight.setText("100");
             //showToast("측정자 키를 입력해주세요");
-        }else if (TextUtils.isEmpty(binding.editAge.getText().toString()) || binding.editAge.getText().toString().length() < 1){
+        }
+
+        if (TextUtils.isEmpty(binding.editAge.getText().toString()) || binding.editAge.getText().toString().length() < 1){
             binding.editAge.setText("19000101");
             //showToast("측정자 생년월일을 입력해주세요");
-        }else if (TextUtils.isEmpty(binding.editWeight.getText().toString()) || binding.editWeight.getText().toString().length() < 1){
+        }
+
+        if (TextUtils.isEmpty(binding.editWeight.getText().toString()) || binding.editWeight.getText().toString().length() < 1){
             binding.editWeight.setText("10");
             //showToast("측정자 몸무게를 입력해주세요");
-        }else if (!binding.rbMale.isChecked() && !binding.rbFemale.isChecked()){
+        }
+
+        if (!binding.rbMale.isChecked() && !binding.rbFemale.isChecked()){
             binding.rbMale.setChecked(true);
             //showToast("측정자 성별을 선택해주세요");
         }/*else {
