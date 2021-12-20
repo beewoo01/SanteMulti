@@ -254,22 +254,19 @@ public class Connect_1chActivity extends AppCompatActivity {
         });
 
         binding.searchDevice.setOnClickListener( v -> {
-            Intent intent = new Intent();
+            /*Intent intent = new Intent();
             String sPath =
-                    getExternalFilesDir(null) + "/I-Motion Lab";
+                    getExternalFilesDir(null) + "/I-Motion Lab";*/
                     //Environment.getExternalStorageState() + "/I-Motion Lab/";
 
-            Uri uri = Uri.parse(sPath);
-            intent.setAction(Intent.ACTION_VIEW);
-            intent.setDataAndType(uri, "*/*");
-            startActivity(intent);
-            //intent.setData(uri);
-            //intent.setDataAndType(uri, "resource/folder");
-            //File exportFile = new File(getContext().getExternalFilesDir(null)
-            // + "/I-Motion Lab/" + export);
-            /*Intent intent = new Intent(this, ScanActivity.class);
+            /*Uri uri = Uri.parse(sPath);
+            intent.setAction(Intent.ACTION_VIEW);*/
+            //intent.setDataAndType(uri, "*/*");
+            //startActivity(intent);
+
+            Intent intent = new Intent(this, ScanActivity.class);
             intent.putExtra("pairedArray", deviceAddress);
-            startActivity(intent);*/
+            startActivity(intent);
         });
 
     }
@@ -521,7 +518,40 @@ public class Connect_1chActivity extends AppCompatActivity {
 
                     binding.tvBatt.setText(batt + "%");
 
-                    if (batt > 90) {
+                    if (battLevel[0] >= 4.0) {
+                        //100
+                        batt = 100;
+                    }else {
+                        //99이하
+                        int abc = 90;
+                        batt = (int) ((battLevel[0] - 3.0) * 100);
+
+                    }
+
+                    if (battLevel[0] >= 4.0) {
+                        //4
+                        binding.imgBatt.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_100));
+
+                    } else if (battLevel[0] >= 3.55) {
+                        //3
+                        binding.imgBatt.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_75));
+
+                    } else if (battLevel[0] >= 3.49) {
+                        //2
+                        binding.imgBatt.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_50));
+
+                    }else if (battLevel[0] >= 3.45 || battLevel[0] >= 3.25) {
+                        //1
+                        binding.imgBatt.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_25));
+
+                    }else if (battLevel[0] <= 3.25){
+                        //0
+                        binding.imgBatt.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_0));
+                    }
+
+                    binding.tvBatt.setText(batt + "%");
+
+                    /*if (batt > 90) {
                         binding.imgBatt.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_100));
                     } else if (batt > 75)
                         binding.imgBatt.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_75));
@@ -530,7 +560,7 @@ public class Connect_1chActivity extends AppCompatActivity {
                     else if (batt > 25)
                         binding.imgBatt.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_25));
                     else if (batt > 10)
-                        binding.imgBatt.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_0));
+                        binding.imgBatt.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_0));*/
 
                     /*int batt = Math.round(battValue * 20);
                     updateBatt(batt);*/

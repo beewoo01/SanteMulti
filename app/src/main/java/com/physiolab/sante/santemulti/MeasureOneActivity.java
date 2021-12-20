@@ -92,7 +92,7 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
 
     int handleflag = 0;// 0 - > 쓰레드 안돔 // 1 도는중 // 2 다끝나고 진행중
 
-    private boolean isFirst;
+    private boolean isFirst = true;
 
 
     private ActivityMeasureOneBinding binding;
@@ -170,15 +170,6 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
         screen.getStandardSize(this);
 
 
-        //binding.testNameEdt.setText(UserInfo.getInstance().memo);
-        /*
-        name = userInfo.getStringExtra("name");
-        height = userInfo.getStringExtra("height");
-        weight = userInfo.getStringExtra("weight");
-        birth = userInfo.getStringExtra("birth");
-        memo = userInfo.getStringExtra("memo");
-        gender = userInfo.getBooleanExtra("gender", false);*/
-
         binding.backContainer.setOnClickListener(v -> finish());
 
         binding.dropdownMenuBtn.setVisibility(View.VISIBLE);
@@ -189,18 +180,13 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
         binding.recordRecyclerview.setHasFixedSize(true);
 
         binding.btnSectionRecord.setOnClickListener(v -> {
-            ////String record = txtWatchSecond.getText().toString();
             binding.recordBackground.setBackground(ContextCompat.getDrawable(this, R.drawable.button_08));
-            //findViewById(R.id.record_background).setBackground(ContextCompat.getDrawable(this, R.drawable.button_08));
-            ////((TextView)findViewById(R.id.txt_watch_second)).setTextColor(ContextCompat.getColor(this, R.color.mainColor));
             binding.txtWatchSecond.setTextColor(ContextCompat.getColor(this, R.color.mainColor));
             binding.dropdownMenuBtn.setVisibility(View.VISIBLE);
-            //findViewById(R.id.dropdown_menu_btn).setVisibility(View.VISIBLE);
             recordAdapter.addTime(binding.txtWatchSecond.getText().toString());
 
         });
 
-        //LinearLayout child = findViewById(R.id.spinner_layout_background);
 
         binding.recordBackground.setOnClickListener(v -> {
             showRecord(binding.spinnerLayoutBackground.getVisibility() == View.VISIBLE);
@@ -217,10 +203,8 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
 
         isPreview = santeApps.GetPreview(device);
 
-        /*isAlarm = santeApps.GetAlarm();
-        isPreview = santeApps.GetPreview();*/
         hasData = false;
-        Log.wtf("getLeadOFF", String.valueOf(santeApps.GetLeadOff(device)));
+
         thresholdLeadoff = santeApps.GetLeadOff(device) * 100.0f + 200.0f;
 
 
@@ -231,8 +215,6 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
         bindService(intent, // intent 객체
                 conn, // 서비스와 연결에 대한 정의
                 Context.BIND_AUTO_CREATE);
-
-        Log.d(TAG, "onCreate");
     }
 
     @SuppressLint({"DefaultLocale", "SetTextI18n"})
@@ -321,13 +303,11 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
         second = second % 60;
 
         binding.txtWatchSecond.setText(String.format("%02d:%02d.%02d", minute, second, milliSecond));
-//        txtWatchMilliSecond.setText(String.format("",));
     }
 
 
     @SuppressLint("DefaultLocale")
     private void UpdateUI() {
-        //binding.btnHome.setEnabled(true);
 
         binding.btnAlarm.setSelected(isAlarm);
         if (isAlarm)
@@ -342,29 +322,25 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
 
         if (isService) {
             switch (isState) {
-                case BTService.STATE_NONE:
-                    Log.d(TAG, "UpdateUI - not connect");
-//                    devState.setBackgroundColor(getResources().getColor(R.color.DeviceStateDisconnect));
-
+                case BTService.STATE_NONE: {
                     binding.btnStart.setEnabled(false);
                     binding.btnWatchstop.setEnabled(false);
                     binding.btnAllstop.setEnabled(false);
                     binding.btnPreview.setEnabled(true);
                     break;
-                case BTService.STATE_CONNECTING:
-                    Log.d(TAG, "UpdateUI - connecting");
+                }
 
-//                    devState.setBackgroundColor(getResources().getColor(R.color.DeviceStateConnecting1));
 
+                case BTService.STATE_CONNECTING: {
                     binding.btnStart.setEnabled(false);
                     binding.btnWatchstop.setEnabled(false);
                     binding.btnAllstop.setEnabled(false);
                     binding.btnPreview.setEnabled(true);
                     break;
+                }
 
-                case BTService.STATE_CONNECTED:
-                    Log.wtf("STATE_CONNECTED", "STATE_CONNECTED");
-//                    devState.setBackgroundColor(getResources().getColor(R.color.DeviceStateConnect));
+                case BTService.STATE_CONNECTED: {
+
                     if (isStart) {
                         Log.d(TAG, "UpdateUI - start");
 
@@ -382,6 +358,8 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
                         binding.btnSectionRecord.setEnabled(false);
                     }
                     break;
+                }
+//
             }
         } else {
             Log.d(TAG, "UpdateUI - no service");
@@ -486,8 +464,6 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
 
         binding.btnStart.setOnClickListener(v -> { /// 측정시작
 
-            Log.wtf("11111111111", "22222222222");
-
             timeThread = new TimeThread();
             UserInfo.getInstance().measureTime = new Date(System.currentTimeMillis());
 
@@ -530,6 +506,8 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
                     handleflag = 0;
                     timeThread.sendEmptyMessage(0);
 
+                }else {
+                    BeepPlay();
                 }
 
             }
@@ -738,18 +716,12 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
 
 
     private void MeasureStop() {
-        Log.wtf("MeasureStop", "111111111111");
         if (isStart | isPreview) {
-            Log.wtf("MeasureStop", "222222222");
             btService.Stop(device);
         }
-        Log.wtf("MeasureStop", "333333333");
-        Log.wtf("MeasureStop isStart", String.valueOf(isStart));
-        Log.wtf("MeasureStop handleflag", String.valueOf(handleflag));
-        Log.wtf("MeasureStop isAlarm", String.valueOf(isAlarm));
+
         if (isStart){
             if (handleflag == 2 || !isAlarm) {
-                Log.wtf("MeasureStop", "444444444");
 
                 defaultDialog = new DefaultDialog(this, () -> {
                     UserInfo.getInstance().watchCnt = cntWatch;
@@ -1028,7 +1000,9 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
 
                                 } else binding.txtLeadoff.setVisibility(View.INVISIBLE);
 
+                                Log.wtf("isFirst", String.valueOf(isFirst));
                                 if (isFirst) {
+                                    Log.wtf("isFirst", String.valueOf(isFirst));
                                     long time = System.currentTimeMillis();
                                     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm:ss.SSSZ");
                                     String firstDataTime = sdf.format(time);

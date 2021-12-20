@@ -69,14 +69,6 @@ public class MeasureFragment extends Fragment {
 
     @SuppressLint("SimpleDateFormat")
     public boolean Add(ST_DATA_PROC data) {
-        /*//여기 있을게 아니라 측정소에 있어야 겠네
-        if (isFirst) {
-            long time = System.currentTimeMillis();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm:ss.SSSZ");
-            firstDataTime = sdf.format(time);
-            Log.wtf("ifFirst", firstDataTime);
-            isFirst = false;
-        }*/
 
         for (int i = 0; i < BTService.PACKET_SAMPLE_NUM; i++) {
             if (EMGCount >= BTService.SAMPLE_RATE * 60 * 5) return false;
@@ -90,7 +82,10 @@ public class MeasureFragment extends Fragment {
 
             EMGCount++;
             RMSCount++;
+
         }
+        //RMSCount = (int) Math.sqrt(EMGCount);
+
 
         for (int i = 0; i < BTService.PACKET_SAMPLE_NUM / 10; i++) {
             if (dataCount >= (BTService.SAMPLE_RATE / 10) * 60 * 5) return false;
@@ -111,6 +106,7 @@ public class MeasureFragment extends Fragment {
 
     public void SetFirstDataTime(String firstDataTime){
         this.firstDataTime = firstDataTime;
+        Log.wtf("SetFirstDataTime", String.valueOf(firstDataTime));
     };
 
     public String GetFirstDataTime() {

@@ -790,11 +790,41 @@ public class MainTestActivity extends AppCompatActivity {
                 int batt = Math.round(battLevel[i] * 20);
 
                 //Log.wtf("battLevel batt" + i, String.valueOf(batt));
+                if (battLevel[i] >= 4.0) {
+                    //100
+                    batt = 100;
+                }else {
+                    //99이하
+                    int abc = 90;
+                    batt = (int) ((battLevel[i] - 3.0) * 100);
+
+                }
+
+                if (battLevel[i] >= 4.0) {
+                    //4
+                    battImv[i].setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_100));
+
+                } else if (battLevel[i] >= 3.55) {
+                    //3
+                    battImv[i].setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_75));
+
+                } else if (battLevel[i] >= 3.49) {
+                    //2
+                    battImv[i].setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_50));
+
+                }else if (battLevel[i] >= 3.45 || battLevel[i] >= 3.25) {
+                    //1
+                    battImv[i].setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_25));
+
+                }else if (battLevel[i] <= 3.25){
+                    //0
+                    battImv[i].setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_0));
+                }
 
                 battTxv[i].setText(batt + "%");
 
 
-                if (batt > 90)
+                /*if (batt > 90)
                     battImv[i].setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_100));
                 else if (batt > 75)
                     battImv[i].setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_75));
@@ -803,7 +833,7 @@ public class MainTestActivity extends AppCompatActivity {
                 else if (batt > 25)
                     battImv[i].setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_25));
                 else if (batt > 10)
-                    battImv[i].setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_0));
+                    battImv[i].setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_0));*/
 
 
             }

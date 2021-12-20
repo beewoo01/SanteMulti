@@ -313,6 +313,40 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 diff = diff - Math.ceil(diff);
             }
 
+
+
+            if (EMGRMSEnable) {
+                if (RMSCount == 0) {
+                    yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[RMSCount]) / (RMSMax - RMSMin)));
+                    xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) RMSCount / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
+
+                    path.moveTo(xPos, yPos);
+                } else {
+                    yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[RMSCount - refresh]) / (RMSMax - RMSMin)));
+                    xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) (RMSCount - refresh) / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
+                    path.moveTo(xPos, yPos);
+
+
+                    for (int i = refresh - 1; i > 0; i--) {
+                        yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[RMSCount - i]) / (RMSMax - RMSMin)));
+                        xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) (RMSCount - i) / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
+                        path.lineTo(xPos, yPos);
+                    }
+
+                }
+
+                for (int i = RMSCount; i < emg; i++) {
+                    yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[i]) / (RMSMax - RMSMin)));
+                    xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) i / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
+
+                    path.lineTo(xPos, yPos);
+                }
+
+                bufferCanvas.drawPath(path, RMSPnt);
+
+
+            }
+
             if (EMGEnable) {
                 //Log.wtf("EMGEnable!!!", "1111111111");
                 if (EMGCount == 0) {
@@ -341,55 +375,37 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 bufferCanvas.drawPath(path, EMGPnt);
             }
 
-            if (EMGRMSEnable) {
+            /*if (EMGRMSEnable) {
                 if (RMSCount == 0) {
-                    //yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[RMSCount]) / (RMSMax - RMSMin)));
                     yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[RMSCount]) / (RMSMax - RMSMin)));
-                    //xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) RMSCount / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
-                    xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) RMSCount / (float) (BTService.SAMPLE_RATE / 10)) - TimeStart) / (TimeRange));
+                    xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) RMSCount / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
 
                     path.moveTo(xPos, yPos);
                 } else {
-                    /*yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[RMSCount - refresh]) / (RMSMax - RMSMin)));
-                    xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) (RMSCount - refresh) / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
-                    path.moveTo(xPos, yPos);*/
-
                     yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[RMSCount - refresh]) / (RMSMax - RMSMin)));
-                    xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) (RMSCount - refresh) / (float) (BTService.SAMPLE_RATE / 10)) - TimeStart) / (TimeRange));
+                    xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) (RMSCount - refresh) / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
                     path.moveTo(xPos, yPos);
 
-                    /*for (int i = refresh - 1; i > 0; i--) {
-                        yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[RMSCount - i]) / (RMSMax - RMSMin)));
-                        xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) (RMSCount - i) / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
-                        path.lineTo(xPos, yPos);
-                    }*/
 
                     for (int i = refresh - 1; i > 0; i--) {
                         yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[RMSCount - i]) / (RMSMax - RMSMin)));
-                        xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) (RMSCount - i) / (float) (BTService.SAMPLE_RATE / 10)) - TimeStart) / (TimeRange));
+                        xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) (RMSCount - i) / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
                         path.lineTo(xPos, yPos);
                     }
+
                 }
 
-                /*for (int i = RMSCount; i < emg; i++) {
+                for (int i = RMSCount; i < emg; i++) {
                     yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[i]) / (RMSMax - RMSMin)));
                     xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) i / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
 
                     path.lineTo(xPos, yPos);
-                }*/
-
-                for (int i = RMSCount; i < data; i++) {
-                    yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[i]) / (RMSMax - RMSMin)));
-                    xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) i / (float) (BTService.SAMPLE_RATE / 10)) - TimeStart) / (TimeRange));
-
-                    path.lineTo(xPos, yPos);
                 }
-
 
                 bufferCanvas.drawPath(path, RMSPnt);
 
 
-            }
+            }*/
 
 
 
@@ -507,7 +523,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
             bufferCanvas.drawColor(getResources().getColor(android.R.color.transparent), PorterDuff.Mode.SRC);
 
-            if (EMGEnable && !EMGRMSEnable) {
+            if (EMGEnable) {
                 xMinCount = (int) Math.max(Math.floor((double) TimeStart * (double) BTService.SAMPLE_RATE), 0.0);
                 xMaxCount = (int) Math.min(Math.ceil((double) (TimeStart + TimeRange) * (double) BTService.SAMPLE_RATE), (double) EMGCount);
 
@@ -519,19 +535,13 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 path.moveTo(xPos, yPos);
 
                 for (int i = xMinCount + 1; i < xMaxCount; i++) {
-                    /*Log.wtf("EMGEnable!!!", "여기옴?just11111111");
-                    Log.wtf("EMGEnable!!!i ", String.valueOf(i));*/
                     yPos = bufferGraph.getHeight() * ((EMGYMax - EMGData[i]) / (EMGYMax - EMGYMin));
                     xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) i / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
 
                     path.lineTo(xPos, yPos);
                 }
                 bufferCanvas.drawPath(path, EMGPnt);
-            }
-
-            else if (EMGEnable && EMGRMSEnable) {
-                /*Log.wtf("EMGEnable!!!", String.valueOf(EMGEnable));
-                Log.wtf("EMGEnable!!!", "여기옴?");*/
+            } /*else if (EMGEnable && EMGRMSEnable) {
                 xMinCount = (int) Math.max(Math.floor((double) TimeStart * (double) BTService.SAMPLE_RATE), 0.0);
                 xMaxCount = (int) Math.min(Math.ceil((double) (TimeStart + TimeRange) * (double) BTService.SAMPLE_RATE), (double) EMGCount);
 
@@ -550,34 +560,25 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                     path.lineTo(xPos, yPos);
                 }
                 bufferCanvas.drawPath(path, EMGPnt);
-            }
+            }*/
 
             if (EMGRMSEnable) {
                 Log.wtf("EMGRMSEnable", "true");
-                /*xMinCount = (int) Math.max(Math.floor((double) TimeStart * (double) BTService.SAMPLE_RATE), 0.0);
-                xMaxCount = (int) Math.min(Math.ceil((double) (TimeStart + TimeRange) * (double) BTService.SAMPLE_RATE), (double) RMSCount);*/
+                xMinCount = (int) Math.max(Math.floor((double) TimeStart * (double) BTService.SAMPLE_RATE), 0.0);
+                xMaxCount = (int) Math.min(Math.ceil((double) (TimeStart + TimeRange) * (double) BTService.SAMPLE_RATE), (double) RMSCount);
 
-                xMinCount = (int) Math.max(Math.floor((double) TimeStart * (double) BTService.SAMPLE_RATE / 10.0), 0.0);
-                xMaxCount = (int) Math.min(Math.ceil((double) (TimeStart + TimeRange) * ((double) BTService.SAMPLE_RATE / 10.0)), (double) RMSCount);
 
                 path.reset();
 
-                /*yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[xMinCount]) / (RMSMax - RMSMin)));
-                xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) xMinCount / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));*/
                 yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[xMinCount]) / (RMSMax - RMSMin)));
-                xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) xMinCount / ((float) BTService.SAMPLE_RATE / 10.0f)) - TimeStart) / (TimeRange));
-
-
+                xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) xMinCount / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
 
 
                 path.moveTo(xPos, yPos);
 
                 for (int i = xMinCount + 1; i < xMaxCount; i++) {
-                    /*Log.wtf("EMGEnable!!!", "여기옴?just11111111");
-                    Log.wtf("EMGEnable!!!i ", String.valueOf(i));*/
                     yPos = (float) (bufferGraph.getHeight() * ((RMSMax - RMSData[i]) / (RMSMax - RMSMin)));
-                    //xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) i / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
-                    xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) i / ((float) BTService.SAMPLE_RATE / 10.0f)) - TimeStart) / (TimeRange));
+                    xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) i / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
 
                     path.lineTo(xPos, yPos);
                 }
@@ -1280,14 +1281,82 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
             if (!wearingPart.equals("ch1")) {
                 deviceNum = 1;
             }
+
+            String AccHPF = "None";
+            String AccLPF = "None";
+            String GyroHPF = "None";
+            String GyroLPF = "None";
+            String EMGNotch = "Off";
+            String EMGHPF = "None";
+            String EMGLPF = "None";
+            String EMGRMS = "0";
+
+            if (santeApp.GetAccHPF(deviceNum) == 0) {
+                AccHPF = "None";
+            }else if (santeApp.GetAccHPF(deviceNum) == 1) {
+                AccHPF = "0.5Hz";
+            }else if (santeApp.GetAccHPF(deviceNum) == 2) {
+                AccHPF = "1Hz";
+            }
+
+            if (santeApp.GetAccLPF(deviceNum) == 0) {
+                AccLPF = "None";
+            }else if (santeApp.GetAccLPF(deviceNum) == 1) {
+                AccLPF = "10Hz";
+            }else if (santeApp.GetAccLPF(deviceNum) == 2) {
+                AccLPF = "20Hz";
+            }
+
+            if (santeApp.GetGyroHPF(deviceNum) == 0) {
+                GyroHPF = "None";
+            }else if (santeApp.GetGyroHPF(deviceNum) == 1){
+                GyroHPF = "0.5Hz";
+            }else if (santeApp.GetGyroHPF(deviceNum) == 2) {
+                GyroHPF = "1Hz";
+            }
+
+
+            if (santeApp.GetGyroLPF(deviceNum) == 0) {
+                GyroLPF = "None";
+            }else if (santeApp.GetGyroLPF(deviceNum) == 1) {
+                GyroLPF = "10Hz";
+            }else if (santeApp.GetGyroLPF(deviceNum) == 2) {
+                GyroLPF = "20Hz";
+            }
+
+
+            if (santeApp.GetEMGNotch(deviceNum) == 0) {
+                EMGNotch = "Notch Off";
+            }else {
+                EMGNotch = "Notch On";
+            }
+
+            if (santeApp.GetEMGHPF(deviceNum) == 0) {
+                EMGHPF = "None";
+            }else if (santeApp.GetEMGHPF(deviceNum) == 1){
+                EMGHPF = "3Hz";
+            }else if (santeApp.GetEMGHPF(deviceNum) == 2) {
+                EMGHPF = "20Hz";
+            }
+
+            if (santeApp.GetEMGHPF(deviceNum) == 0) {
+                EMGLPF = "None";
+            }else if (santeApp.GetEMGHPF(deviceNum) == 1) {
+                EMGLPF = "250Hz";
+            }else if (santeApp.GetEMGHPF(deviceNum) == 2) {
+                EMGLPF = "500Hz";
+            }
+
+
             String[] defaltSettingData = new String[]{
-                    String.valueOf(santeApp.GetAccHPF(deviceNum)),
-                    String.valueOf(santeApp.GetAccLPF(deviceNum)),
-                    String.valueOf(santeApp.GetGyroHPF(deviceNum)),
-                    String.valueOf(santeApp.GetGyroLPF(deviceNum)),
-                    String.valueOf(santeApp.GetEMGNotch(deviceNum)),
-                    String.valueOf(santeApp.GetEMGHPF(deviceNum)),
-                    String.valueOf(santeApp.GetEMGLPF(deviceNum)),
+                    "",
+                    "Acc HPF " + AccHPF,
+                    "Acc LPF " + AccLPF,
+                    "Gyro HPF " + GyroHPF,
+                    "Gyro LPF " + GyroLPF,
+                    "EMG Notch " + EMGNotch,
+                    "EMG HPF " + EMGHPF,
+                    "EMG LPF " + EMGLPF,
                     String.valueOf(santeApp.GetEMGRMS(deviceNum))
             };
             data.add(defaltSettingData);

@@ -89,7 +89,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
     private GestureDetector gestureDetector = null;
 
     int count;
-    int ope_cnt = 3;
+
 
     private SoundPool sPool;
 
@@ -273,6 +273,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
     protected void onDestroy() {
         super.onDestroy();
 
+        Log.wtf("onDestroy", "onDestroy");
         if (isFinishing()) {
 
             if (isService) {
@@ -485,6 +486,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
         if (isStart) {
 
             if (handleflag == 2 || !isAlarm) {
+                Log.wtf("MeasureStop", "andleflag == 2 || !isAlarm");
                 defaultDialog = new DefaultDialog(this, () -> {
                     UserInfo.getInstance().watchCnt = cntWatch;
                     UserInfo.getInstance().spacial = binding.testNameEdt.getText().toString();
@@ -544,8 +546,10 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                             //isMeasure[deviceIndex] = false;
                             break;
                         case BTService.STATE_CONNECTING:
+
                             isState[deviceIndex] = BTService.STATE_CONNECTING;
                             if (isStart | isPreview) {
+                                Log.wtf("BTService.STATE_CONNECTING", "isStart | isPreview");
                                 MeasureStop();
                             }
                             break;
@@ -553,6 +557,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                             isState[deviceIndex] = BTService.STATE_NONE;
                             if (D) Log.d(TAG, "Device Close");
                             if (isStart | isPreview) {
+                                Log.wtf("BTService.STATE_NONE", "BTService.isStart | isPreview");
                                 MeasureStop();
                             }
                             break;
@@ -616,6 +621,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                                 }
 
                                 if (isFirst) {
+                                    Log.wtf("isFirst", String.valueOf(isFirst));
                                     long time = System.currentTimeMillis();
                                     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm:ss.SSSZ");
                                     String firstDataTime = sdf.format(time);
@@ -624,6 +630,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                                     isFirst = false;
                                 }
                                 if (!fragMeasure[deviceIndex].Add(data)) {
+                                    Log.wtf("MESSAGE_DATA_RECEIVE", "!fragMeasure[deviceIndex].Add(data)");
                                     MeasureStop();
                                 }
 
@@ -637,6 +644,8 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
                                 if (powerStatus[deviceIndex] == BTService.POWER_USB_FULL_CHARGE || powerStatus[deviceIndex] == BTService.POWER_USB_CHARGING) {
                                     Toast.makeText(santeApps[deviceIndex], "USB연결중에는 측정할 수 없습니다.", Toast.LENGTH_SHORT).show();
+
+                                    Log.wtf("MESSAGE_DATA_RECEIVE", "USB연결중에는");
                                     MeasureStop();
                                 }
                                 /*if (powerStatus[deviceIndex] != BTService.POWER_BATT) {
@@ -747,9 +756,6 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
         binding.btnStart.setOnClickListener(v -> { /// 측정시작
 
-            Log.wtf("11111111111", "22222222222");
-
-            //timeThread = new TimeThread[powerStatus.length];
             UserInfo.getInstance().measureTime = new Date(System.currentTimeMillis());
             timeThread[0] = new TimeThread(0);
             timeThread[1] = new TimeThread(1);
@@ -805,6 +811,8 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                     timeThread[0].sendEmptyMessage(0);
                     timeThread[1].sendEmptyMessage(0);
 
+                }else {
+                    BeepPlay();
                 }
                 UpdateUI(0);
                 UpdateUI(1);
@@ -876,7 +884,9 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
         binding.btnAllstop.setSelected(true);
         binding.btnAllstop.setOnClickListener(v -> {
+            Log.wtf("btnAllstop", "btnAllstop");
             MeasureStop();
+
         });
         //btnAlarm = (Button) findViewById(R.id.btn_alarm);
         binding.btnAlarm.setSelected(isAlarm);
@@ -1246,6 +1256,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
     class TimeThread extends Handler {
 
         private int deviceNum = -1;
+        int ope_cnt = 3;
 
         public TimeThread(int deviceNum) {
             this.deviceNum = deviceNum;
@@ -1255,6 +1266,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
 
+            Log.wtf("ope_cnt", String.valueOf(ope_cnt));
             if (msg.what == 0) {
                 try {//타이머 진행
                     if (handleflag == 0) {
@@ -1289,7 +1301,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
                     sum = sum / 3 / count;
                     if (sum > 4) {
-
+                        Log.wtf("sum > 4", "sum > 4");
                         MeasureStop();
                         fragMeasure[0].setGyroData(count);
                         fragMeasure[1].setGyroData(count);
@@ -1328,7 +1340,8 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
                 } else if (isState[0] == BTService.STATE_CONNECTED && isState[1] == BTService.STATE_CONNECTED) {
                     if (isPreview && !isStart) {
-                        btService.Stop(deviceNum);
+                        btService.Stop(0);
+                        btService.Stop(1);
                     }
                     isPreview = false;
 
@@ -1341,8 +1354,13 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
                     isWatch = true;
                     SetWatch(cntWatch);
-                    fragMeasure[deviceNum].Init();
-                    SetTimeRange(deviceNum);
+                    /*fragMeasure[deviceNum].Init();
+                    SetTimeRange(deviceNum);*/
+                    Log.wtf("msg.what == 1", "fragMeasure.Init()");
+                    fragMeasure[0].Init();
+                    fragMeasure[1].Init();
+                    SetTimeRange(0);
+                    SetTimeRange(1);
 
                     long now = System.currentTimeMillis();
                     UserInfo.getInstance().measureTime = new Date(now);
@@ -1353,9 +1371,16 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                     cntIgnore = 25;
 
 
-                    btService.SetEMGFilter(santeApps[deviceNum].GetEMGNotch(deviceNum), santeApps[deviceNum].GetEMGHPF(deviceNum), santeApps[deviceNum].GetEMGLPF(deviceNum), deviceNum);
+                    /*btService.SetEMGFilter(santeApps[deviceNum].GetEMGNotch(deviceNum), santeApps[deviceNum].GetEMGHPF(deviceNum), santeApps[deviceNum].GetEMGLPF(deviceNum), deviceNum);
                     btService.SetAccFilter(santeApps[deviceNum].GetAccHPF(deviceNum), santeApps[deviceNum].GetAccLPF(deviceNum), deviceNum);
-                    btService.SetGyroFilter(santeApps[deviceNum].GetGyroHPF(deviceNum), santeApps[deviceNum].GetGyroLPF(deviceNum), deviceNum);
+                    btService.SetGyroFilter(santeApps[deviceNum].GetGyroHPF(deviceNum), santeApps[deviceNum].GetGyroLPF(deviceNum), deviceNum);*/
+
+                    btService.SetEMGFilter(santeApps[0].GetEMGNotch(0), santeApps[0].GetEMGHPF(0), santeApps[0].GetEMGLPF(0), 0);
+                    btService.SetEMGFilter(santeApps[1].GetEMGNotch(1), santeApps[1].GetEMGHPF(1), santeApps[1].GetEMGLPF(1), 1);
+                    btService.SetAccFilter(santeApps[0].GetAccHPF(0), santeApps[0].GetAccLPF(0), 0);
+                    btService.SetAccFilter(santeApps[1].GetAccHPF(1), santeApps[1].GetAccLPF(1), 1);
+                    btService.SetGyroFilter(santeApps[0].GetGyroHPF(0), santeApps[0].GetGyroLPF(0), 0);
+                    btService.SetGyroFilter(santeApps[1].GetGyroHPF(1), santeApps[1].GetGyroLPF(1), 1);
 
                     btService.Start(0);
                     btService.Start(1);

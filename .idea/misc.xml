@@ -4,12 +4,13 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="app/src/main/res/drawable-v24/button_01.xml" value="0.37335526315789475" />
-        <entry key="app/src/main/res/layout/activity_connect_1ch.xml" value="0.335" />
+        <entry key="app/src/main/res/layout/activity_connect_1ch.xml" value="0.165" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.2796352583586626" />
         <entry key="app/src/main/res/layout/activity_main_test.xml" value="0.165" />
         <entry key="app/src/main/res/layout/activity_measure.xml" value="0.335" />
         <entry key="app/src/main/res/layout/activity_measure_one.xml" value="0.45" />
         <entry key="app/src/main/res/layout/activity_select.xml" value="0.2796352583586626" />
+        <entry key="app/src/main/res/layout/dialog_acceleration.xml" value="0.55" />
         <entry key="app/src/main/res/layout/spinner_recyclerview_item.xml" value="0.2796352583586626" />
       </map>
     </option>
