@@ -179,6 +179,12 @@ public class Connect_1chActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        binding.editAge.addTextChangedListener(textWatcher);
+    }
+
+    @Override
     protected void onDestroy() {
         //Log.d(TAG, "onDestroy");
         super.onDestroy();
@@ -202,10 +208,10 @@ public class Connect_1chActivity extends AppCompatActivity {
         screen = new ScreenSize();
         screen.getStandardSize(this);
 
-        binding.editAge.addTextChangedListener(textWatcher);
+        //binding.editAge.addTextChangedListener(textWatcher);
 
 
-        binding.backContainer.setOnClickListener( v -> finish());
+        binding.backContainer.setOnClickListener(v -> finish());
 
         binding.btnMale.setOnClickListener(v -> {
             // TextView 클릭될 시 할 코드작성
@@ -253,11 +259,11 @@ public class Connect_1chActivity extends AppCompatActivity {
             isVaild();
         });
 
-        binding.searchDevice.setOnClickListener( v -> {
+        binding.searchDevice.setOnClickListener(v -> {
             /*Intent intent = new Intent();
             String sPath =
                     getExternalFilesDir(null) + "/I-Motion Lab";*/
-                    //Environment.getExternalStorageState() + "/I-Motion Lab/";
+            //Environment.getExternalStorageState() + "/I-Motion Lab/";
 
             /*Uri uri = Uri.parse(sPath);
             intent.setAction(Intent.ACTION_VIEW);*/
@@ -271,42 +277,38 @@ public class Connect_1chActivity extends AppCompatActivity {
 
     }
 
-    private void isVaild(){
+    @SuppressLint("SetTextI18n")
+    private void isVaild() {
 
-        if (isState[0] == STATE_NONE){
+        if (isState[0] == STATE_NONE) {
             showToast("기기를 연결해주세요");
             return;
-        }else if (TextUtils.isEmpty(binding.editName.getText().toString()) || binding.editName.getText().toString().length() < 1){
+        } else if (TextUtils.isEmpty(binding.editName.getText().toString()) || binding.editName.getText().toString().length() < 1) {
             showToast("측정자이름을 입력해주세요");
             return;
         }
 
-        if (TextUtils.isEmpty(binding.editHeight.getText().toString()) || binding.editHeight.getText().toString().length() < 1){
+        if (TextUtils.isEmpty(binding.editHeight.getText().toString()) || binding.editHeight.getText().toString().length() < 1) {
             binding.editHeight.setText("100");
-            //showToast("측정자 키를 입력해주세요");
         }
 
-        if (TextUtils.isEmpty(binding.editAge.getText().toString()) || binding.editAge.getText().toString().length() < 1){
-            binding.editAge.setText("19000101");
-            //showToast("측정자 생년월일을 입력해주세요");
+        if (TextUtils.isEmpty(binding.editAge.getText().toString()) || binding.editAge.getText().toString().length() < 1) {
+            binding.editAge.setText("1900-01-01");
         }
 
-        if (TextUtils.isEmpty(binding.editWeight.getText().toString()) || binding.editWeight.getText().toString().length() < 1){
+        if (TextUtils.isEmpty(binding.editWeight.getText().toString()) || binding.editWeight.getText().toString().length() < 1) {
             binding.editWeight.setText("10");
-            //showToast("측정자 몸무게를 입력해주세요");
         }
 
-        if (!binding.rbMale.isChecked() && !binding.rbFemale.isChecked()){
+        if (!binding.rbMale.isChecked() && !binding.rbFemale.isChecked()) {
             binding.rbMale.setChecked(true);
-            //showToast("측정자 성별을 선택해주세요");
-        }/*else {
-            moveMeasure();
-        }*/
+        }
+
         moveMeasure();
 
     }
 
-    private void moveMeasure(){
+    private void moveMeasure() {
         infoGender = binding.rbMale.isChecked();
         Intent intent = new Intent(Connect_1chActivity.this, MeasureOneActivity.class);
         UserInfo.getInstance().name = binding.editName.getText().toString();
@@ -324,22 +326,22 @@ public class Connect_1chActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void showToast(String msg){
+    private void showToast(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
     private void DeviceOpen() {
-        if (isState[0] == STATE_NONE){
-            String deviceAddress="";
-            Object selObj=null;
+        if (isState[0] == STATE_NONE) {
+            String deviceAddress = "";
+            Object selObj = null;
 
-            selObj=binding.spinDevice.getSelectedItem();
-            if (selObj!=null) deviceAddress=selObj.toString();
+            selObj = binding.spinDevice.getSelectedItem();
+            if (selObj != null) deviceAddress = selObj.toString();
 
 
             if (isState[0] != STATE_NONE && deviceAddress.equals(btService.getDeviceNum(0))) return;
 
-            if (btService!=null) btService.Connect(deviceAddress,0);
+            if (btService != null) btService.Connect(deviceAddress, 0);
         }
 
         Object selObj = null;
@@ -521,7 +523,7 @@ public class Connect_1chActivity extends AppCompatActivity {
                     if (battLevel[0] >= 4.0) {
                         //100
                         batt = 100;
-                    }else {
+                    } else {
                         //99이하
                         int abc = 90;
                         batt = (int) ((battLevel[0] - 3.0) * 100);
@@ -540,11 +542,11 @@ public class Connect_1chActivity extends AppCompatActivity {
                         //2
                         binding.imgBatt.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_50));
 
-                    }else if (battLevel[0] >= 3.45 || battLevel[0] >= 3.25) {
+                    } else if (battLevel[0] >= 3.45 || battLevel[0] >= 3.25) {
                         //1
                         binding.imgBatt.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_25));
 
-                    }else if (battLevel[0] <= 3.25){
+                    } else if (battLevel[0] <= 3.25) {
                         //0
                         binding.imgBatt.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_0));
                     }
@@ -604,9 +606,9 @@ public class Connect_1chActivity extends AppCompatActivity {
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             //Log.wtf("퍼미션", "11111111");
-            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION}, 11);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION}, 11);
         }
     }
 

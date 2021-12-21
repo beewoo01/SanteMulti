@@ -149,6 +149,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                         btService.SetAccFilter(santeApps[i].GetAccHPF(i), santeApps[i].GetAccLPF(i), i);
                         btService.SetGyroFilter(santeApps[i].GetGyroHPF(i), santeApps[i].GetGyroLPF(i), i);
 
+
                         btService.Start(i);
 
                     }
@@ -182,18 +183,14 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
         txtAccMaxes[0] = binding.txtAccMax;
         txtAccMaxes[1] = binding.txtAccMax2;
 
-
         txtAccMins[0] = binding.txtAccMin;
         txtAccMins[1] = binding.txtAccMin2;
-
 
         txtGyroMaxes[0] = binding.txtGyroMax;
         txtGyroMaxes[1] = binding.txtGyroMax2;
 
-
         txtGyroMins[0] = binding.txtGyroMin;
         txtGyroMins[1] = binding.txtGyroMin2;
-
 
         txtEmgMaxes[0] = binding.txtEmgMax;
         txtEmgMaxes[1] = binding.txtEmgMax2;
@@ -444,11 +441,11 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
         if (!hasData) {
             txtTimeMins[deviceNum].setText("0.00");
+            txtTimeMaxes[deviceNum].setText(String.format("%.2f", fragMeasure[deviceNum].GetTimeRange()));
         } else {
             txtTimeMins[deviceNum].setText(String.format("%.2f", fragMeasure[deviceNum].GetTimeStart()));
+            txtTimeMaxes[deviceNum].setText(String.format("%.2f", fragMeasure[deviceNum].GetTimeStart() + fragMeasure[deviceNum].GetTimeRange()));
         }
-        txtTimeMaxes[deviceNum].setText(String.format("%.2f", fragMeasure[deviceNum].GetTimeRange()));
-
     }
 
     @SuppressLint({"DefaultLocale", "SetTextI18n"})
@@ -479,7 +476,6 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
         if (isStart | isPreview) {
             btService.Stop(0);
             btService.Stop(1);
-
         }
 
 
@@ -621,7 +617,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                                 }
 
                                 if (isFirst) {
-                                    Log.wtf("isFirst", String.valueOf(isFirst));
+                                    //Log.wtf("isFirst", String.valueOf(isFirst));
                                     long time = System.currentTimeMillis();
                                     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm:ss.SSSZ");
                                     String firstDataTime = sdf.format(time);
@@ -638,7 +634,12 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 //                                    if (cntWatch == -200 && isAlarm) BeepPlay();
 //                                    else if (cntWatch == 0 && !isAlarm) BeepPlay();
                                     cntWatch += 40;
-                                    SetWatch(cntWatch);
+
+                                    //여기 수정한곳
+                                    if (deviceIndex == 1) {
+                                        SetWatch(cntWatch);
+                                    }
+
                                     SetTimeRange(deviceIndex);
                                 }
 
@@ -781,6 +782,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
 
                 isWatch = true;
+
                 SetWatch(cntWatch);
                 fragMeasure[0].Init();
                 fragMeasure[1].Init();
@@ -1250,6 +1252,16 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
         }
     };
 
+    private Handler timerHandler = new Handler(Looper.getMainLooper()) {
+
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+        }
+
+    };
+
+
 
     //타이머 핸들러 김인호
     @SuppressLint("HandlerLeak")
@@ -1353,7 +1365,11 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                     else cntWatch = 0;
 
                     isWatch = true;
-                    SetWatch(cntWatch);
+
+                    if (deviceNum == 1) {
+                        SetWatch(cntWatch);
+                    }
+
                     /*fragMeasure[deviceNum].Init();
                     SetTimeRange(deviceNum);*/
                     Log.wtf("msg.what == 1", "fragMeasure.Init()");

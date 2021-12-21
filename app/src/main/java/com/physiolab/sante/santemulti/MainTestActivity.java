@@ -127,6 +127,7 @@ public class MainTestActivity extends AppCompatActivity {
 
         binding.btnDeviceMeasure.setOnClickListener(v -> {
             Log.wtf("btnDeviceMeasure", "Click");
+            binding.birthEdt.removeTextChangedListener(textWatcher);
             isVail();
             /*if (isState[0] == STATE_NONE && isState[1] == STATE_NONE){
                 Toast.makeText(MainTestActivity.this,
@@ -177,7 +178,7 @@ public class MainTestActivity extends AppCompatActivity {
 
         if (TextUtils.isEmpty(binding.birthEdt.getText().toString()) || binding.birthEdt.getText().toString().length() < 1) {
             Log.wtf("isVail", "birthEdt null" );
-            binding.birthEdt.setText("19000101");
+            binding.birthEdt.setText("1900-01-01");
             //showToast("측정자 생년월일을 입력해주세요");
         }
 
@@ -341,7 +342,8 @@ public class MainTestActivity extends AppCompatActivity {
         btn_disConnect[0] = binding.btnRightDeviceClose;
         btn_disConnect[1] = binding.btnLeftDeviceClose;
 
-        binding.birthEdt.addTextChangedListener(textWatcher);
+        //binding.birthEdt.addTextChangedListener(textWatcher);
+
 
 
         binding.backContainer.setOnClickListener(v -> finish());
@@ -701,6 +703,7 @@ public class MainTestActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Log.wtf("onResume", "OnRESUME");
+        binding.birthEdt.addTextChangedListener(textWatcher);
         if (addedDeviceAddress != null) {
             UpdateSerial();
             //BTCheck();

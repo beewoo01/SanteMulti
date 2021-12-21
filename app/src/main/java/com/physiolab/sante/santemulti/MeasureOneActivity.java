@@ -223,10 +223,12 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
 
         if (!hasData) {
             binding.txtTimeMin.setText("0.00");
+            binding.txtTimeMax.setText(String.format("%.2f", fragMeasure.GetTimeRange()));
         } else {
             binding.txtTimeMin.setText(String.format("%.2f", fragMeasure.GetTimeStart()));
+            binding.txtTimeMax.setText(String.format("%.2f", fragMeasure.GetTimeStart() + fragMeasure.GetTimeRange()));
         }
-        binding.txtTimeMax.setText(String.format("%.2f", fragMeasure.GetTimeRange()));
+        //binding.txtTimeMax.setText(String.format("%.2f", fragMeasure.GetTimeRange()));
 
     }
 
@@ -1000,9 +1002,9 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
 
                                 } else binding.txtLeadoff.setVisibility(View.INVISIBLE);
 
-                                Log.wtf("isFirst", String.valueOf(isFirst));
+                                //Log.wtf("isFirst", String.valueOf(isFirst));
                                 if (isFirst) {
-                                    Log.wtf("isFirst", String.valueOf(isFirst));
+                                    //Log.wtf("isFirst", String.valueOf(isFirst));
                                     long time = System.currentTimeMillis();
                                     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm:ss.SSSZ");
                                     String firstDataTime = sdf.format(time);
