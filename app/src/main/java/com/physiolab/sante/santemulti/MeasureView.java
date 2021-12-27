@@ -1325,13 +1325,22 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
         if (size < 5) {
             /** 0 번째 데이터 ~ 4번 까지*/
-            for (int i = 0; i < 10; i++) {
-                //if (conInt != 0 && i % conInt != 0) {
-                if (conInt != 0 && size % conInt != 0) {
+            if (conInt == 0 || size % conInt == 0) {
+                for (int i = 0; i < 10; i++) {
+                    //if (conInt != 0 && i % conInt != 0) {
+                /*if (conInt != 0 && size % conInt != 0) {
                     continue;
+                }*/
+                    result += Math.pow(EMGData[i], 2);
                 }
-                result += Math.pow(EMGData[i], 2);
             }
+            /*for (int i = 0; i < 10; i++) {
+                //if (conInt != 0 && i % conInt != 0) {
+                *//*if (conInt != 0 && size % conInt != 0) {
+                    continue;
+                }*//*
+                result += Math.pow(EMGData[i], 2);
+            }*/
 
         } else if (EMGData.length - 5 < size) {
             /** 마지막 -5 번째 데이터 ~ 마지막 까지*/
