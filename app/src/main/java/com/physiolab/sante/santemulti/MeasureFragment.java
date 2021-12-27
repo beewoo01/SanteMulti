@@ -30,12 +30,21 @@ public class MeasureFragment extends Fragment {
 
     private MeasureView mView = null;
 
-    private final float[] EMGData = new float[BTService.SAMPLE_RATE * 60 * 5];
+    /*private final float[] EMGData = new float[BTService.SAMPLE_RATE * 60 * 5];
     private final double[] RMSData = new double[BTService.SAMPLE_RATE * 60 * 5];
     private final double[] SampleRMSData = new double[BTService.SAMPLE_RATE * 60 * 5];
     private final float[] LeadOffData = new float[BTService.SAMPLE_RATE * 60 * 5];
     private final float[][] AccData = new float[3][(BTService.SAMPLE_RATE / 10) * 60 * 5];
-    private final float[][] GyroData = new float[3][(BTService.SAMPLE_RATE / 10) * 60 * 5];
+    private final float[][] GyroData = new float[3][(BTService.SAMPLE_RATE / 10) * 60 * 5];*/
+
+    private final float[] EMGData = new float[BTService.SAMPLE_RATE * 350 * 5];
+    private final double[] RMSData = new double[BTService.SAMPLE_RATE * 350 * 5];
+    private final double[] SampleRMSData = new double[BTService.SAMPLE_RATE * 350 * 5];
+    private final float[] LeadOffData = new float[BTService.SAMPLE_RATE * 350 * 5];
+    private final float[][] AccData = new float[3][(BTService.SAMPLE_RATE / 10) * 350 * 5];
+    private final float[][] GyroData = new float[3][(BTService.SAMPLE_RATE / 10) * 350 * 5];
+
+
     private int EMGCount = 0;
     private int RMSCount = 0;
     private int dataCount = 0;
@@ -71,7 +80,8 @@ public class MeasureFragment extends Fragment {
     public boolean Add(ST_DATA_PROC data) {
 
         for (int i = 0; i < BTService.PACKET_SAMPLE_NUM; i++) {
-            if (EMGCount >= BTService.SAMPLE_RATE * 60 * 5) return false;
+            //if (EMGCount >= BTService.SAMPLE_RATE * 60 * 5) return false;
+            if (EMGCount >= BTService.SAMPLE_RATE * 350 * 5) return false;
 
             EMGData[EMGCount] = (float) data.Filted[i];
             LeadOffData[EMGCount] = (float) data.BPF_DC[i];
@@ -88,11 +98,11 @@ public class MeasureFragment extends Fragment {
 
 
         for (int i = 0; i < BTService.PACKET_SAMPLE_NUM / 10; i++) {
-            if (dataCount >= (BTService.SAMPLE_RATE / 10) * 60 * 5) return false;
+            //if (dataCount >= (BTService.SAMPLE_RATE / 10) * 60 * 5) return false;
+            if (dataCount >= (BTService.SAMPLE_RATE / 10) * 350 * 5) return false;
             for (int j = 0; j < 3; j++) {
                 AccData[j][dataCount] = (float) data.Acc[j][i];
                 GyroData[j][dataCount] = (float) data.Gyro[j][i];
-
             }
             dataCount++;
         }
@@ -103,11 +113,9 @@ public class MeasureFragment extends Fragment {
     }
 
 
-
-    public void SetFirstDataTime(String firstDataTime){
+    public void SetFirstDataTime(String firstDataTime) {
         this.firstDataTime = firstDataTime;
-        Log.wtf("SetFirstDataTime", String.valueOf(firstDataTime));
-    };
+    }
 
     public String GetFirstDataTime() {
         return firstDataTime;
@@ -201,28 +209,27 @@ public class MeasureFragment extends Fragment {
 
     public void SaveData(String wearingPart, Activity activity
             , ArrayList<String> timLab, SanteApp santeApp) {
-        Log.wtf("SaveData", "333333333");
         //mView.SaveData(activity, info, context, timLab, progressDialog);
         mView.SaveData(wearingPart, activity, timLab, firstDataTime, santeApp);
 
 
     }
 
-    public float[][] getGyroData(){
+    public float[][] getGyroData() {
 
         return GyroData;
 
     }
-    public void setGyroData(int count){
-        for(int i = 0 ; i<count;i++){
-            GyroData[0][i]=0;
-            GyroData[1][i]=0;
-            GyroData[2][i]=0;
+
+    public void setGyroData(int count) {
+        for (int i = 0; i < count; i++) {
+            GyroData[0][i] = 0;
+            GyroData[1][i] = 0;
+            GyroData[2][i] = 0;
         }
-        return ;
+        return;
 
     }
-
 
 
 }

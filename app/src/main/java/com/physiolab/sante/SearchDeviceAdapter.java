@@ -1,6 +1,5 @@
 package com.physiolab.sante;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -8,7 +7,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.physiolab.sante.santemulti.MainTestActivity;
 import com.physiolab.sante.santemulti.databinding.SearchDeviceItemBinding;
 
 import java.util.ArrayList;

@@ -3,53 +3,55 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-     android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:background="@color/white"
-    >
+    android:layout_height="match_parent"
+    android:background="@color/white">
 
     <LinearLayout
         android:id="@+id/toolbar_layout"
         android:layout_width="match_parent"
         android:layout_height="@dimen/_25sdp"
         android:background="@color/white"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/content_container"
-        >
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/back_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_gravity="center"
-            >
+            android:orientation="horizontal">
 
             <ImageButton
                 android:id="@+id/back_imb"
-                android:layout_width="@dimen/_5sdp"
-                android:layout_height="@dimen/_10sdp"
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_20sdp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
                 android:layout_gravity="center"
                 android:layout_marginStart="@dimen/_10sdp"
                 android:background="@null"
+                android:contentDescription="@string/back"
+                android:padding="10dp"
                 android:scaleType="centerInside"
                 android:src="@drawable/back_button" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
                 android:layout_marginStart="@dimen/_10sdp"
+                android:layout_toEndOf="@+id/back_imb"
                 android:fontFamily="@font/spoqahansansneo_bold"
                 android:text="2ch 측정"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_11sdp"
-                android:textStyle="bold"
-                />
+                android:textStyle="bold" />
 
-        </LinearLayout>
+        </RelativeLayout>
 
 
     </LinearLayout>
@@ -59,15 +61,14 @@
         android:id="@+id/content_container"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:background="@color/white"
         android:baselineAligned="false"
         android:orientation="horizontal"
-        android:background="@color/white"
         android:weightSum="2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar_layout"
         app:layout_constraintBottom_toBottomOf="parent"
-        >
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar_layout">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
@@ -92,142 +93,143 @@
                 android:textSize="@dimen/_10sdp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                />
+                app:layout_constraintTop_toTopOf="parent" />
 
 
             <TextView
                 android:id="@+id/name_txv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_5sdp"
                 android:text="@string/name"
                 android:textColor="@color/black"
-                android:layout_marginTop="@dimen/_5sdp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/info_txv"
                 app:layout_constraintBottom_toTopOf="@id/name_edt"
-                />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/info_txv" />
 
 
             <EditText
                 android:id="@+id/name_edt"
                 android:layout_width="0dp"
-                android:layout_height="@dimen/_17sdp"
-                android:background="@drawable/bg_rounded_edt"
-                android:textSize="@dimen/_6sdp"
-                android:padding="@dimen/_5sdp"
-                android:maxLines="1"
-                android:hint="@string/name"
-                android:inputType="textPersonName"
-                android:nextFocusDown="@id/birth_edt"
+                android:layout_height="48dp"
                 android:layout_marginEnd="@dimen/_10sdp"
-                app:layout_constraintTop_toBottomOf="@id/name_txv"
-                app:layout_constraintStart_toStartOf="parent"
+                android:background="@drawable/bg_rounded_edt"
+                android:hint="@string/name"
+                android:importantForAutofill="no"
+                android:inputType="textPersonName"
+                android:maxLines="1"
+                android:nextFocusDown="@id/birth_edt"
+                android:padding="@dimen/_5sdp"
+                android:textSize="@dimen/_6sdp"
+                android:layout_marginTop="@dimen/_3sdp"
                 app:layout_constraintEnd_toStartOf="@id/height_edt"
-                />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/name_txv" />
 
 
             <TextView
                 android:id="@+id/height_txv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/height"
-                android:textColor="@color/black"
                 android:layout_marginTop="@dimen/_5sdp"
                 android:layout_marginBottom="@dimen/_10sdp"
+                android:text="@string/height"
+                android:textColor="@color/black"
                 app:layout_constraintBottom_toTopOf="@id/height_edt"
-                app:layout_constraintTop_toBottomOf="@id/info_txv"
                 app:layout_constraintStart_toStartOf="@id/height_edt"
-                />
+                app:layout_constraintTop_toBottomOf="@id/info_txv" />
 
 
             <EditText
                 android:id="@+id/height_edt"
                 android:layout_width="0dp"
-                android:layout_height="@dimen/_17sdp"
-                android:background="@drawable/bg_rounded_edt"
-                android:textSize="@dimen/_6sdp"
-                android:padding="@dimen/_5sdp"
-                android:maxLines="1"
-                android:inputType="date"
-                android:hint="@string/height"
-                android:maxLength="3"
+                android:layout_height="48dp"
                 android:layout_marginStart="@dimen/_10sdp"
-                app:layout_constraintTop_toBottomOf="@id/height_txv"
+                android:background="@drawable/bg_rounded_edt"
+                android:hint="@string/height"
+                android:importantForAutofill="no"
+                android:inputType="date"
+                android:maxLength="3"
+                android:maxLines="1"
+                android:padding="@dimen/_5sdp"
+                android:textSize="@dimen/_6sdp"
+                android:layout_marginTop="@dimen/_3sdp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/name_edt"
-                />
+                app:layout_constraintTop_toBottomOf="@id/height_txv"
+                tools:ignore="TextFields" />
 
             <TextView
                 android:id="@+id/birth_txv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
                 android:text="@string/birth"
                 android:textColor="@color/black"
-                android:layout_marginTop="@dimen/_10sdp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/name_edt"
-                />
+                app:layout_constraintTop_toBottomOf="@id/name_edt" />
 
             <EditText
                 android:id="@+id/birth_edt"
                 android:layout_width="0dp"
-                android:layout_height="@dimen/_17sdp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="@dimen/_10sdp"
                 android:background="@drawable/bg_rounded_edt"
-                android:textSize="@dimen/_6sdp"
-                android:padding="@dimen/_5sdp"
-                android:maxLines="1"
                 android:hint="@string/birth_hint"
+                android:importantForAutofill="no"
                 android:inputType="date"
                 android:maxLength="10"
+                android:maxLines="1"
                 android:nextFocusDown="@id/height_edt"
-                android:layout_marginEnd="@dimen/_10sdp"
-                app:layout_constraintTop_toBottomOf="@id/birth_txv"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintStart_toEndOf="@id/name_edt"
+                android:padding="@dimen/_5sdp"
+                android:textSize="@dimen/_6sdp"
+                android:layout_marginTop="@dimen/_3sdp"
                 app:layout_constraintEnd_toStartOf="@id/weight_edt"
-                />
+                app:layout_constraintStart_toEndOf="@id/name_edt"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/birth_txv" />
 
 
             <TextView
                 android:id="@+id/weight_txv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/weight"
                 android:layout_marginTop="@dimen/_10sdp"
+                android:text="@string/weight"
                 android:textColor="@color/black"
-                app:layout_constraintTop_toBottomOf="@id/height_edt"
                 app:layout_constraintStart_toStartOf="@id/weight_edt"
+                app:layout_constraintTop_toBottomOf="@id/height_edt"
 
                 />
 
             <EditText
                 android:id="@+id/weight_edt"
                 android:layout_width="0dp"
-                android:layout_height="@dimen/_17sdp"
-                android:background="@drawable/bg_rounded_edt"
+                android:layout_height="48dp"
                 android:layout_marginStart="@dimen/_10sdp"
+                android:background="@drawable/bg_rounded_edt"
                 android:hint="@string/weight"
-                android:textSize="@dimen/_6sdp"
-                android:padding="@dimen/_5sdp"
+                android:importantForAutofill="no"
                 android:inputType="date"
-                android:nextFocusDown="@id/special_edt"
                 android:maxLength="3"
+                android:nextFocusDown="@id/special_edt"
+                android:padding="@dimen/_5sdp"
+                android:textSize="@dimen/_6sdp"
+                android:layout_marginTop="@dimen/_3sdp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/birth_edt"
                 app:layout_constraintTop_toBottomOf="@id/weight_txv"
-                />
+                tools:ignore="TextFields" />
 
             <TextView
                 android:id="@+id/gender_txv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_8sdp"
                 android:text="@string/gender"
                 android:textColor="@color/black"
-                android:layout_marginTop="@dimen/_8sdp"
-                app:layout_constraintTop_toBottomOf="@id/weight_edt"
                 app:layout_constraintStart_toStartOf="parent"
-                />
+                app:layout_constraintTop_toBottomOf="@id/weight_edt" />
 
             <RadioButton
                 android:id="@+id/rb_male"
@@ -235,11 +237,11 @@
                 android:layout_height="wrap_content"
                 android:buttonTint="@color/mainColor"
                 android:clickable="false"
-                android:text="@string/male"
                 android:paddingStart="@dimen/_5sdp"
+                android:text="@string/male"
+                app:layout_constraintBottom_toTopOf="@id/special_txv"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/gender_txv"
-                app:layout_constraintBottom_toTopOf="@id/special_txv"
                 tools:ignore="RtlSymmetry" />
 
 
@@ -249,47 +251,42 @@
                 android:layout_height="wrap_content"
                 android:buttonTint="@color/mainColor"
                 android:clickable="false"
-                android:text="@string/female"
                 android:paddingStart="@dimen/_5sdp"
+                android:text="@string/female"
+                app:layout_constraintBottom_toBottomOf="@id/rb_male"
                 app:layout_constraintStart_toStartOf="@id/weight_edt"
                 app:layout_constraintTop_toTopOf="@id/rb_male"
-                app:layout_constraintBottom_toBottomOf="@id/rb_male"
                 tools:ignore="RtlSymmetry" />
-
 
 
             <TextView
                 android:id="@+id/special_txv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginVertical="@dimen/_5sdp"
                 android:text="@string/special"
                 android:textColor="@color/black"
-                android:layout_marginVertical="@dimen/_5sdp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/rb_male"
                 app:layout_constraintBottom_toTopOf="@id/special_edt"
-                />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/rb_male" />
 
 
             <EditText
                 android:id="@+id/special_edt"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:background="@drawable/bg_rounded_edt"
                 android:layout_marginBottom="@dimen/_10sdp"
-                android:text="특이사항없음"
-                android:padding="@dimen/_5sdp"
+                android:background="@drawable/bg_rounded_edt"
                 android:gravity="top|start"
-                android:textSize="@dimen/_6sdp"
                 android:hint="내용을 입력해 주세요"
-                app:layout_constraintTop_toBottomOf="@id/special_txv"
+                android:importantForAutofill="no"
+                android:padding="@dimen/_5sdp"
+                android:text="특이사항없음"
+                android:textSize="@dimen/_6sdp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:importantForAutofill="no" />
-
-
-
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/special_txv" />
 
 
             <!--<TextView
@@ -358,11 +355,11 @@
                 android:text="연결"
                 android:textColor="@color/white"
                 android:textSize="@dimen/_8sdp"
-                app:layout_constraintVertical_chainStyle="packed"
+                app:layout_constraintBottom_toTopOf="@id/left_tv_connect_device"
                 app:layout_constraintEnd_toStartOf="@id/btn_right_device_close"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/left_tv_connect_device"
-                app:layout_constraintTop_toBottomOf="@id/spin_right_device" />
+                app:layout_constraintTop_toBottomOf="@id/spin_right_device"
+                app:layout_constraintVertical_chainStyle="packed" />
 
             <Button
                 android:id="@+id/btn_right_device_close"
@@ -420,14 +417,14 @@
                 android:layout_height="@dimen/_30sdp"
                 android:layout_marginVertical="@dimen/_8sdp"
                 android:background="@null"
-                android:src="@drawable/big_logo"
+                android:contentDescription="@string/logo"
                 android:scaleType="fitCenter"
+                android:src="@drawable/big_logo"
                 app:layout_constraintBottom_toTopOf="@id/btn_device_measure"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/btn_left_device_open"
-                app:layout_constraintVertical_chainStyle="packed"
-                />
+                app:layout_constraintVertical_chainStyle="packed" />
 
 
             <Button
@@ -435,6 +432,7 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_gravity="end"
+                android:layout_marginBottom="@dimen/_10sdp"
                 android:layout_weight="1"
                 android:background="@drawable/button_05"
                 android:fontFamily="@font/spoqahansansneo_bold"
@@ -442,13 +440,11 @@
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:textSize="@dimen/_13sdp"
-                android:layout_marginBottom="@dimen/_10sdp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/connect_all"
-                app:layout_constraintVertical_chainStyle="packed"
-                />
+                app:layout_constraintVertical_chainStyle="packed" />
 
 
             <Spinner
@@ -457,10 +453,11 @@
                 android:layout_height="@dimen/_20sdp"
                 android:layout_marginTop="@dimen/_5sdp"
                 android:background="@drawable/bg_rounded_02"
+                app:layout_constraintBottom_toTopOf="@id/btn_right_device_open"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/btn_right_device_open"
-                app:layout_constraintTop_toBottomOf="@id/tv_right_connect_device" />
+                app:layout_constraintTop_toBottomOf="@id/tv_right_connect_device"
+                tools:ignore="SpeakableTextPresentCheck" />
 
             <Spinner
                 android:id="@+id/spin_left_device"
@@ -471,7 +468,8 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/left_tv_connect_device"
-                app:layout_constraintVertical_chainStyle="packed" />
+                app:layout_constraintVertical_chainStyle="packed"
+                tools:ignore="SpeakableTextPresentCheck" />
 
 
             <TextView
@@ -483,34 +481,32 @@
                 android:textColor="@color/mainColor"
                 android:textSize="@dimen/_10sdp"
                 android:textStyle="bold"
-                app:layout_constraintVertical_chainStyle="packed"
                 app:layout_constraintBottom_toTopOf="@id/spin_right_device"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed" />
 
 
             <ImageView
                 android:id="@+id/right_img_batt"
                 android:layout_width="@dimen/_30sdp"
                 android:layout_height="@dimen/_15sdp"
-                android:src="@drawable/battery_100"
                 android:layout_marginEnd="@dimen/_10sdp"
-                app:layout_constraintEnd_toStartOf="@id/right_batt_txv"
-                app:layout_constraintTop_toTopOf="@id/tv_right_connect_device"
+                android:src="@drawable/battery_100"
                 app:layout_constraintBottom_toBottomOf="@id/tv_right_connect_device"
-                />
+                app:layout_constraintEnd_toStartOf="@id/right_batt_txv"
+                app:layout_constraintTop_toTopOf="@id/tv_right_connect_device" />
 
             <TextView
                 android:id="@+id/right_batt_txv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/_10sdp"
                 android:text="100%"
                 android:textColor="@color/mainColor"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/tv_right_connect_device"
+                android:textSize="@dimen/_10sdp"
                 app:layout_constraintBottom_toBottomOf="@id/tv_right_connect_device"
-                />
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tv_right_connect_device" />
 
 
             <TextView
@@ -534,26 +530,23 @@
                 android:id="@+id/left_img_batt"
                 android:layout_width="@dimen/_30sdp"
                 android:layout_height="@dimen/_15sdp"
-                android:src="@drawable/battery_100"
                 android:layout_marginEnd="@dimen/_10sdp"
-                app:layout_constraintEnd_toStartOf="@id/left_batt_txv"
-                app:layout_constraintTop_toTopOf="@id/left_tv_connect_device"
+                android:contentDescription="@string/battery"
+                android:src="@drawable/battery_100"
                 app:layout_constraintBottom_toBottomOf="@id/left_tv_connect_device"
-                />
+                app:layout_constraintEnd_toStartOf="@id/left_batt_txv"
+                app:layout_constraintTop_toTopOf="@id/left_tv_connect_device" />
 
             <TextView
                 android:id="@+id/left_batt_txv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/_10sdp"
                 android:text="100%"
                 android:textColor="@color/mainColor"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/left_tv_connect_device"
+                android:textSize="@dimen/_10sdp"
                 app:layout_constraintBottom_toBottomOf="@id/left_tv_connect_device"
-                />
-
-
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/left_tv_connect_device" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

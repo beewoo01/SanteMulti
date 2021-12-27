@@ -12,6 +12,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.os.Build;
+import android.os.Environment;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -315,8 +316,6 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
             }
 
 
-
-
             if (EMGEnable) {
                 //Log.wtf("EMGEnable!!!", "1111111111");
                 if (EMGCount == 0) {
@@ -344,7 +343,6 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 }
                 bufferCanvas.drawPath(path, EMGPnt);
             }
-
 
 
             //if (GyroEnable)
@@ -418,16 +416,6 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 }
             }
 
-
-
-
-
-
-
-
-
-
-
             /*{
                 if (EMGRMSEnable) {
                     path.reset();
@@ -452,7 +440,8 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
                     for (int i = EMGCount; i < emg; i++) {
                         //yPos = bufferGraph.getHeight() * ((EMGYMax - EMGData[i]) / (EMGYMax - EMGYMin));
-                        yPos = bufferGraph.getHeight() * ((EMGYMax - RMS(EMGData,600,i)) / (EMGYMax - EMGYMin));
+                        yPos = bufferGraph.getHeight() * ((EMGYMax -
+                        (EMGData,600,i)) / (EMGYMax - EMGYMin));
                         xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) i / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
 
                         path.lineTo(xPos, yPos);
@@ -545,7 +534,6 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
             bufferCanvas.drawColor(getResources().getColor(android.R.color.transparent), PorterDuff.Mode.SRC);
 
 
-
             if (EMGEnable) {
                 xMinCount = (int) Math.max(Math.floor((double) TimeStart * (double) BTService.SAMPLE_RATE), 0.0);
                 xMaxCount = (int) Math.min(Math.ceil((double) (TimeStart + TimeRange) * (double) BTService.SAMPLE_RATE), (double) EMGCount);
@@ -584,7 +572,6 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 }
                 bufferCanvas.drawPath(path, EMGPnt);
             }*/
-
 
 
             //if(GyroEnable)
@@ -645,7 +632,6 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
 
             if (EMGRMSEnable) {
-                Log.wtf("EMGRMSEnable", "true");
                 xMinCount = (int) Math.max(Math.floor((double) TimeStart * (double) BTService.SAMPLE_RATE), 0.0);
                 xMaxCount = (int) Math.min(Math.ceil((double) (TimeStart + TimeRange) * (double) BTService.SAMPLE_RATE), (double) RMSCount);
 
@@ -666,12 +652,12 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 }
                 bufferCanvas.drawPath(path, RMSPnt);
             } else {
-                Log.wtf("EMGRMSEnable", "false");
+
             }
 
         }
 
-        Log.d(TAG, "Redraw Stop");
+        //Log.d(TAG, "Redraw Stop");
     }
 
     public boolean GetEnable(int i) {
@@ -916,7 +902,8 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
     //폴더 만들기
     private void CreateFolder() {
-        File f = new File(getContext().getExternalFilesDir(null) + "/I-Motion Lab/");
+        //File f = new File(getContext().getExternalFilesDir(null) + "/I-Motion Lab/");
+        File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/");
         //File f = new File(getContext().getFilesDir(), "/Sante/");
         //File f = new File(getContext().getExternalFilesDir(null) + "/Sante/");
 
@@ -941,7 +928,6 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
     public void SaveData(String wearingPart, Activity activity,
                          ArrayList<String> timeLab, String firstTime,
                          SanteApp santeApp) {
-        Log.wtf("SaveData", "4444444444444444" + wearingPart);
         listener = (SaveFileListener) activity;
 
         //this.progressDialog = progressDialog;
@@ -977,9 +963,13 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
     }
 
-    private void saveCSV(String wearingPart, ArrayList<String> timeLab, String firstTime, SanteApp santeApp) {
+    private void saveCSV(String wearingPart, ArrayList<String> timeLab,
+                         String firstTime, SanteApp santeApp) {
         try {
-            File exportFile = new File(getContext().getExternalFilesDir(null) + "/I-Motion Lab/" + export);
+            CreateFolder();
+            //File exportFile = new File(getContext().getExternalFilesDir(null) + "/I-Motion Lab/" + export);
+            File exportFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + export);
+
             FileOutputStream fos = new FileOutputStream(exportFile);
             Writer out = new OutputStreamWriter(fos, "EUC-KR");
 
@@ -1087,13 +1077,13 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
             if (santeApp.GetEMGRMS(deviceNum) == 0) {
                 EMGRMS = "0.05s";
-            }else if (santeApp.GetEMGRMS(deviceNum) == 1) {
+            } else if (santeApp.GetEMGRMS(deviceNum) == 1) {
                 EMGRMS = "0.1s";
-            }else if (santeApp.GetEMGRMS(deviceNum) == 2) {
+            } else if (santeApp.GetEMGRMS(deviceNum) == 2) {
                 EMGRMS = "0.3s";
-            }else if (santeApp.GetEMGRMS(deviceNum) == 3) {
+            } else if (santeApp.GetEMGRMS(deviceNum) == 3) {
                 EMGRMS = "0.5s";
-            }else if (santeApp.GetEMGRMS(deviceNum) == 4) {
+            } else if (santeApp.GetEMGRMS(deviceNum) == 4) {
                 EMGRMS = "1s";
             }
 
@@ -1120,12 +1110,13 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 int tmp = (int) Math.floor((double) i / 10.0);
                 result = (float) (Math.floor(time * 10000) / 10000);
 
-                double rmsData = RMSData[i];
+                //double rmsData = RMSData[i];
 
 
                 double sampleRMSData = SampleRMSData[i];
 
-                sampleRMSData = SampleRMS(EMGData, i);
+                //sampleRMSData = SampleRMS(EMGData, i);
+                sampleRMSData = SampleRMS2(EMGData, i, santeApp.GetEMGRMS(deviceNum));
 
                 float fdata0 = AccData[0][tmp];
                 float fdata1 = AccData[1][tmp];
@@ -1155,14 +1146,13 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
             writer.writeAll(data);
             writer.close();
-            int device = wearingPart.equals("ch1") ? 0 : 1;
-            listener.onSuccess(device);
+            //int device = wearingPart.equals("ch1") ? 0 : 1;
+            listener.onSuccess(deviceNum);
 
 
-        } catch (IOException e) {
-            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
+            listener.onFail();
         }
 
     }
@@ -1173,7 +1163,8 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         String outputStr = "";
         String str = "";
 
-        File logFile = new File(getContext().getExternalFilesDir(null), "/I-Motion Lab/" + "/Sante_TUG.log");
+        //File logFile = new File(getContext().getExternalFilesDir(null), "/I-Motion Lab/" + "/I_Motion_TUG.log");
+        File logFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + "/I_Motion_TUG.log");
 
 
         if (!logFile.exists()) {
@@ -1316,6 +1307,57 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         return rms_mvc;
     }
 
+    public double SampleRMS2(float[] EMGData, int size, int sec) {
+        double result = 0;
+        int conInt;
+        if (sec == 1) {
+            conInt = 2;
+        } else if (sec == 2) {
+            conInt = 5;
+        } else if (sec == 3) {
+            conInt = 9;
+        } else if (sec == 4) {
+            conInt = 19;
+        } else {
+            conInt = 0;
+        }
+
+
+        if (size < 5) {
+            /** 0 번째 데이터 ~ 4번 까지*/
+            for (int i = 0; i < 10; i++) {
+                //if (conInt != 0 && i % conInt != 0) {
+                if (conInt != 0 && size % conInt != 0) {
+                    continue;
+                }
+                result += Math.pow(EMGData[i], 2);
+            }
+
+        } else if (EMGData.length - 5 < size) {
+            /** 마지막 -5 번째 데이터 ~ 마지막 까지*/
+            for (int i = EMGData.length - 10; i < EMGData.length; i++) {
+                //if (conInt != 0 && i % conInt != 0) {
+                if (conInt != 0 && size % conInt != 0) {
+                    continue;
+                }
+
+                result += Math.pow(EMGData[i], 2);
+            }
+
+        } else {
+            /** 중간 데이터 */
+            for (int i = size - 5; i < size + 6; i++) {
+                //if (conInt != 0 && i % conInt != 0) {
+                if (conInt != 0 && size % conInt != 0) {
+                    continue;
+                }
+                result += Math.pow(EMGData[i], 2);
+            }
+
+        }
+        result = (double) Math.sqrt(result / 11);
+        return result;
+    }
 
     public float RMS(float[] EMGData, int m, int count) {
         float result = 0;
@@ -1339,7 +1381,6 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
     public double SampleRMS(float[] EMGData, int few) {
         double result = 0;
         if (few < 5) {
-            //int sub =
             for (int i = 0; i < 10; i++) {
                 result += Math.pow(EMGData[i], 2);
             }

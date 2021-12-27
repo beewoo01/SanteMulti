@@ -16,7 +16,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <LinearLayout
+            <RelativeLayout
                 android:id="@+id/back_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -29,12 +29,15 @@
 
                 <ImageButton
                     android:id="@+id/back_imb"
-                    android:layout_width="@dimen/_5sdp"
-                    android:layout_height="@dimen/_10sdp"
+                    android:layout_width="@dimen/_20sdp"
+                    android:layout_height="@dimen/_20sdp"
+                    android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
                     android:layout_gravity="center"
                     android:layout_marginStart="@dimen/_10sdp"
                     android:background="@null"
+                    android:contentDescription="@string/back"
+                    android:padding="10dp"
                     android:scaleType="centerInside"
                     android:src="@drawable/back_button" />
 
@@ -48,9 +51,11 @@
                     android:textColor="@color/black"
                     android:textSize="@dimen/_11sdp"
                     android:textStyle="bold"
+                    android:layout_toEndOf="@+id/back_imb"
+                    android:layout_centerVertical="true"
                     app:layout_constraintStart_toEndOf="@id/back_imb" />
 
-            </LinearLayout>
+            </RelativeLayout>
 
 
 
@@ -144,36 +149,34 @@
             <EditText
                 android:id="@+id/edit_name"
                 android:layout_width="0dp"
-                android:layout_height="@dimen/_17sdp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="@dimen/_5sdp"
                 android:background="@drawable/bg_rounded_02"
-                android:textSize="@dimen/_6sdp"
-                android:padding="@dimen/_5sdp"
-                android:singleLine="true"
                 android:hint="@string/name"
                 android:nextFocusDown="@id/edit_age"
-                android:layout_marginEnd="@dimen/_5sdp"
-                app:layout_constraintTop_toBottomOf="@id/name_txv"
-                app:layout_constraintStart_toStartOf="parent"
+                android:padding="@dimen/_5sdp"
+                android:singleLine="true"
+                android:textSize="@dimen/_6sdp"
                 app:layout_constraintEnd_toStartOf="@id/edit_height"
-                />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/name_txv" />
 
             <EditText
                 android:id="@+id/edit_height"
                 android:layout_width="0dp"
-                android:layout_height="@dimen/_17sdp"
+                android:layout_height="48dp"
+                android:layout_marginStart="@dimen/_5sdp"
                 android:background="@drawable/bg_rounded_02"
                 android:hint="@string/height"
                 android:inputType="number"
+                android:maxLength="3"
+                android:nextFocusDown="@id/edit_weight"
                 android:padding="@dimen/_5sdp"
                 android:singleLine="true"
-                android:maxLength="3"
-                android:layout_marginStart="@dimen/_5sdp"
                 android:textSize="@dimen/_6sdp"
-                android:nextFocusDown="@id/edit_weight"
-                app:layout_constraintTop_toBottomOf="@id/name_txv"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/edit_name"
-                />
+                app:layout_constraintTop_toBottomOf="@id/name_txv" />
 
 
             <TextView
@@ -204,41 +207,39 @@
             <EditText
                 android:id="@+id/edit_age"
                 android:layout_width="0dp"
-                android:layout_height="@dimen/_17sdp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="@dimen/_5sdp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_rounded_02"
                 android:hint="@string/birth_hint"
                 android:inputType="date"
                 android:maxLength="10"
-                android:padding="@dimen/_5sdp"
                 android:maxLines="1"
+                android:nextFocusDown="@id/edit_height"
+                android:padding="@dimen/_5sdp"
                 android:singleLine="true"
                 android:textSize="@dimen/_6sdp"
-                android:nextFocusDown="@id/edit_height"
-                android:layout_marginEnd="@dimen/_5sdp"
-                app:layout_constraintTop_toBottomOf="@id/tv_dayOfBirth"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/edit_weight"
-                />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_dayOfBirth" />
 
             <EditText
                 android:id="@+id/edit_weight"
                 android:layout_width="0dp"
-                android:layout_height="@dimen/_17sdp"
+                android:layout_height="48dp"
+                android:layout_marginStart="@dimen/_5sdp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_rounded_02"
                 android:hint="몸무게"
                 android:inputType="number"
+                android:maxLength="3"
+                android:nextFocusDown="@id/edit_memo"
                 android:padding="@dimen/_5sdp"
                 android:singleLine="true"
                 android:textSize="@dimen/_6sdp"
-                android:maxLength="3"
-                android:nextFocusDown="@id/edit_memo"
-                android:layout_marginStart="@dimen/_5sdp"
-                app:layout_constraintTop_toBottomOf="@id/tv_dayOfBirth"
-                app:layout_constraintStart_toEndOf="@id/edit_age"
                 app:layout_constraintEnd_toEndOf="parent"
-                />
+                app:layout_constraintStart_toEndOf="@id/edit_age"
+                app:layout_constraintTop_toBottomOf="@id/tv_dayOfBirth" />
 
             <TextView
                 android:id="@+id/tv_gender"

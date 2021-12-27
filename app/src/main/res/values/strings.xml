@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">신체기능평가솔루션</string>
+    <string name="app_name">I-Motion Lab</string>
 
     <string name="btn_emg_enable">EMG</string>
     <string name="btn_acc_enable">Acc</string>
@@ -39,5 +39,8 @@
     <string name="gender">성별</string>
     <string name="female">여성</string>
     <string name="male">남성</string>
+    <string name="back">back</string>
+    <string name="logo">logo</string>
+    <string name="battery">battery</string>
 
 </resources>

@@ -11,6 +11,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.media.ToneGenerator;
@@ -19,6 +20,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.os.SystemClock;
 import android.transition.Slide;
 import android.transition.Transition;
 import android.transition.TransitionManager;
@@ -95,6 +97,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
     private boolean isFirst = true;
 
+    private long baseTime;
 
     int handleflag = 0;// 0 - > 쓰레드 안돔 // 1 도는중 // 2 다끝나고 진행중
 
@@ -139,7 +142,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                     }*/ else if (isState[i] == BTService.STATE_CONNECTED && !isStart) {
 
                         cntIgnore = 25;
-                        SetWatch(0);
+                        //SetWatch(0, "onServiceConnected");
                         fragMeasure[i].Init();
                         hasData = false;
 
@@ -448,12 +451,14 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
         }
     }
 
-    @SuppressLint({"DefaultLocale", "SetTextI18n"})
-    private void SetWatch(int cnt) {
+    /*@SuppressLint({"DefaultLocale", "SetTextI18n"})
+    private void SetWatch(int cnt, String where) {
         int hour = 0;
         int minute = 0;
         int second = 0;
         int milliSecond = 0;
+
+        Log.wtf("Who's call SetWatch", where);
 
         if (cnt < 0) {
 
@@ -470,7 +475,23 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
         binding.txtWatchSecond.setText(String.format("%02d:%02d.%02d", minute, second, milliSecond));
 //        txtWatchMilliSecond.setText(String.format("",));
+    }*/
+
+    @SuppressLint("DefaultLocale")
+    private String getTime(){
+        //경과된 시간 체크
+
+        long nowTime = SystemClock.elapsedRealtime();
+        //시스템이 부팅된 이후의 시간?
+        long overTime = nowTime - baseTime;
+
+        long m = overTime/1000/60;
+        long s = (overTime/1000)%60;
+        long ms = overTime % 100;
+
+        return String.format("%02d:%02d:%02d",m,s,ms);
     }
+
 
     private void MeasureStop() {
         if (isStart | isPreview) {
@@ -479,8 +500,9 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
         }
 
 
-        if (isStart) {
 
+        if (isStart) {
+            timerHandler.removeMessages(0);
             if (handleflag == 2 || !isAlarm) {
                 Log.wtf("MeasureStop", "andleflag == 2 || !isAlarm");
                 defaultDialog = new DefaultDialog(this, () -> {
@@ -606,6 +628,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                                 for (int i = 0; i < BTService.PACKET_SAMPLE_NUM; i++) {
                                     avgLeadoff[deviceIndex] += data.BPF_DC[i];
                                 }
+
                                 avgLeadoff[deviceIndex] /= (float) BTService.PACKET_SAMPLE_NUM;
                                 if (avgLeadoff[deviceIndex] > thresholdLeadoff[deviceIndex] && (isPreview || isStart)
                                         && fragMeasure[deviceIndex].GetEnable(2)) {
@@ -625,6 +648,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
                                     isFirst = false;
                                 }
+
                                 if (!fragMeasure[deviceIndex].Add(data)) {
                                     Log.wtf("MESSAGE_DATA_RECEIVE", "!fragMeasure[deviceIndex].Add(data)");
                                     MeasureStop();
@@ -637,7 +661,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
                                     //여기 수정한곳
                                     if (deviceIndex == 1) {
-                                        SetWatch(cntWatch);
+                                        //SetWatch(cntWatch, "MESSAGE_DATA_RECEIVE");
                                     }
 
                                     SetTimeRange(deviceIndex);
@@ -783,7 +807,9 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
                 isWatch = true;
 
-                SetWatch(cntWatch);
+                //SetWatch(cntWatch, "btnStart");
+                //baseTime = SystemClock.elapsedRealtime();
+                //timerHandler.sendEmptyMessage(0);
                 fragMeasure[0].Init();
                 fragMeasure[1].Init();
                 SetTimeRange(0);
@@ -923,23 +949,18 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                     }*/
                     else if (isState[i] == BTService.STATE_CONNECTED && !isStart) {
                         cntIgnore = 25;
-                        SetWatch(0);
+                        //SetWatch(0, "btnPreview");
                         fragMeasure[i].Init();
 
                         hasData = false;
 
                         SetTimeRange(i);
 
-                        /*btService.SetEMGFilter(santeApps[i].GetEMGNotch(i), santeApps[i].GetEMGHPF(i), santeApps[i].GetEMGLPF(i), 0);
-                        btService.SetAccFilter(santeApps[i].GetAccHPF(i), santeApps[i].GetAccLPF(i), 0);
-                        btService.SetGyroFilter(santeApps[i].GetGyroHPF(i), santeApps[i].GetGyroLPF(i), 0);*/
-
-                        //btService.Start(0);
-
                         btService.SetEMGFilter(santeApps[i].GetEMGNotch(i), santeApps[i].GetEMGHPF(i), santeApps[i].GetEMGLPF(i), i);
                         btService.SetAccFilter(santeApps[i].GetAccHPF(i), santeApps[i].GetAccLPF(i), i);
                         btService.SetGyroFilter(santeApps[i].GetGyroHPF(i), santeApps[i].GetGyroLPF(i), i);
                         btService.Start(i);
+
                     }
                 } else {
                     if (isState[i] == BTService.STATE_CONNECTED && !isStart) {
@@ -1252,11 +1273,14 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
         }
     };
 
-    private Handler timerHandler = new Handler(Looper.getMainLooper()) {
+    private final Handler timerHandler = new Handler(Looper.getMainLooper()) {
 
         @Override
         public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
+            //super.handleMessage(msg);
+            binding.txtWatchSecond.setText(getTime());
+            timerHandler.sendEmptyMessage(0);
+
         }
 
     };
@@ -1335,8 +1359,10 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                         sendEmptyMessageDelayed(2, 0);
                     } else {
                         ope_cnt = ope_cnt - 1;
-
                         sendEmptyMessageDelayed(0, 1000);
+                        baseTime = SystemClock.elapsedRealtime();
+                        //timerHandler.sendEmptyMessage(0);
+                        timerHandler.sendEmptyMessageDelayed(0, 1000);
                     }
 
                 } catch (Exception e) {
@@ -1367,7 +1393,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                     isWatch = true;
 
                     if (deviceNum == 1) {
-                        SetWatch(cntWatch);
+                        //SetWatch(cntWatch, "TimeThread");
                     }
 
                     /*fragMeasure[deviceNum].Init();
@@ -1454,8 +1480,11 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
             } else if (msg.what == 2) {//정상 진행 종료
                 Log.wtf("쓰레드", "2222정지");
-                if (deviceNum == 0){
+                if (deviceNum == 1){
                     BeepPlay();
+                    /*baseTime = SystemClock.elapsedRealtime();
+                    //timerHandler.sendEmptyMessage(0);
+                    timerHandler.sendEmptyMessageDelayed(0, 1000);*/
                 }
 
                 removeMessages(0);
@@ -1467,9 +1496,14 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
 
     private void BeepInit() {
-        tone = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, ToneGenerator.MAX_VOLUME);
+        tone = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, ToneGenerator.MIN_VOLUME);
 
-        sPool = new SoundPool(5, AudioManager.STREAM_NOTIFICATION, 0);
+        //sPool = new SoundPool(5, AudioManager.STREAM_NOTIFICATION, 0);
+        AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build();
+        sPool = new SoundPool.Builder().setAudioAttributes(audioAttributes).setMaxStreams(8).build();
         beepNum = sPool.load(getApplicationContext(), R.raw.beep, 1);
     }
 

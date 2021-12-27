@@ -21,6 +21,7 @@
         android:roundIcon="@mipmap/app_icon"
         android:supportsRtl="true"
         android:largeHeap="true"
+        android:hardwareAccelerated="false"
         android:theme="@style/AppTheme">
 
         <activity android:name=".ScanActivity"
@@ -41,7 +42,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".Connect_1chActivity"
+        <activity android:name=".Main1chActivity"
             android:screenOrientation="landscape"
             android:windowSoftInputMode="adjustResize|adjustPan|stateAlwaysHidden"
             >
@@ -92,7 +93,7 @@
         </activity>
 
         <activity
-            android:name=".MainTestActivity"
+            android:name=".Main2chActivity"
             android:launchMode="standard"
             android:screenOrientation="landscape"
             android:windowSoftInputMode="adjustResize|adjustPan|stateAlwaysHidden">

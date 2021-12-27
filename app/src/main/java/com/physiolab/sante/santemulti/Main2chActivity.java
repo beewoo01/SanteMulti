@@ -5,15 +5,12 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -25,7 +22,6 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.util.Pair;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,8 +34,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -47,14 +41,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.physiolab.sante.BlueToothService.BTService;
 import com.physiolab.sante.SearchDeviceAdapter;
 import com.physiolab.sante.UserInfo;
-import com.physiolab.sante.santemulti.databinding.ActivityMainTestBinding;
-import com.physiolab.sante.santemulti.databinding.SearchDeviceItemBinding;
+import com.physiolab.sante.santemulti.databinding.Activity2chMainBinding;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -72,11 +63,11 @@ import static com.physiolab.sante.BlueToothService.BTService.STATE_CONNECTED;
 import static com.physiolab.sante.BlueToothService.BTService.STATE_CONNECTING;
 import static com.physiolab.sante.BlueToothService.BTService.STATE_NONE;
 
-public class MainTestActivity extends AppCompatActivity {
+public class Main2chActivity extends AppCompatActivity {
 
     private static final String TAG = "Activity-MainTest";
     private static final boolean D = true;
-    private ActivityMainTestBinding binding;
+    private Activity2chMainBinding binding;
 
 
     private BTService btService = null;
@@ -117,7 +108,7 @@ public class MainTestActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityMainTestBinding.inflate(getLayoutInflater());
+        binding = Activity2chMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
 
@@ -147,7 +138,7 @@ public class MainTestActivity extends AppCompatActivity {
 
 
         Intent intent = new Intent(
-                MainTestActivity.this, // 현재 화면
+                Main2chActivity.this, // 현재 화면
                 BTService.class); // 다음넘어갈 컴퍼넌트
 
         bindService(intent, // intent 객체
@@ -160,6 +151,7 @@ public class MainTestActivity extends AppCompatActivity {
 
     }
 
+    @SuppressLint("SetTextI18n")
     private void isVail() {
         if (isState[0] == STATE_NONE || isState[1] == STATE_NONE) {
             showToast("기기를 연결해주세요");
@@ -198,7 +190,7 @@ public class MainTestActivity extends AppCompatActivity {
 
     private void moveMeasure() {
         boolean infoGender = binding.rbMale.isChecked();
-        Intent intent = new Intent(MainTestActivity.this, MeasureActivity.class);
+        Intent intent = new Intent(Main2chActivity.this, MeasureActivity.class);
         UserInfo.getInstance().name = binding.nameEdt.getText().toString();
         UserInfo.getInstance().height = binding.heightEdt.getText().toString();
         UserInfo.getInstance().weight = binding.weightEdt.getText().toString();
@@ -342,11 +334,9 @@ public class MainTestActivity extends AppCompatActivity {
         btn_disConnect[0] = binding.btnRightDeviceClose;
         btn_disConnect[1] = binding.btnLeftDeviceClose;
 
-        //binding.birthEdt.addTextChangedListener(textWatcher);
-
-
-
         binding.backContainer.setOnClickListener(v -> finish());
+
+        binding.backImb.setOnClickListener(v -> finish());
 
         binding.rbMale.setOnClickListener(v -> {
             // TextView 클릭될 시 할 코드작성
@@ -363,7 +353,7 @@ public class MainTestActivity extends AppCompatActivity {
         });
 
         btn_connect[0].setOnClickListener(v -> {
-            Log.wtf("btn_connet 0", "onCLICK");
+            //Log.wtf("btn_connet 0", "onCLICK");
             if (isState[0] == STATE_NONE) {
                 String deviceAddress = "";
                 Object selObj = null;
@@ -733,9 +723,9 @@ public class MainTestActivity extends AppCompatActivity {
             Toast.makeText(this, "Bluetooth를 지원하지 않은 단말기 입니다.", Toast.LENGTH_SHORT).show();
         } else {
             if (bluetoothAdapter.isEnabled()) {
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+                /*if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
                     return;
-                }
+                }*/
                 if (bluetoothAdapter.isDiscovering()) {
                     Toast.makeText(this, "장치 검색중입니다...", Toast.LENGTH_SHORT).show();
                 } else {

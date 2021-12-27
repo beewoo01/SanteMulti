@@ -16,7 +16,6 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -32,8 +31,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,11 +38,9 @@ import android.widget.Toast;
 import com.physiolab.sante.BlueToothService.BTService;
 import com.physiolab.sante.ScreenSize;
 import com.physiolab.sante.UserInfo;
-import com.physiolab.sante.dialog.DefaultDialog;
-import com.physiolab.sante.santemulti.databinding.ActivityConnect1chBinding;
-import com.physiolab.sante.santemulti.databinding.ActivityMeasureOneBinding;
+import com.physiolab.sante.santemulti.databinding.Activity1chMainBinding;
 
-import java.io.File;
+
 import java.util.Set;
 
 import static com.physiolab.sante.BlueToothService.BTService.MESSAGE_COMMAND_RECEIVE;
@@ -60,11 +55,11 @@ import static com.physiolab.sante.BlueToothService.BTService.STATE_CONNECTED;
 import static com.physiolab.sante.BlueToothService.BTService.STATE_CONNECTING;
 import static com.physiolab.sante.BlueToothService.BTService.STATE_NONE;
 
-public class Connect_1chActivity extends AppCompatActivity {
+public class Main1chActivity extends AppCompatActivity {
 
     private BTService btService = null;
     private boolean isService = false;
-    private ActivityConnect1chBinding binding;
+    private Activity1chMainBinding binding;
     private ScreenSize screen = null;
 
     private static final String TAG = "Activity-Measure";
@@ -161,14 +156,14 @@ public class Connect_1chActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityConnect1chBinding.inflate(getLayoutInflater());
+        binding = Activity1chMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         CheckPermission();
         InitControl();
 
         Intent intent = new Intent(
-                Connect_1chActivity.this, // 현재 화면
+                Main1chActivity.this, // 현재 화면
                 BTService.class); // 다음넘어갈 컴퍼넌트
 
         bindService(intent, // intent 객체
@@ -239,6 +234,9 @@ public class Connect_1chActivity extends AppCompatActivity {
             DeviceClose();
         });
 
+        binding.backImb.setOnClickListener(v -> {
+            finish();
+        });
 
         binding.btnMale.setOnClickListener(v -> {
             // TextView 클릭될 시 할 코드작성
@@ -310,7 +308,7 @@ public class Connect_1chActivity extends AppCompatActivity {
 
     private void moveMeasure() {
         infoGender = binding.rbMale.isChecked();
-        Intent intent = new Intent(Connect_1chActivity.this, MeasureOneActivity.class);
+        Intent intent = new Intent(Main1chActivity.this, MeasureOneActivity.class);
         UserInfo.getInstance().name = binding.editName.getText().toString();
         UserInfo.getInstance().height = binding.editHeight.getText().toString();
         UserInfo.getInstance().weight = binding.editWeight.getText().toString();
@@ -427,7 +425,7 @@ public class Connect_1chActivity extends AppCompatActivity {
                 case MESSAGE_STATE_CHANGE:
                     switch (msg.arg1) {
                         case STATE_CONNECTED:
-                            if (D) Log.d(TAG, "Device Connect");
+                            //if (D) Log.d(TAG, "Device Connect");
                             isState[deviceIndex] = STATE_CONNECTED;
                             //isMeasure[deviceIndex] = false;
                             break;
@@ -436,7 +434,7 @@ public class Connect_1chActivity extends AppCompatActivity {
                             break;
                         case STATE_NONE:
                             isState[deviceIndex] = STATE_NONE;
-                            if (D) Log.d(TAG, "Device Close");
+                            //if (D) Log.d(TAG, "Device Close");
                             break;
                     }
                     //StopSave(deviceIndex);

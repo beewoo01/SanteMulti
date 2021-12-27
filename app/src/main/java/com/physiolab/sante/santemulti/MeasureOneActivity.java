@@ -11,13 +11,17 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.media.ToneGenerator;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.Message;
+import android.os.SystemClock;
 import android.transition.Slide;
 import android.transition.Transition;
 import android.transition.TransitionManager;
@@ -78,6 +82,8 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
 
     private TimeThread timeThread;
 
+    private long baseTime;
+
     private static final String TAG = "Activity-Measure";
     private static final boolean D = true;
 
@@ -123,10 +129,11 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
                     Toast.makeText(santeApps, "USB연결중에는 측정할 수 없습니다.", Toast.LENGTH_SHORT).show();
                     isPreview = false;
                     santeApps.SetPreview(isPreview, device);
-                }*/ else if (isState == BTService.STATE_CONNECTED && !isStart) {
+                }*/
+                else if (isState == BTService.STATE_CONNECTED && !isStart) {
 
                     cntIgnore = 25;
-                    SetWatch(0);
+                    //SetWatch(0);
                     fragMeasure.Init();
                     hasData = false;
 
@@ -170,7 +177,15 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
         screen.getStandardSize(this);
 
 
-        binding.backContainer.setOnClickListener(v -> finish());
+        //binding.backContainer.setOnClickListener(v -> finish());
+        binding.backImb.setOnClickListener(v -> {
+            if (isStart) {
+                MeasureStop();
+            }
+
+            finish();
+
+        });
 
         binding.dropdownMenuBtn.setVisibility(View.VISIBLE);
         findViewById(R.id.dropdown_menu_btn).setVisibility(View.VISIBLE);
@@ -219,7 +234,6 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
 
     @SuppressLint({"DefaultLocale", "SetTextI18n"})
     private void SetTimeRange() {
-
 
         if (!hasData) {
             binding.txtTimeMin.setText("0.00");
@@ -284,7 +298,7 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
 
     }
 
-    @SuppressLint({"DefaultLocale", "SetTextI18n"})
+    /*@SuppressLint({"DefaultLocale", "SetTextI18n"})
     private void SetWatch(int cnt) {
         int hour = 0;
         int minute = 0;
@@ -305,7 +319,7 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
         second = second % 60;
 
         binding.txtWatchSecond.setText(String.format("%02d:%02d.%02d", minute, second, milliSecond));
-    }
+    }*/
 
 
     @SuppressLint("DefaultLocale")
@@ -324,13 +338,13 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
 
         if (isService) {
             switch (isState) {
-                case BTService.STATE_NONE: {
+                case BTService.STATE_NONE: /*{
                     binding.btnStart.setEnabled(false);
                     binding.btnWatchstop.setEnabled(false);
                     binding.btnAllstop.setEnabled(false);
                     binding.btnPreview.setEnabled(true);
                     break;
-                }
+                }*/
 
 
                 case BTService.STATE_CONNECTING: {
@@ -485,7 +499,9 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
                 else cntWatch = 0;
 
                 isWatch = true;
-                SetWatch(cntWatch);
+                //baseTime = SystemClock.elapsedRealtime();
+                timerHandler.sendEmptyMessage(0);
+                //SetWatch(cntWatch);
                 fragMeasure.Init();
                 SetTimeRange();
 
@@ -508,7 +524,7 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
                     handleflag = 0;
                     timeThread.sendEmptyMessage(0);
 
-                }else {
+                } else {
                     BeepPlay();
                 }
 
@@ -554,7 +570,7 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
                     santeApps.SetPreview(isPreview, device);
                 } else if (isState == BTService.STATE_CONNECTED && !isStart) {
                     cntIgnore = 25;
-                    SetWatch(0);
+                    //SetWatch(0);
                     fragMeasure.Init();
 
                     hasData = false;
@@ -722,7 +738,8 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
             btService.Stop(device);
         }
 
-        if (isStart){
+        if (isStart) {
+            timerHandler.removeMessages(0);
             if (handleflag == 2 || !isAlarm) {
 
                 defaultDialog = new DefaultDialog(this, () -> {
@@ -753,6 +770,33 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
         UpdateUI();
     }
 
+
+    @SuppressLint("DefaultLocale")
+    private String getTime() {
+        //경과된 시간 체크
+
+        long nowTime = SystemClock.elapsedRealtime();
+        //시스템이 부팅된 이후의 시간?
+        long overTime = nowTime - baseTime;
+
+        long m = overTime / 1000 / 60;
+        long s = (overTime / 1000) % 60;
+        long ms = overTime % 100;
+
+        return String.format("%02d:%02d:%02d", m, s, ms);
+    }
+
+    private final Handler timerHandler = new Handler(Looper.getMainLooper()) {
+
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            //super.handleMessage(msg);
+            binding.txtWatchSecond.setText(getTime());
+            timerHandler.sendEmptyMessage(0);
+
+        }
+
+    };
 
 
     private final View.OnClickListener defaultDialogclose = new View.OnClickListener() {
@@ -841,6 +885,9 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
                         ope_cnt = ope_cnt - 1;
 
                         sendEmptyMessageDelayed(0, 1000);
+                        baseTime = SystemClock.elapsedRealtime();
+                        //timerHandler.sendEmptyMessage(0);
+                        timerHandler.sendEmptyMessageDelayed(0, 1000);
                     }
 
                 } catch (Exception e) {
@@ -848,7 +895,6 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
                 }
             } else if (msg.what == 1) {// 움직여서 종료
                 Log.wtf("쓰레드", "111정지");
-
 
 
                 if (powerStatus != BTService.POWER_BATT) {
@@ -867,7 +913,7 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
                     else cntWatch = 0;
 
                     isWatch = true;
-                    SetWatch(cntWatch);
+                    //SetWatch(cntWatch);
                     fragMeasure.Init();
                     SetTimeRange();
 
@@ -904,10 +950,19 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
     }
 
     private void BeepInit() {
-        tone = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, ToneGenerator.MAX_VOLUME);
+        tone = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, ToneGenerator.MIN_VOLUME);
 
-        sPool = new SoundPool(5, AudioManager.STREAM_NOTIFICATION, 0);
+        //sPool = new SoundPool(5, AudioManager.STREAM_NOTIFICATION, 0);
+
+
+        AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build();
+        sPool = new SoundPool.Builder().setAudioAttributes(audioAttributes).setMaxStreams(8).build();
         beepNum = sPool.load(getApplicationContext(), R.raw.beep, 1);
+
+
     }
 
     private void BeepPlay() {
@@ -1021,7 +1076,7 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
 //                                    if (cntWatch == -200 && isAlarm) BeepPlay();
 //                                    else if (cntWatch == 0 && !isAlarm) BeepPlay();
                                     cntWatch += 40;
-                                    SetWatch(cntWatch);
+                                    //SetWatch(cntWatch);
                                     SetTimeRange();
                                 }
 
