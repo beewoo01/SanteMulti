@@ -54,7 +54,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
     private ScreenSize screen = null;
 
-    private SanteApp[] santeApps;
+    public SanteApp[] santeApps;
 
     private BTService btService = null;
     private boolean isService = false;
@@ -781,6 +781,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
         binding.btnStart.setOnClickListener(v -> { /// 측정시작
 
+            recordAdapter.removeAllItem();
             UserInfo.getInstance().measureTime = new Date(System.currentTimeMillis());
             timeThread[0] = new TimeThread(0);
             timeThread[1] = new TimeThread(1);
@@ -845,57 +846,6 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                 UpdateUI(0);
                 UpdateUI(1);
             }
-
-            /*for (int i = 0; i < powerStatus.length; i++) {
-                timeThread[i] = new TimeThread(i);
-                if (powerStatus[i] == BTService.POWER_USB_FULL_CHARGE || powerStatus[i] == BTService.POWER_USB_CHARGING) {
-                    Toast.makeText(santeApps[i], "USB연결중에는 측정할 수 없습니다.", Toast.LENGTH_SHORT).show();
-                }
-                *//*if (powerStatus[i] != BTService.POWER_BATT) {
-                    Toast.makeText(santeApps[i], "USB연결중에는 측정할 수 없습니다.", Toast.LENGTH_SHORT).show();
-                }*//*
-                else if (isState[i] == BTService.STATE_CONNECTED) {
-                    if (isPreview && !isStart) {
-                        btService.Stop(i);
-                    }
-                    isPreview = false;
-
-                    isStart = true;
-
-                    hasData = true;
-
-                    if (isAlarm) cntWatch = BTService.SAMPLE_RATE * -3;
-                    else cntWatch = 0;
-
-                    isWatch = true;
-                    SetWatch(cntWatch);
-                    fragMeasure[i].Init();
-                    SetTimeRange(i);
-
-                    long now = System.currentTimeMillis();
-                    UserInfo.getInstance().measureTime = new Date(now);
-                    UserInfo.getInstance().alarm = isAlarm;
-                    UserInfo.getInstance().watchCnt = 0;
-
-
-                    cntIgnore = 25;
-
-                    btService.SetEMGFilter(santeApps[i].GetEMGNotch(i), santeApps[i].GetEMGHPF(i), santeApps[i].GetEMGLPF(i), i);
-                    btService.SetAccFilter(santeApps[i].GetAccHPF(i), santeApps[i].GetAccLPF(i), i);
-                    btService.SetGyroFilter(santeApps[i].GetGyroHPF(i), santeApps[i].GetGyroLPF(i), i);
-
-                    btService.Start(i);
-
-                    if (isAlarm) {
-                        timeThread[i] = new TimeThread(i);
-                        handleflag = 0;
-                        timeThread[i].sendEmptyMessage(0);
-
-                    }
-
-                }
-                UpdateUI(i);
-            }*/
 
         });
 

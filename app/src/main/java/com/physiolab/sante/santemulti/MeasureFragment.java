@@ -59,7 +59,7 @@ public class MeasureFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView");
 
-        mView = new MeasureView(getActivity());
+        mView = new MeasureView(getActivity(), getActivity());
         mView.SetData(EMGData, RMSData, LeadOffData, AccData, GyroData, SampleRMSData);
 
         return mView;

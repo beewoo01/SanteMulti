@@ -1,5 +1,6 @@
 package com.physiolab.sante;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,10 +21,17 @@ public class Spinner_Re_Adapter  extends RecyclerView.Adapter<Spinner_Re_Adapter
         this.arrayList = arrayList;
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void addTime(String time){
         arrayList.add(time);
         notifyDataSetChanged();
         //notifyItemChanged(arrayList.size());
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void removeAllItem() {
+        arrayList.clear();
+        notifyDataSetChanged();
     }
 
     public ArrayList<String> getItems(){
