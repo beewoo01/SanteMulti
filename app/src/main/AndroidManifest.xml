@@ -57,7 +57,7 @@
         </activity>
 
         <activity
-            android:name=".MeasureOneActivity"
+            android:name=".Measure1chActivity"
             android:launchMode="standard"
             android:screenOrientation="landscape"
             android:windowSoftInputMode="adjustResize|adjustPan|stateAlwaysHidden" />
@@ -73,7 +73,7 @@
             android:screenOrientation="landscape" />
 
         <activity
-            android:name=".MeasureActivity"
+            android:name=".Measure2chActivity"
             android:launchMode="standard"
             android:screenOrientation="landscape"
             android:windowSoftInputMode="adjustResize|adjustPan|stateAlwaysHidden" />

@@ -42,5 +42,29 @@
     <string name="back">back</string>
     <string name="logo">logo</string>
     <string name="battery">battery</string>
+    <string name="measure1ch">1ch 측정</string>
+    <string name="input_info">대상자 정보입력</string>
+    <string name="dropdown">dropDown</string>
+    <string name="connect_1ch">1ch 기기연결</string>
+    <string name="connect">연결</string>
+    <string name="disconnect">연결끊기</string>
+    <string name="find_device">디바이스 찾기</string>
+    <string name="ready_to_test">Ready to test</string>
+    <string name="sante_i_motion_lab">Sante I-Motion Lab</string>
+    <string name="_3sec_alarm">3Sec.Alarm</string>
+    <string name="start">START</string>
+    <string name="watch_stop">Watch STOP</string>
+    <string name="all_stop">All STOP</string>
+    <string name="record_section">구간기록</string>
+    <string name="preview">미리보기</string>
+    <string name="acc">ACC.</string>
+    <string name="gyro">Gyro.</string>
+    <string name="emg">EMG</string>
+    <string name="test_name">테스트명</string>
+    <string name="tug_measure_graph">TUG측정 그래프</string>
+    <string name="measure_2ch">2ch 측정</string>
+    <string name="measure_2ch_graph">2ch 측정 그래프</string>
+    <string name="measure_1ch_graph">1ch 측정 그래프</string>
+    <string name="connect_2ch">2ch 기기연결</string>
 
 </resources>

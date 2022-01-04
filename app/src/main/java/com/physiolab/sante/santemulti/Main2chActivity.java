@@ -190,7 +190,7 @@ public class Main2chActivity extends AppCompatActivity {
 
     private void moveMeasure() {
         boolean infoGender = binding.rbMale.isChecked();
-        Intent intent = new Intent(Main2chActivity.this, MeasureActivity.class);
+        Intent intent = new Intent(Main2chActivity.this, Measure2chActivity.class);
         UserInfo.getInstance().name = binding.nameEdt.getText().toString();
         UserInfo.getInstance().height = binding.heightEdt.getText().toString();
         UserInfo.getInstance().weight = binding.weightEdt.getText().toString();
@@ -334,7 +334,7 @@ public class Main2chActivity extends AppCompatActivity {
         btn_disConnect[0] = binding.btnRightDeviceClose;
         btn_disConnect[1] = binding.btnLeftDeviceClose;
 
-        binding.backContainer.setOnClickListener(v -> finish());
+        //binding.backContainer.setOnClickListener(v -> finish());
 
         binding.backImb.setOnClickListener(v -> finish());
 
@@ -782,7 +782,8 @@ public class Main2chActivity extends AppCompatActivity {
 
                 int batt = Math.round(battLevel[i] * 20);
 
-                //Log.wtf("battLevel batt" + i, String.valueOf(batt));
+
+                /* battery version1
                 if (battLevel[i] >= 4.0) {
                     //100
                     batt = 100;
@@ -813,6 +814,40 @@ public class Main2chActivity extends AppCompatActivity {
                     //0
                     battImv[i].setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_0));
                 }
+
+
+                */
+
+                // battery version2
+                if (battLevel[i] >= 4.200) {
+                    batt = 100;
+                }else {
+                    batt = (int) ((battLevel[i] - 3.500F) / 4.200F  * 1000);
+                }
+
+
+                if (batt >= 100) {
+                    //4
+                    battImv[i].setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_100));
+
+                } else if (batt > 74) {
+                    //3
+                    battImv[i].setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_75));
+
+                } else if (batt > 49) {
+                    //2
+                    battImv[i].setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_50));
+
+                }else if (batt > 24) {
+                    //1
+                    battImv[i].setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_25));
+
+                }else {
+                    //0
+                    battImv[i].setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_0));
+                }
+
+
 
                 battTxv[i].setText(batt + "%");
 

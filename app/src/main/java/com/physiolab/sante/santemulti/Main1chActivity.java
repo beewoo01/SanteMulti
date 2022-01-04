@@ -308,7 +308,7 @@ public class Main1chActivity extends AppCompatActivity {
 
     private void moveMeasure() {
         infoGender = binding.rbMale.isChecked();
-        Intent intent = new Intent(Main1chActivity.this, MeasureOneActivity.class);
+        Intent intent = new Intent(Main1chActivity.this, Measure1chActivity.class);
         UserInfo.getInstance().name = binding.editName.getText().toString();
         UserInfo.getInstance().height = binding.editHeight.getText().toString();
         UserInfo.getInstance().weight = binding.editWeight.getText().toString();
@@ -515,20 +515,51 @@ public class Main1chActivity extends AppCompatActivity {
 
                     int batt = Math.round(battLevel[0] * 20);
 
-
                     binding.tvBatt.setText(batt + "%");
+                    /*
+                    * 4.2 >= 100
+                    * 4.1 = 90
+                    * 4.0 = 80
+                    * 3.9 = 70
+                    * 3.8 = 60
+                    * 3.7 = 50
+                    * 3.6 = 40
+                    * 3.5 = 30    4.29 ~ 3.50 까지 있음
+                    * 3.4 = 20 --> 3.49 부터 0% 이어야함
+                    * 3.3 = 10
+                    * 3.2 = 0
+                    *
+                    *
+                    *
+                    * 3.99 - 0.3 = 3.69   69
+                    * 3.89
+                    * 3.79
+                    * 3.69
+                    * */
 
-                    if (battLevel[0] >= 4.0) {
+                    if (battLevel[0] >= 4.200) {
                         //100
                         batt = 100;
                     } else {
                         //99이하
-                        int abc = 90;
-                        batt = (int) ((battLevel[0] - 3.0) * 100);
-
+                        batt = (int) ((battLevel[0] - 3.500F) / 4.200F  * 1000);
+                        Log.wtf("battLevel", String.valueOf(battLevel[0]));
+                        /*int abc = 90;
+                        batt = (int) ((battLevel[0] - 3.0) * 100);*/
                     }
 
-                    if (battLevel[0] >= 4.0) {
+                    //4.2 -> 100%
+                    //3.4 -> 0%
+
+                    /* 4.2 - 3.4 = 0.8
+                    * 5단계
+                    * it >= 4.0 100%
+                    * it >=
+                    *
+                    * */
+
+
+                    /*if (battLevel[0] >= 4.0) {
                         //4
                         binding.imgBatt.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_100));
 
@@ -546,6 +577,27 @@ public class Main1chActivity extends AppCompatActivity {
 
                     } else if (battLevel[0] <= 3.25) {
                         //0
+                        binding.imgBatt.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_0));
+                    }*/
+
+                    if (batt >= 100) {
+                        //4 100%
+                        binding.imgBatt.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_100));
+
+                    } else if (batt > 74) {
+                        //3 99 ~ 75
+                        binding.imgBatt.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_75));
+
+                    } else if (batt > 49) {
+                        //2 74 ~ 50
+                        binding.imgBatt.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_50));
+
+                    } else if (batt > 24) {
+                        //1 49 ~ 25
+                        binding.imgBatt.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_25));
+
+                    } else {
+                        //0 24 ~ 0
                         binding.imgBatt.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_0));
                     }
 

@@ -12,7 +12,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/back_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -25,14 +25,18 @@
 
             <ImageButton
                 android:id="@+id/back_imb"
-                android:layout_width="@dimen/_5sdp"
-                android:layout_height="@dimen/_10sdp"
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_20sdp"
+                android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:layout_gravity="center"
                 android:layout_marginStart="@dimen/_10sdp"
                 android:background="@null"
+                android:contentDescription="@string/back"
+                android:padding="10dp"
                 android:scaleType="centerInside"
-                android:src="@drawable/back_button" />
+                android:src="@drawable/back_button"
+                tools:ignore="ImageContrastCheck" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -40,13 +44,15 @@
                 android:layout_gravity="center"
                 android:layout_marginStart="@dimen/_10sdp"
                 android:fontFamily="@font/spoqahansansneo_bold"
-                android:text="1ch 측정"
+                android:text="@string/measure1ch"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_11sdp"
                 android:textStyle="bold"
+                android:layout_toEndOf="@+id/back_imb"
+                android:layout_centerVertical="true"
                 app:layout_constraintStart_toEndOf="@id/back_imb" />
 
-        </LinearLayout>
+        </RelativeLayout>
 
 
 
@@ -62,7 +68,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/graph_container"
         app:layout_constraintWidth_percent="0.4"
-        >
+        tools:ignore="RtlSymmetry">
 
 
         <TextView
@@ -71,7 +77,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/_3sdp"
             android:fontFamily="@font/spoqahansansneo_bold"
-            android:text="Sante I-Motion Lab"
+            android:text="@string/sante_i_motion_lab"
             android:textColor="@color/mainColor"
             android:textSize="@dimen/_11sdp"
             app:layout_constraintStart_toStartOf="parent"
@@ -86,7 +92,7 @@
             android:layout_marginStart="@dimen/_2sdp"
             android:layout_marginTop="@dimen/_10sdp"
             android:background="@drawable/button_01"
-            android:text="START"
+            android:text="@string/start"
             android:textColor="@color/mainColor"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/i_motion_txv"
@@ -99,7 +105,7 @@
             android:layout_height="@dimen/_25sdp"
             android:layout_marginStart="@dimen/_5sdp"
             android:background="@drawable/button_02"
-            android:text="Watch STOP"
+            android:text="@string/watch_stop"
             android:textColor="@color/mainColor"
             android:textSize="@dimen/_6sdp"
             app:layout_constraintEnd_toStartOf="@+id/btn_allstop"
@@ -113,7 +119,7 @@
             android:layout_height="@dimen/_25sdp"
             android:layout_marginStart="@dimen/_5sdp"
             android:background="@drawable/button_02"
-            android:text="All STOP"
+            android:text="@string/all_stop"
             android:textColor="@color/mainColor"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/btn_watchstop"
@@ -127,7 +133,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/button_02"
             android:enabled="false"
-            android:text="구간기록"
+            android:text="@string/record_section"
             android:textColor="@color/mainColor"
             android:textSize="@dimen/_10sdp"
             android:textStyle="bold"
@@ -166,7 +172,8 @@
                 android:layout_centerVertical="true"
                 android:layout_marginHorizontal="@dimen/_5sdp"
                 android:src="@drawable/selectbox_arrow"
-                android:visibility="gone" />
+                android:visibility="gone"
+                android:contentDescription="@string/dropdown" />
 
         </RelativeLayout>
 
@@ -186,6 +193,7 @@
                 android:layout_marginTop="@dimen/_3sdp"
                 android:background="@drawable/button_08"
                 android:visibility="gone"
+                tools:ignore="UselessParent"
                 >
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -207,7 +215,7 @@
             android:layout_height="@dimen/_20sdp"
             android:layout_marginTop="@dimen/_10sdp"
             android:background="@drawable/button_02"
-            android:text="3Sec.Alarm"
+            android:text="@string/_3sec_alarm"
             android:textColor="@color/mainColor"
             android:textSize="@dimen/_9sdp"
             app:layout_constraintStart_toStartOf="@id/btn_start"
@@ -220,7 +228,7 @@
             android:layout_width="88dp"
             android:layout_height="@dimen/_20sdp"
             android:background="@drawable/button_02"
-            android:text="미리보기"
+            android:text="@string/preview"
             android:textColor="@color/mainColor"
             android:textSize="@dimen/_8sdp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -231,16 +239,15 @@
             android:id="@+id/btn_acc_axis"
             android:layout_width="0dp"
             android:layout_height="@dimen/_20sdp"
+            android:layout_marginTop="@dimen/_10sdp"
             android:background="@drawable/bg_rounded_02"
-            android:text="ACC."
+            android:text="@string/acc"
             android:textColor="@color/mainColor"
             android:textSize="@dimen/_6sdp"
-            android:layout_marginTop="@dimen/_10sdp"
-            app:layout_constraintTop_toBottomOf="@id/btn_alarm"
-            app:layout_constraintStart_toStartOf="@id/btn_start"
             app:layout_constraintEnd_toStartOf="@id/btn_gyro_axis"
-            />
-
+            app:layout_constraintStart_toStartOf="@id/btn_start"
+            app:layout_constraintTop_toBottomOf="@id/btn_alarm"
+            tools:ignore="TextContrastCheck" />
 
 
         <Button
@@ -249,15 +256,15 @@
             android:layout_height="@dimen/_20sdp"
             android:layout_marginStart="@dimen/_5sdp"
             android:background="@drawable/bg_rounded_02"
-            android:text="Gyro."
+            android:text="@string/gyro"
             android:textColor="@color/mainColor"
             android:textSize="@dimen/_6sdp"
             app:layout_constraintBottom_toBottomOf="@id/btn_acc_axis"
-            app:layout_constraintTop_toTopOf="@id/btn_acc_axis"
             app:layout_constraintEnd_toStartOf="@id/btn_emg_axis"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toEndOf="@id/btn_acc_axis"
-            />
+            app:layout_constraintTop_toTopOf="@id/btn_acc_axis"
+            tools:ignore="TextContrastCheck" />
 
         <Button
             android:id="@+id/btn_emg_axis"
@@ -265,21 +272,21 @@
             android:layout_height="@dimen/_20sdp"
             android:layout_marginStart="@dimen/_5sdp"
             android:background="@drawable/bg_rounded_02"
-            android:text="EMG"
+            android:text="@string/emg"
             android:textColor="@color/mainColor"
             android:textSize="@dimen/_6sdp"
+            app:layout_constraintBottom_toBottomOf="@id/btn_acc_axis"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/btn_gyro_axis"
             app:layout_constraintTop_toTopOf="@id/btn_acc_axis"
-            app:layout_constraintBottom_toBottomOf="@id/btn_acc_axis"
-            />
+            tools:ignore="TextContrastCheck,DuplicateSpeakableTextCheck" />
 
 
         <TextView
             android:id="@+id/test_name_Txv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="테스트명"
+            android:text="@string/test_name"
             android:textColor="@color/black"
             android:fontFamily="@font/spoqahansansneo_bold"
             android:layout_marginTop="@dimen/_10sdp"
@@ -292,19 +299,19 @@
         <EditText
             android:id="@+id/test_name_edt"
             android:layout_width="0dp"
-            android:layout_height="35dp"
-            android:layout_marginBottom="@dimen/_10sdp"
+            android:layout_height="@dimen/_20sdp"
             android:layout_marginTop="@dimen/_5sdp"
-            android:inputType="text"
-            android:hint="테스트명"
-            android:textSize="@dimen/_6sdp"
-            android:paddingHorizontal="@dimen/_5sdp"
             android:background="@drawable/bg_rounded_02"
-            app:layout_constraintTop_toBottomOf="@id/test_name_Txv"
-            app:layout_constraintStart_toStartOf="@id/btn_start"
+            android:hint="@string/test_name"
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:paddingHorizontal="@dimen/_5sdp"
+            android:textColorHint="#757575"
+            android:textSize="@dimen/_6sdp"
             app:layout_constraintEnd_toEndOf="@id/btn_allstop"
-
-            />
+            app:layout_constraintStart_toStartOf="@id/btn_start"
+            app:layout_constraintTop_toBottomOf="@id/test_name_Txv"
+            tools:ignore="TextContrastCheck" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -328,11 +335,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/_3sdp"
             android:fontFamily="@font/spoqahansansneo_bold"
-            android:text="TUG측정 그래프"
+            android:text="@string/tug_measure_graph"
             android:textColor="@color/mainColor"
             android:textSize="@dimen/_11sdp"
-
-
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             />
@@ -366,12 +371,10 @@
                 android:layout_marginBottom="3dp"
                 android:gravity="bottom|end"
                 android:text="@string/btn_emg_enable"
-
                 android:textSize="12sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toTopOf="@id/frag_graph_measure"
                 app:layout_constraintHeight_percent="0.1"
-
                 app:layout_constraintHorizontal_bias="0.80"
                 app:layout_constraintLeft_toLeftOf="@id/frag_graph_measure"
                 app:layout_constraintRight_toRightOf="@id/frag_graph_measure"
@@ -415,12 +418,11 @@
                 android:layout_height="0dp"
                 android:background="@color/button01"
                 android:gravity="center"
-
                 android:text="@string/txt_default_range"
+                android:textColor="#616161"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toTopOf="@id/frag_graph_measure"
                 app:layout_constraintHeight_percent="0.1"
-
                 app:layout_constraintLeft_toLeftOf="@id/frag_graph_measure"
                 app:layout_constraintWidth_percent="0.15" />
 
@@ -432,9 +434,9 @@
                 android:gravity="center"
                 android:text="@string/txt_full_range"
                 android:textSize="12sp"
+                android:textColor="#616161"
                 app:layout_constraintBottom_toTopOf="@id/frag_graph_measure"
                 app:layout_constraintHeight_percent="0.1"
-
                 app:layout_constraintStart_toEndOf="@+id/txt_default_range"
                 app:layout_constraintWidth_percent="0.15" />
 
@@ -444,11 +446,10 @@
                 android:layout_height="0dp"
                 android:layout_marginBottom="3dp"
                 android:gravity="bottom|end"
-
                 android:textSize="12sp"
+                android:textColor="@color/gray"
                 app:layout_constraintBottom_toTopOf="@id/frag_graph_measure"
                 app:layout_constraintHeight_percent="0.1"
-
                 app:layout_constraintStart_toEndOf="@+id/txt_enable_emg"
                 app:layout_constraintWidth_percent="0.065" />
 
@@ -459,11 +460,10 @@
                 android:layout_marginBottom="3dp"
                 android:gravity="bottom|center_horizontal"
                 android:text=" ~ "
-
+                android:textColor="@color/gray"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toTopOf="@id/frag_graph_measure"
                 app:layout_constraintHeight_percent="0.1"
-
                 app:layout_constraintStart_toEndOf="@+id/txt_emg_min"
                 app:layout_constraintWidth_percent="0.02" />
 
@@ -473,11 +473,10 @@
                 android:layout_height="0dp"
                 android:layout_marginBottom="3dp"
                 android:gravity="bottom|start"
-
+                android:textColor="@color/gray"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toTopOf="@id/frag_graph_measure"
                 app:layout_constraintHeight_percent="0.1"
-
                 app:layout_constraintStart_toEndOf="@+id/txt_emg_wave"
                 app:layout_constraintWidth_percent="0.065" />
 
@@ -569,12 +568,12 @@
                 android:layout_height="0dp"
                 android:gravity="center"
                 android:text="@string/txt_time_label"
-
                 android:textSize="12sp"
                 android:textStyle="bold"
+                android:textColor="@color/gray"
                 app:layout_constraintEnd_toEndOf="@+id/frag_graph_measure"
                 app:layout_constraintHeight_percent="0.1"
-
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/frag_graph_measure"
                 app:layout_constraintTop_toBottomOf="@id/frag_graph_measure"
                 app:layout_constraintWidth_percent="0.15" />
@@ -593,7 +592,8 @@
                 app:layout_constraintRight_toLeftOf="@id/btn_prev_sec"
 
                 app:layout_constraintTop_toBottomOf="@id/frag_graph_measure"
-                app:layout_constraintWidth_percent="0.0875" />
+                app:layout_constraintWidth_percent="0.0875"
+                tools:ignore="TouchTargetSizeCheck" />
 
             <Button
                 android:id="@+id/btn_prev_sec"
@@ -609,7 +609,8 @@
                 app:layout_constraintRight_toLeftOf="@id/txt_time_label"
 
                 app:layout_constraintTop_toBottomOf="@id/frag_graph_measure"
-                app:layout_constraintWidth_percent="0.0875" />
+                app:layout_constraintWidth_percent="0.0875"
+                tools:ignore="TouchTargetSizeCheck" />
 
             <Button
                 android:id="@+id/btn_next_sec"
@@ -625,7 +626,8 @@
                 app:layout_constraintLeft_toRightOf="@id/txt_time_label"
 
                 app:layout_constraintTop_toBottomOf="@id/frag_graph_measure"
-                app:layout_constraintWidth_percent="0.0875" />
+                app:layout_constraintWidth_percent="0.0875"
+                tools:ignore="TouchTargetSizeCheck" />
 
             <Button
                 android:id="@+id/btn_next_page"
@@ -641,7 +643,8 @@
                 app:layout_constraintLeft_toRightOf="@id/btn_next_sec"
 
                 app:layout_constraintTop_toBottomOf="@id/frag_graph_measure"
-                app:layout_constraintWidth_percent="0.0875" />
+                app:layout_constraintWidth_percent="0.0875"
+                tools:ignore="TouchTargetSizeCheck" />
 
             <TextView
                 android:id="@+id/txt_leadoff"
@@ -651,12 +654,13 @@
                 android:gravity="center"
 
                 android:text="@string/txt_leadoff"
+                android:textColor="#000000"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:visibility="visible"
                 app:layout_constraintEnd_toEndOf="@+id/frag_graph_measure"
-                app:layout_constraintHeight_percent="0.085"
 
+                app:layout_constraintHeight_percent="0.085"
                 app:layout_constraintTop_toTopOf="@id/frag_graph_measure"
                 app:layout_constraintWidth_percent="0.1225" />
 

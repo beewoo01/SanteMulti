@@ -49,7 +49,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class MeasureActivity extends AppCompatActivity implements SaveFileListener {
+public class Measure2chActivity extends AppCompatActivity implements SaveFileListener {
 
 
     private ScreenSize screen = null;
@@ -247,7 +247,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
 
         Intent intent = new Intent(
-                MeasureActivity.this, // 현재 화면
+                Measure2chActivity.this, // 현재 화면
                 BTService.class); // 다음넘어갈 컴퍼넌트
 
         bindService(intent, // intent 객체
@@ -509,7 +509,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
                     UserInfo.getInstance().watchCnt = cntWatch;
                     UserInfo.getInstance().spacial = binding.testNameEdt.getText().toString();
                     fragMeasure[0].SaveData("ch1",
-                            MeasureActivity.this, recordAdapter.getItems(),
+                            Measure2chActivity.this, recordAdapter.getItems(),
                             santeApps[0]);
                 }, "알림", "측정결과를 저장하시겠습니까?");
                 defaultDialog.show();
@@ -532,7 +532,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
             Toast.makeText(this, "파일 저장에 성공하였습니다.", Toast.LENGTH_SHORT).show();
         } else {
             //fragMeasure[1].SaveData("left", MeasureActivity.this, recordAdapter.getItems());
-            fragMeasure[1].SaveData("ch2", MeasureActivity.this,
+            fragMeasure[1].SaveData("ch2", Measure2chActivity.this,
                     recordAdapter.getItems(), santeApps[1]);
         }
     }
@@ -926,6 +926,11 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
 
         binding.btnAccAxis.setOnClickListener(v -> {
+            if (isStart || isPreview) {
+                showToast("측정 중에는 변경할 수 없습니다.");
+                return;
+            }
+
             boolean[] enableAxis = new boolean[3];
             fragMeasure[0].GetEnable(0, enableAxis);
             fragMeasure[1].GetEnable(0, enableAxis);
@@ -940,6 +945,12 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
         //btnGyroAxis = (Button) findViewById(R.id.btn_gyro_axis);
         binding.btnGyroAxis.setOnClickListener(v -> {
+
+            if (isStart || isPreview) {
+                showToast("측정 중에는 변경할 수 없습니다.");
+                return;
+            }
+
             boolean[] enableAxis = new boolean[3];
             fragMeasure[0].GetEnable(1, enableAxis);
             fragMeasure[1].GetEnable(1, enableAxis);
@@ -954,6 +965,12 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
         //btnEMGAxis = (Button) findViewById(R.id.btn_emg_axis);
 
         binding.btnEmgAxis.setOnClickListener(v -> {
+
+            if (isStart || isPreview) {
+                showToast("측정 중에는 변경할 수 없습니다.");
+                return;
+            }
+
             boolean[] enableAxis = new boolean[3];
             fragMeasure[0].GetEnable(2, enableAxis);
             fragMeasure[1].GetEnable(2, enableAxis);
@@ -1096,14 +1113,14 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
 
         //txtTimeLabel = (TextView) findViewById(R.id.txt_time_label);
         binding.txtTimeLabel.setOnClickListener(v -> {
-            Intent intent = new Intent(MeasureActivity.this, PopupTimeActivity.class);
+            Intent intent = new Intent(Measure2chActivity.this, PopupTimeActivity.class);
             intent.putExtra("Type", BTService.REQUEST_Time_RANGE);
             intent.putExtra("deviceLength", 2);
             startActivityForResult(intent, BTService.REQUEST_Time_RANGE);
         });
 
         binding.txtTimeLabel2.setOnClickListener(v -> {
-            Intent intent = new Intent(MeasureActivity.this, PopupTimeActivity.class);
+            Intent intent = new Intent(Measure2chActivity.this, PopupTimeActivity.class);
             intent.putExtra("Type", BTService.REQUEST_Time_RANGE);
             intent.putExtra("deviceLength", 2);
             startActivityForResult(intent, BTService.REQUEST_Time_RANGE);
@@ -1175,6 +1192,10 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
         });
     }
 
+    private void showToast(String msg){
+        Toast.makeText(Measure2chActivity.this, msg, Toast.LENGTH_SHORT).show();
+    }
+
 
     private final View.OnClickListener defaultDialogclose = new View.OnClickListener() {
         @Override
@@ -1188,7 +1209,7 @@ public class MeasureActivity extends AppCompatActivity implements SaveFileListen
             defaultDialog.dismiss();
             UserInfo.getInstance().watchCnt = cntWatch;
             UserInfo.getInstance().memo = binding.testNameEdt.getText().toString();
-            fragMeasure[0].SaveData("ch1", MeasureActivity.this,
+            fragMeasure[0].SaveData("ch1", Measure2chActivity.this,
                     recordAdapter.getItems(), santeApps[0]);
 
 

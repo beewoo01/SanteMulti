@@ -15,7 +15,6 @@ import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.media.ToneGenerator;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -32,7 +31,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.physiolab.sante.BlueToothService.BTService;
@@ -44,14 +42,13 @@ import com.physiolab.sante.ScreenSize;
 import com.physiolab.sante.Spinner_Re_Adapter;
 import com.physiolab.sante.UserInfo;
 import com.physiolab.sante.dialog.DefaultDialog;
-import com.physiolab.sante.santemulti.databinding.ActivityMeasureBinding;
 import com.physiolab.sante.santemulti.databinding.ActivityMeasureOneBinding;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class MeasureOneActivity extends AppCompatActivity implements SaveFileListener {
+public class Measure1chActivity extends AppCompatActivity implements SaveFileListener {
 
     private ScreenSize screen = null;
 
@@ -224,7 +221,7 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
 
 
         Intent intent = new Intent(
-                MeasureOneActivity.this, // 현재 화면
+                Measure1chActivity.this, // 현재 화면
                 BTService.class); // 다음넘어갈 컴퍼넌트
 
         bindService(intent, // intent 객체
@@ -495,6 +492,10 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
 
                 hasData = true;
 
+                /*binding.btnAccAxis.setEnabled(false);
+                binding.btnGyroAxis.setEnabled(false);
+                binding.btnEmgAxis.setEnabled(false);*/
+
                 if (isAlarm) cntWatch = BTService.SAMPLE_RATE * -3;
                 else cntWatch = 0;
 
@@ -596,6 +597,10 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
 
 
         binding.btnAccAxis.setOnClickListener(v -> {
+            if (isStart || isPreview) {
+                showToast("측정 중에는 변경할 수 없습니다.");
+                return;
+            }
             boolean[] enableAxis = new boolean[3];
             fragMeasure.GetEnable(0, enableAxis);
 
@@ -608,6 +613,10 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
         });
 
         binding.btnGyroAxis.setOnClickListener(v -> {
+            if (isStart || isPreview) {
+                showToast("측정 중에는 변경할 수 없습니다.");
+                return;
+            }
             boolean[] enableAxis = new boolean[3];
             fragMeasure.GetEnable(1, enableAxis);
 
@@ -620,6 +629,10 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
         });
 
         binding.btnEmgAxis.setOnClickListener(v -> {
+            if (isStart || isPreview) {
+                showToast("측정 중에는 변경할 수 없습니다.");
+                return;
+            }
             boolean[] enableAxis = new boolean[3];
             fragMeasure.GetEnable(2, enableAxis);
 
@@ -689,7 +702,7 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
 
         //txtTimeLabel = (TextView) findViewById(R.id.txt_time_label);
         binding.txtTimeLabel.setOnClickListener(v -> {
-            Intent intent = new Intent(MeasureOneActivity.this, PopupTimeActivity.class);
+            Intent intent = new Intent(Measure1chActivity.this, PopupTimeActivity.class);
             intent.putExtra("Type", BTService.REQUEST_Time_RANGE);
             intent.putExtra("deviceLength", 1);
             startActivityForResult(intent, BTService.REQUEST_Time_RANGE);
@@ -732,6 +745,10 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
 
     }
 
+    private void showToast(String msg){
+        Toast.makeText(Measure1chActivity.this, msg, Toast.LENGTH_SHORT).show();
+    }
+
 
     private void MeasureStop() {
         if (isStart | isPreview) {
@@ -745,7 +762,7 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
                 defaultDialog = new DefaultDialog(this, () -> {
                     UserInfo.getInstance().watchCnt = cntWatch;
                     UserInfo.getInstance().spacial = binding.testNameEdt.getText().toString();
-                    fragMeasure.SaveData("ch1", MeasureOneActivity.this,
+                    fragMeasure.SaveData("ch1", Measure1chActivity.this,
                             recordAdapter.getItems(), santeApps);
                 }, "알림", "측정결과를 저장하시겠습니까?");
                 defaultDialog.show();
@@ -766,6 +783,9 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
         isStart = false;
         isPreview = false;
         isFirst = true;
+        /*binding.btnAccAxis.setEnabled(true);
+        binding.btnGyroAxis.setEnabled(true);
+        binding.btnEmgAxis.setEnabled(true);*/
         santeApps.SetPreview(isPreview, device);
         UpdateUI();
     }
@@ -807,7 +827,7 @@ public class MeasureOneActivity extends AppCompatActivity implements SaveFileLis
             //String deviceDirection = device == 0 ? "right" : "left";
             UserInfo.getInstance().watchCnt = cntWatch;
             UserInfo.getInstance().spacial = binding.testNameEdt.getText().toString();
-            fragMeasure.SaveData("ch1", MeasureOneActivity.this,
+            fragMeasure.SaveData("ch1", Measure1chActivity.this,
                     recordAdapter.getItems(), santeApps);
 
         }
