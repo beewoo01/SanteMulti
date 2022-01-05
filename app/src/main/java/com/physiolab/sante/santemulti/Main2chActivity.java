@@ -104,6 +104,7 @@ public class Main2chActivity extends AppCompatActivity {
     //private IntentFilter intentFilter;
     private SpinnerAdapter adapterDevice;
     private String addedDeviceAddress = null;
+    private int[] batt = new int[]{0, 0};
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -780,7 +781,7 @@ public class Main2chActivity extends AppCompatActivity {
 
                 battImv[i].setVisibility(View.VISIBLE);
 
-                int batt = Math.round(battLevel[i] * 20);
+
 
 
                 /* battery version1
@@ -818,27 +819,34 @@ public class Main2chActivity extends AppCompatActivity {
 
                 */
 
+                float min = 3.400F;
+                float max = 4.200F;
+
                 // battery version2
                 if (battLevel[i] >= 4.200) {
-                    batt = 100;
+                    batt[i] = 100;
                 }else {
-                    batt = (int) ((battLevel[i] - 3.500F) / 4.200F  * 1000);
+                    batt[i] = (int) ((battLevel[i] - min) / (max - min) * 100);
+
+                    if (batt[i] <= 0) {
+                        batt[i] = 0;
+                    }
                 }
 
 
-                if (batt >= 100) {
+                if (batt[i] >= 100) {
                     //4
                     battImv[i].setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_100));
 
-                } else if (batt > 74) {
+                } else if (batt[i] > 74) {
                     //3
                     battImv[i].setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_75));
 
-                } else if (batt > 49) {
+                } else if (batt[i] > 49) {
                     //2
                     battImv[i].setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_50));
 
-                }else if (batt > 24) {
+                }else if (batt[i] > 24) {
                     //1
                     battImv[i].setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_25));
 
@@ -849,7 +857,7 @@ public class Main2chActivity extends AppCompatActivity {
 
 
 
-                battTxv[i].setText(batt + "%");
+                battTxv[i].setText(batt[i] + "%");
 
 
                 /*if (batt > 90)

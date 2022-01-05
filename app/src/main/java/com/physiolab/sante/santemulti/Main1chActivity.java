@@ -74,6 +74,7 @@ public class Main1chActivity extends AppCompatActivity {
     private String[] deviceAddress;
 
     private boolean infoGender = true;
+    private int batt = 0;
 
     private final ServiceConnection conn = new ServiceConnection() {
         public void onServiceConnected(ComponentName name,
@@ -281,6 +282,10 @@ public class Main1chActivity extends AppCompatActivity {
         if (isState[0] == STATE_NONE) {
             showToast("기기를 연결해주세요");
             return;
+        } else if (batt <= 0) {
+            showToast("측정기기 배터리를 충전해 주세요");
+            return;
+
         } else if (TextUtils.isEmpty(binding.editName.getText().toString()) || binding.editName.getText().toString().length() < 1) {
             showToast("측정자이름을 입력해주세요");
             return;
@@ -513,7 +518,7 @@ public class Main1chActivity extends AppCompatActivity {
                     binding.tvBatt.setVisibility(View.VISIBLE);
                     binding.imgBatt.setVisibility(View.VISIBLE);
 
-                    int batt = Math.round(battLevel[0] * 20);
+                    //batt = Math.round(battLevel[0] * 20);
 
                     binding.tvBatt.setText(batt + "%");
                     /*
@@ -537,26 +542,20 @@ public class Main1chActivity extends AppCompatActivity {
                     * 3.69
                     * */
 
+                    float min = 3.400F;
+                    float max = 4.200F;
+
                     if (battLevel[0] >= 4.200) {
                         //100
                         batt = 100;
                     } else {
                         //99이하
-                        batt = (int) ((battLevel[0] - 3.500F) / 4.200F  * 1000);
-                        Log.wtf("battLevel", String.valueOf(battLevel[0]));
-                        /*int abc = 90;
-                        batt = (int) ((battLevel[0] - 3.0) * 100);*/
+                        batt = (int) ((battLevel[0] - min) / (max - min) * 100);
+
+                        if (batt < 0) {
+                            batt = 0;
+                        }
                     }
-
-                    //4.2 -> 100%
-                    //3.4 -> 0%
-
-                    /* 4.2 - 3.4 = 0.8
-                    * 5단계
-                    * it >= 4.0 100%
-                    * it >=
-                    *
-                    * */
 
 
                     /*if (battLevel[0] >= 4.0) {
@@ -603,19 +602,6 @@ public class Main1chActivity extends AppCompatActivity {
 
                     binding.tvBatt.setText(batt + "%");
 
-                    /*if (batt > 90) {
-                        binding.imgBatt.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_100));
-                    } else if (batt > 75)
-                        binding.imgBatt.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_75));
-                    else if (batt > 50)
-                        binding.imgBatt.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_50));
-                    else if (batt > 25)
-                        binding.imgBatt.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_25));
-                    else if (batt > 10)
-                        binding.imgBatt.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.battery_0));*/
-
-                    /*int batt = Math.round(battValue * 20);
-                    updateBatt(batt);*/
                     break;
             }
         } else {

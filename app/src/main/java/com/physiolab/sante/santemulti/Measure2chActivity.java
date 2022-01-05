@@ -111,6 +111,8 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
 
     private final TextView[] txtReadOffs = new TextView[2];
 
+    private boolean timeLabStart = false;
+
     private final Spinner_Re_Adapter recordAdapter = new Spinner_Re_Adapter(new ArrayList<>());
 
     private final ServiceConnection conn = new ServiceConnection() {
@@ -497,6 +499,7 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
         if (isStart | isPreview) {
             btService.Stop(0);
             btService.Stop(1);
+            timeLabStart = false;
         }
 
 
@@ -721,7 +724,7 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
 
     }
 
-    @SuppressLint("ClickableViewAccessibility")
+    @SuppressLint({"ClickableViewAccessibility", "SetTextI18n"})
     private void InitControl() {
         fragMeasure = new MeasureFragment[]{
                 (MeasureFragment) getSupportFragmentManager().findFragmentById(R.id.frag_graph_measure),
@@ -832,6 +835,7 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
 
                 btService.Start(0);
                 btService.Start(1);
+                binding.txtWatchSecond.setText("00:00:00");
 
                 if (isAlarm) {
                     timeThread[0] = new TimeThread(0);
@@ -842,6 +846,9 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
 
                 }else {
                     BeepPlay();
+                    timeLabStart = true;
+                    baseTime = SystemClock.elapsedRealtime();
+                    timerHandler.sendEmptyMessage(0);
                 }
                 UpdateUI(0);
                 UpdateUI(1);
@@ -1249,7 +1256,11 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
         @Override
         public void handleMessage(@NonNull Message msg) {
             //super.handleMessage(msg);
-            binding.txtWatchSecond.setText(getTime());
+
+            if (timeLabStart)
+            {
+                binding.txtWatchSecond.setText(getTime());
+            }
             timerHandler.sendEmptyMessage(0);
 
         }
@@ -1449,10 +1460,12 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
                 ope_cnt = 3;
                 sendEmptyMessageDelayed(0, 1000);*/
 
-            } else if (msg.what == 2) {//정상 진행 종료
+            } else if (msg.what == 2) {
+                //정상 진행 종료
                 Log.wtf("쓰레드", "2222정지");
                 if (deviceNum == 1){
                     BeepPlay();
+                    timeLabStart = true;
                     /*baseTime = SystemClock.elapsedRealtime();
                     //timerHandler.sendEmptyMessage(0);
                     timerHandler.sendEmptyMessageDelayed(0, 1000);*/

@@ -15,6 +15,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.text.format.DateFormat;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.Toast;
@@ -26,12 +27,17 @@ import com.physiolab.sante.BlueToothService.BTService;
 import com.physiolab.sante.SanteApp;
 import com.physiolab.sante.UserInfo;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -912,7 +918,27 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
 
-    private void WriteString(List<String[]> list, String str) {
+    private void WriteString(DataOutputStream output, String str) {
+        byte[] bytes;
+        int length = 0;
+
+        try {
+            bytes = str.getBytes(StandardCharsets.UTF_8);
+            length = bytes.length;
+
+            while (length >= 0x80) {
+                output.writeByte((length & 0x7F) | 0x80);
+                length = length >> 7;
+            }
+
+            output.writeByte((length & 0x7F));
+            output.write(bytes);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /*private void WriteString(List<String[]> list, String str) {
         byte[] bytes;
         int length = 0;
 
@@ -940,7 +966,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     //폴더 만들기
     private void CreateFolder() {
@@ -984,7 +1010,6 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
         saveLog();
 
-        boolean isExportExist = false;
         export = "";
 
         Date nowDate = new Date(System.currentTimeMillis());
@@ -995,17 +1020,336 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         export += "_";
         //export += UserInfo.getInstance().direction_of_wear;
         export += wearingPart;
-        export += ".csv";
+        export += ".snt";
+        //export += ".csv";
 
         //CreateFolder();
 
-
-        saveCSV(wearingPart, timeLab, firstTime, santeApp);
+        saveSNT(wearingPart, timeLab, firstTime, santeApp);
+        //saveCSV(wearingPart, timeLab, firstTime, santeApp);
 
 
     }
 
-    private void saveCSV(String wearingPart, ArrayList<String> timeLab,
+    private void saveSNT(String wearingPart, ArrayList<String> timeLab,
+                         String firstTime, SanteApp santeApp) {
+
+        CreateFolder();
+
+        FileOutputStream fileOutput = null;
+        BufferedOutputStream bufOutput = null;
+        DataOutputStream output = null;
+
+        ByteBuffer buf = ByteBuffer.allocate(Float.BYTES);
+        buf.order(ByteOrder.LITTLE_ENDIAN);
+        buf.clear();
+
+        boolean isExportExist = false;
+        /*
+        export = "";
+        if (info.name.compareTo("") != 0) {
+
+            export = info.name;
+        }
+        export += "_" + DateFormat.format("yyyyMMdd_HHmmss", info.measureTime).toString();
+
+        export += ".snt";
+
+        CreateFolder();*/
+
+        File exportFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + export);
+
+        try {
+            fileOutput = new FileOutputStream(exportFile, false);
+            bufOutput = new BufferedOutputStream(fileOutput, 4096);
+            output = new DataOutputStream(bufOutput);
+            isExportExist = true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            isExportExist = false;
+        }
+
+        if (!isExportExist) {
+            try {
+                output.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            try {
+                bufOutput.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            try {
+                fileOutput.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            listener.onFail();
+            return;
+        }
+
+
+        try {
+            //파일구분을 위한 표시 : 6 byte
+            output.writeShort((short) 0xFF12);
+            output.writeShort((short) 0xFF50);
+            output.writeShort((short) 0x0001);
+            output.flush();
+
+            //측정시간
+            output.writeLong(Long.reverseBytes(BTService.Time_Offset + UserInfo.getInstance().measureTime.getTime() * 10000L));
+
+            output.writeBoolean(UserInfo.getInstance().gender);
+
+            byte[] strData = UserInfo.getInstance().birth.getBytes(StandardCharsets.UTF_8);
+            output.write(strData);
+            output.writeInt(Integer.parseInt(UserInfo.getInstance().height));
+            output.writeInt(Integer.parseInt(UserInfo.getInstance().weight));
+
+            output.writeBoolean(UserInfo.getInstance().alarm);
+            output.writeInt(Integer.reverseBytes(EMGCount));
+
+            strData = firstTime.getBytes(StandardCharsets.UTF_8);
+            output.write(strData);
+
+
+            if (timeLab != null && timeLab.size() > 0) {
+                output.writeInt(timeLab.size());
+                for (int i = 0; i < timeLab.size(); i++) {
+                    strData = timeLab.get(i).getBytes(StandardCharsets.UTF_8);
+                    output.write(strData);
+                }
+            }else {
+                strData = "".getBytes(StandardCharsets.UTF_8);
+                output.write(strData);
+                output.write(strData);
+            }
+
+
+            /*if (info.watchCnt < 0) {
+                output.writeInt(Integer.reverseBytes(0));
+
+            } else {
+                output.writeInt(Integer.reverseBytes(info.watchCnt));
+            }*/
+            output.flush();
+
+            String LINE_SEPERATOR = System.getProperty("line.separator");
+
+            WriteString(output, UserInfo.getInstance().name.replace(LINE_SEPERATOR, ""));
+            WriteString(output, UserInfo.getInstance().memo.replace(LINE_SEPERATOR, "\r\n"));
+            output.flush();
+
+            fileOutput.getChannel().position(2048);
+
+            output.flush();
+
+            int deviceNum = 0;
+            if (!wearingPart.equals("ch1")) {
+                deviceNum = 1;
+            }
+
+            String AccHPF = "None";
+            String AccLPF = "None";
+            String GyroHPF = "None";
+            String GyroLPF = "None";
+            String EMGNotch = "Off";
+            String EMGHPF = "None";
+            String EMGLPF = "None";
+            String EMGRMS = "0.3s";
+
+            if (santeApp.GetAccHPF(deviceNum) == 0) {
+                AccHPF = "None";
+            } else if (santeApp.GetAccHPF(deviceNum) == 1) {
+                AccHPF = "0.5Hz";
+            } else if (santeApp.GetAccHPF(deviceNum) == 2) {
+                AccHPF = "1Hz";
+            }
+
+            if (santeApp.GetAccLPF(deviceNum) == 0) {
+                AccLPF = "None";
+            } else if (santeApp.GetAccLPF(deviceNum) == 1) {
+                AccLPF = "10Hz";
+            } else if (santeApp.GetAccLPF(deviceNum) == 2) {
+                AccLPF = "20Hz";
+            }
+
+            if (santeApp.GetGyroHPF(deviceNum) == 0) {
+                GyroHPF = "None";
+            } else if (santeApp.GetGyroHPF(deviceNum) == 1) {
+                GyroHPF = "0.5Hz";
+            } else if (santeApp.GetGyroHPF(deviceNum) == 2) {
+                GyroHPF = "1Hz";
+            }
+
+
+            if (santeApp.GetGyroLPF(deviceNum) == 0) {
+                GyroLPF = "None";
+            } else if (santeApp.GetGyroLPF(deviceNum) == 1) {
+                GyroLPF = "10Hz";
+            } else if (santeApp.GetGyroLPF(deviceNum) == 2) {
+                GyroLPF = "20Hz";
+            }
+
+
+            if (santeApp.GetEMGNotch(deviceNum) == 0) {
+                EMGNotch = "Notch Off";
+            } else {
+                EMGNotch = "Notch On";
+            }
+
+            if (santeApp.GetEMGHPF(deviceNum) == 0) {
+                EMGHPF = "None";
+            } else if (santeApp.GetEMGHPF(deviceNum) == 1) {
+                EMGHPF = "3Hz";
+            } else if (santeApp.GetEMGHPF(deviceNum) == 2) {
+                EMGHPF = "20Hz";
+            }
+
+            if (santeApp.GetEMGHPF(deviceNum) == 0) {
+                EMGLPF = "None";
+            } else if (santeApp.GetEMGHPF(deviceNum) == 1) {
+                EMGLPF = "250Hz";
+            } else if (santeApp.GetEMGHPF(deviceNum) == 2) {
+                EMGLPF = "500Hz";
+            }
+
+            if (santeApp.GetEMGRMS(deviceNum) == 0) {
+                EMGRMS = "0.05s";
+            } else if (santeApp.GetEMGRMS(deviceNum) == 1) {
+                EMGRMS = "0.1s";
+            } else if (santeApp.GetEMGRMS(deviceNum) == 2) {
+                EMGRMS = "0.3s";
+            } else if (santeApp.GetEMGRMS(deviceNum) == 3) {
+                EMGRMS = "0.5s";
+            } else if (santeApp.GetEMGRMS(deviceNum) == 4) {
+                EMGRMS = "1s";
+            }
+
+            strData = "".getBytes(StandardCharsets.UTF_8);
+            output.write(strData);
+
+            strData = "Acc HPF".getBytes(StandardCharsets.UTF_8);
+            output.write(strData);
+            strData = AccHPF.getBytes(StandardCharsets.UTF_8);
+            output.write(strData);
+
+            strData = "Acc LPF".getBytes(StandardCharsets.UTF_8);
+            output.write(strData);
+            strData = AccLPF.getBytes(StandardCharsets.UTF_8);
+            output.write(strData);
+
+            strData = "Gyro HPF".getBytes(StandardCharsets.UTF_8);
+            output.write(strData);
+            strData = GyroHPF.getBytes(StandardCharsets.UTF_8);
+            output.write(strData);
+
+            strData = "Gyro LPF".getBytes(StandardCharsets.UTF_8);
+            output.write(strData);
+            strData = GyroLPF.getBytes(StandardCharsets.UTF_8);
+            output.write(strData);
+
+            strData = "EMG Notch".getBytes(StandardCharsets.UTF_8);
+            output.write(strData);
+            strData = EMGNotch.getBytes(StandardCharsets.UTF_8);
+            output.write(strData);
+
+            strData = "EMG HPF".getBytes(StandardCharsets.UTF_8);
+            output.write(strData);
+            strData = EMGHPF.getBytes(StandardCharsets.UTF_8);
+            output.write(strData);
+
+            strData = "EMG LPF".getBytes(StandardCharsets.UTF_8);
+            output.write(strData);
+            strData = EMGLPF.getBytes(StandardCharsets.UTF_8);
+            output.write(strData);
+
+            strData = "EMG RMS".getBytes(StandardCharsets.UTF_8);
+            output.write(strData);
+            strData = EMGRMS.getBytes(StandardCharsets.UTF_8);
+            output.write(strData);
+
+
+
+            for (int i = 0; i < EMGCount; i++) {
+                int tmp = (int) Math.floor((double) i / 10.0);
+
+                buf.clear();
+
+                buf.putFloat(AccData[0][tmp]);
+                bufOutput.write(buf.array(), 0, Float.BYTES);
+                buf.clear();
+
+                buf.putFloat(AccData[1][tmp]);
+                bufOutput.write(buf.array(), 0, Float.BYTES);
+                buf.clear();
+
+                buf.putFloat(AccData[2][tmp]);
+                bufOutput.write(buf.array(), 0, Float.BYTES);
+
+                buf.clear();
+                buf.putFloat(GyroData[0][tmp]);
+                bufOutput.write(buf.array(), 0, Float.BYTES);
+
+                buf.clear();
+                buf.putFloat(GyroData[1][tmp]);
+                bufOutput.write(buf.array(), 0, Float.BYTES);
+
+                buf.clear();
+                buf.putFloat(GyroData[2][tmp]);
+                bufOutput.write(buf.array(), 0, Float.BYTES);
+
+                buf.clear();
+                buf.putFloat(EMGData[i]);
+                bufOutput.write(buf.array(), 0, Float.BYTES);
+
+                buf.clear();
+                buf.putFloat(LeadOffData[i]);
+                bufOutput.write(buf.array(), 0, Float.BYTES);
+
+                float sampleRMSData = (float) SampleRMS2(EMGData, i, santeApp.GetEMGRMS(deviceNum));
+                buf.clear();
+                buf.putFloat(sampleRMSData);
+                bufOutput.write(buf.array(), 0, Float.BYTES);
+
+
+            }
+            listener.onSuccess(deviceNum);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            listener.onFail();
+            return;
+        }
+
+        try {
+            output.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            bufOutput.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            fileOutput.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        /*Toast toast = Toast.makeText(context, "데이터 저장이 완료되었습니다.", Toast.LENGTH_SHORT);
+
+        toast.setGravity(Gravity.CENTER, 0, 0);
+
+
+        toast.show();*/
+
+
+    }
+
+    /*private void saveCSV(String wearingPart, ArrayList<String> timeLab,
                          String firstTime, SanteApp santeApp) {
         try {
             CreateFolder();
@@ -1198,7 +1542,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
             listener.onFail();
         }
 
-    }
+    }*/
 
 
     @SuppressLint("DefaultLocale")
