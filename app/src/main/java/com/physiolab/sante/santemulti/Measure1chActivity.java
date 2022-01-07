@@ -30,6 +30,7 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -173,7 +174,7 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
 
         screen = new ScreenSize();
         screen.getStandardSize(this);
-
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         //binding.backContainer.setOnClickListener(v -> finish());
         binding.backImb.setOnClickListener(v -> {

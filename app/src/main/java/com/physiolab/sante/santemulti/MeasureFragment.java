@@ -49,6 +49,7 @@ public class MeasureFragment extends Fragment {
     private int RMSCount = 0;
     private int dataCount = 0;
     private String firstDataTime = null;
+    private SanteApp santeApps;
 
     public static MeasureFragment newInstance() {
         return new MeasureFragment();
@@ -60,6 +61,7 @@ public class MeasureFragment extends Fragment {
         Log.d(TAG, "onCreateView");
 
         mView = new MeasureView(getActivity(), getActivity());
+        santeApps = (SanteApp) getActivity().getApplication();
         mView.SetData(EMGData, RMSData, LeadOffData, AccData, GyroData, SampleRMSData);
 
         return mView;
@@ -83,12 +85,20 @@ public class MeasureFragment extends Fragment {
             //if (EMGCount >= BTService.SAMPLE_RATE * 60 * 5) return false;
             if (EMGCount >= BTService.SAMPLE_RATE * 350 * 5) return false;
 
+            /**
+             *
+             *  TODO: 2022/01/07  배열 사이즈를 강제로 늘이다보니 사이즈가 맞지않는다.
+             *  TODO: 데이터를 비우고 다시 쓰는 방법을 써야할거 같다.
+             *
+             */
+
             EMGData[EMGCount] = (float) data.Filted[i];
             LeadOffData[EMGCount] = (float) data.BPF_DC[i];
 
 
             RMSData[EMGCount] = data.RMS[i];
 
+            SampleRMSData[EMGCount] = RMS(EMGData, setRMSFilter(), RMSCount);
 
             EMGCount++;
             RMSCount++;
@@ -110,6 +120,53 @@ public class MeasureFragment extends Fragment {
         //mView.SetCount(EMGCount, dataCount);
         mView.SetCount(EMGCount, dataCount, RMSCount);
         return true;
+    }
+
+    private int setRMSFilter() {
+        int result = 10;
+
+        switch (santeApps.GetEMGRMS(0)) {
+            case 0: {
+                result = 10;
+                break;
+            }
+
+            case 1: {
+                result = 20;
+                break;
+            }
+
+            case 2: {
+                result = 60;
+                break;
+            }
+
+            case 3: {
+                result = 100;
+                break;
+            }
+
+            case 4: {
+                result = 200;
+                break;
+            }
+        }
+        return result;
+    }
+
+    public float RMS(float[] EMGData, int m, int count) {
+        float result = 0;
+        if (count > 0) {
+            for (int i = 0; i < m; i++) {
+                if (count < m)
+                    break;
+                result += Math.pow(EMGData[count - (m - i)], 2);
+            }
+            result = (float) Math.sqrt(result / m);
+            return result;
+
+        } else return 0;
+
     }
 
 
