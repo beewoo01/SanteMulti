@@ -6,11 +6,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.SoundPool;
@@ -112,6 +114,10 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
 
     private final TextView[] txtReadOffs = new TextView[2];
 
+    private DataSaveThread[] saveThread = new DataSaveThread[2];
+
+    private boolean[] isSave = new boolean[]{false, false};
+
     private boolean timeLabStart = false;
 
     private final Spinner_Re_Adapter recordAdapter = new Spinner_Re_Adapter(new ArrayList<>());
@@ -211,9 +217,10 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
         screen.getStandardSize(this);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        binding.backContainer.setOnClickListener(v -> finish());
+        //binding.backContainer.setOnClickListener(v -> finish());
         binding.dropdownMenuBtn.setVisibility(View.VISIBLE);
 
+        binding.backImb.setOnClickListener(v -> finish());
         binding.recordRecyclerview.setAdapter(recordAdapter);
         binding.recordRecyclerview.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         binding.recordRecyclerview.setHasFixedSize(true);
@@ -509,15 +516,24 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
             timerHandler.removeMessages(0);
             if (handleflag == 2 || !isAlarm) {
                 Log.wtf("MeasureStop", "andleflag == 2 || !isAlarm");
-                defaultDialog = new DefaultDialog(this, () -> {
-                    UserInfo.getInstance().watchCnt = cntWatch;
-                    UserInfo.getInstance().spacial = binding.testNameEdt.getText().toString();
-                    fragMeasure[0].SaveData("ch1",
-                            Measure2chActivity.this, recordAdapter.getItems(),
-                            santeApps[0]);
+                defaultDialog = new DefaultDialog(this, (DialogOnClick) isSave -> {
+                    if (isSave) {
+                        UserInfo.getInstance().watchCnt = cntWatch;
+                        UserInfo.getInstance().spacial = binding.testNameEdt.getText().toString();
+                        fragMeasure[0].SaveData("ch1",
+                                Measure2chActivity.this, recordAdapter.getItems(),
+                                santeApps[0]);
+                    }else {
+                        fragMeasure[0].deleteData();
+                        //fragMeasure[1].deleteData();
+                    }
+
                 }, "알림", "측정결과를 저장하시겠습니까?");
                 defaultDialog.show();
             }
+        }else {
+            StopSave(0);
+            StopSave(1);
         }
 
         isStart = false;
@@ -649,13 +665,16 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
                                     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm:ss.SSSZ");
                                     String firstDataTime = sdf.format(time);
                                     fragMeasure[deviceIndex].SetFirstDataTime(firstDataTime);
-
+                                    StartSave(0);
+                                    StartSave(1);
                                     isFirst = false;
                                 }
 
                                 if (!fragMeasure[deviceIndex].Add(data)) {
                                     Log.wtf("MESSAGE_DATA_RECEIVE", "!fragMeasure[deviceIndex].Add(data)");
                                     MeasureStop();
+                                } else {
+                                    if (isSave[deviceIndex]) saveThread[deviceIndex].Add(data);
                                 }
 
                                 if (isStart && (isWatch || cntWatch <= 0)) {
@@ -1496,6 +1515,42 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
         tone.startTone(ToneGenerator.TONE_DTMF_S, 100);
 
         sPool.play(beepNum, 1f, 1f, 0, 0, 1f);
+    }
+
+
+    private void StartSave(int index) {
+        StopSave(index);
+
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(getApplicationContext(), "저장소 접근 권한이 없어서\n데이터가 저장되지 않았습니다.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        long time = System.currentTimeMillis();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm:ss.SSSZ");
+        String firstDataTime = sdf.format(time);
+        //saveThread[index] = new DataSaveThread(new Date(), index);
+        saveThread[index] = new DataSaveThread(new Date(), index, this);
+        saveThread[index].start();
+        saveThread[index].setFirstDataTime(firstDataTime);
+        isSave[index] = true;
+    }
+
+
+    private void StopSave(int index) {
+        isSave[index] = false;
+        if (saveThread[index] != null) {
+            saveThread[index].cancle();
+
+            if (saveThread[index].isAlive()) {
+                try {
+                    saveThread[index].join(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            saveThread[index] = null;
+        }
     }
 
 

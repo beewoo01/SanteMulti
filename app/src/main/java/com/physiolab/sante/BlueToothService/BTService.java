@@ -85,6 +85,7 @@ public class BTService extends Service {
 
     public static final int PACKET_SAMPLE_NUM = 40;
     public static final int SAMPLE_RATE = 2000;
+    //public static final int SAMPLE_RATE = 580000;
 
     public static final int REQUEST_EMG_FILTER=0;
     public static final int REQUEST_Acc_FILTER=1;

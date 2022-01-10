@@ -6,11 +6,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.SoundPool;
@@ -98,7 +100,9 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
 
     private boolean isFirst = true;
     private boolean timeLabStart = false;
+    private DataSaveThread[] saveThread = new DataSaveThread[1];
 
+    private boolean[] isSave = new boolean[]{false, false};
 
     private ActivityMeasureOneBinding binding;
 
@@ -199,6 +203,9 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
             binding.dropdownMenuBtn.setVisibility(View.VISIBLE);
             recordAdapter.addTime(binding.txtWatchSecond.getText().toString());
 
+            /*saveThread[0].addTimeLab(binding.txtWatchSecond.getText().toString());
+            saveThread[1].addTimeLab(binding.txtWatchSecond.getText().toString());*/
+
         });
 
 
@@ -233,14 +240,20 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
 
     @SuppressLint({"DefaultLocale", "SetTextI18n"})
     private void SetTimeRange() {
-
+        //Log.wtf("SetTimeRange", "SetTimeRange");
+        /*Log.wtf("SetTimeRange", String.valueOf(fragMeasure.GetTimeRange()));
+        Log.wtf("GetTimeStart", String.valueOf(fragMeasure.GetTimeStart()));
+        Log.wtf("GetTimeStart2", String.valueOf(fragMeasure.GetTimeStart2()));*/
         if (!hasData) {
             binding.txtTimeMin.setText("0.00");
             binding.txtTimeMax.setText(String.format("%.2f", fragMeasure.GetTimeRange()));
+
         } else {
             binding.txtTimeMin.setText(String.format("%.2f", fragMeasure.GetTimeStart()));
             binding.txtTimeMax.setText(String.format("%.2f", fragMeasure.GetTimeStart() + fragMeasure.GetTimeRange()));
         }
+
+        binding.txtWatchSecond.setText(String.format("%.2f", fragMeasure.GetTimeStart2()));
         //binding.txtTimeMax.setText(String.format("%.2f", fragMeasure.GetTimeRange()));
 
     }
@@ -479,6 +492,7 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
 
         binding.btnStart.setOnClickListener(v -> { /// 측정시작
 
+            recordAdapter.removeAllItem();
             timeThread = new TimeThread();
             UserInfo.getInstance().measureTime = new Date(System.currentTimeMillis());
 
@@ -503,7 +517,7 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
 
                 isWatch = true;
                 //baseTime = SystemClock.elapsedRealtime();
-                timerHandler.sendEmptyMessage(0);
+                //timerHandler.sendEmptyMessage(0);
                 //SetWatch(cntWatch);
                 fragMeasure.Init();
                 SetTimeRange();
@@ -532,7 +546,7 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
                     BeepPlay();
                     timeLabStart = true;
                     baseTime = SystemClock.elapsedRealtime();
-                    timerHandler.sendEmptyMessage(0);
+                    //timerHandler.sendEmptyMessage(0);
                 }
 
             }
@@ -763,17 +777,30 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
         }
 
         if (isStart) {
-            timerHandler.removeMessages(0);
+            //timerHandler.removeMessages(0);
             if (handleflag == 2 || !isAlarm) {
-
-                defaultDialog = new DefaultDialog(this, () -> {
+                Log.wtf("MeasureStop", "StopSave");
+                StopSave(0);
+                defaultDialog = new DefaultDialog(this, (DialogOnClick) isSave -> {
+                    if (isSave) {
+                        UserInfo.getInstance().watchCnt = cntWatch;
+                        UserInfo.getInstance().spacial = binding.testNameEdt.getText().toString();
+                        fragMeasure.SaveData("ch1", Measure1chActivity.this,
+                                recordAdapter.getItems(), santeApps);
+                    }else {
+                        fragMeasure.deleteData();
+                    }
+                }, "알림", "측정결과를 저장하시겠습니까?");
+                /*defaultDialog = new DefaultDialog(this, () -> {
                     UserInfo.getInstance().watchCnt = cntWatch;
                     UserInfo.getInstance().spacial = binding.testNameEdt.getText().toString();
                     fragMeasure.SaveData("ch1", Measure1chActivity.this,
                             recordAdapter.getItems(), santeApps);
-                }, "알림", "측정결과를 저장하시겠습니까?");
+                }, "알림", "측정결과를 저장하시겠습니까?");*/
                 defaultDialog.show();
             }
+        }else {
+
         }
         /*if (isStart && handleflag == 2) {
             Log.wtf("MeasureStop", "444444444");
@@ -813,12 +840,12 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
         return String.format("%02d:%02d:%02d", m, s, ms);
     }
 
-    private final Handler timerHandler = new Handler(Looper.getMainLooper()) {
+    /*private final Handler timerHandler = new Handler(Looper.getMainLooper()) {
 
         @Override
         public void handleMessage(@NonNull Message msg) {
             //super.handleMessage(msg);
-            /*여기 TimeLab*/
+            *//*여기 TimeLab*//*
             if (timeLabStart)
             {
                 binding.txtWatchSecond.setText(getTime());
@@ -828,7 +855,7 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
 
         }
 
-    };
+    };*/
 
 
     private final View.OnClickListener defaultDialogclose = new View.OnClickListener() {
@@ -918,8 +945,8 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
 
                         sendEmptyMessageDelayed(0, 1000);
                         baseTime = SystemClock.elapsedRealtime();
-                        //timerHandler.sendEmptyMessage(0);
-                        timerHandler.sendEmptyMessageDelayed(0, 1000);
+
+                        //timerHandler.sendEmptyMessageDelayed(0, 1000);
                     }
 
                 } catch (Exception e) {
@@ -1092,20 +1119,26 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
 
                                 } else binding.txtLeadoff.setVisibility(View.INVISIBLE);
 
+
                                 //Log.wtf("isFirst", String.valueOf(isFirst));
                                 if (isFirst) {
-                                    //Log.wtf("isFirst", String.valueOf(isFirst));
+                                    Log.wtf("isFirst", String.valueOf(isFirst));
                                     long time = System.currentTimeMillis();
                                     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm:ss.SSSZ");
                                     String firstDataTime = sdf.format(time);
                                     fragMeasure.SetFirstDataTime(firstDataTime);
-
+                                    UserInfo.getInstance().spacial = binding.testNameEdt.getText().toString();
+                                    StartSave(deviceIndex);
                                     isFirst = false;
                                 }
 
                                 if (!fragMeasure.Add(data)) {
                                     MeasureStop();
+                                }else {
+
+                                    if (isSave[deviceIndex]) saveThread[deviceIndex].Add(data);
                                 }
+
 
                                 if (isStart && (isWatch || cntWatch <= 0)) {
 //                                    if (cntWatch == -200 && isAlarm) BeepPlay();
@@ -1166,6 +1199,47 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
             }
         }
 
+    }
+
+    private void StartSave(int index) {
+        Log.wtf("StartSave", "StartSave");
+        StopSave(index);
+
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(getApplicationContext(), "저장소 접근 권한이 없어서\n데이터가 저장되지 않았습니다.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        long time = System.currentTimeMillis();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm:ss.SSSZ");
+        String firstDataTime = sdf.format(time);
+        //saveThread[index] = new DataSaveThread(new Date(), index);
+        saveThread[index] = new DataSaveThread(new Date(), index, this);
+        saveThread[index].start();
+        saveThread[index].setFirstDataTime(firstDataTime);
+        isSave[index] = true;
+    }
+
+
+    private void StopSave(int index) {
+        Log.wtf("StopSave", "StopSave");
+        isSave[index] = false;
+        if (saveThread[index] != null) {
+            Log.wtf("StopSave", "saveThread not null");
+            saveThread[index].cancle();
+
+            if (saveThread[index].isAlive()) {
+                Log.wtf("StopSave", "isAlive");
+                try {
+                    saveThread[index].join(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            saveThread[index] = null;
+        }else {
+            Log.wtf("StopSave", "saveThread null");
+        }
     }
 
     @Override

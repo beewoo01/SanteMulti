@@ -1,5 +1,7 @@
 package com.physiolab.sante.santemulti;
 
+import static com.physiolab.sante.santemulti.DataSaveThread.psFileName;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -20,6 +22,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 
 import com.opencsv.CSVWriter;
@@ -28,17 +31,29 @@ import com.physiolab.sante.SanteApp;
 import com.physiolab.sante.UserInfo;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.io.RandomAccessFile;
 import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -83,7 +98,9 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
     private float GyroYMax = 800.0f;
     private float GyroYMin = -400.0f;
     private float TimeStart = 0.0f;
+    private float TimeStart2 = 0.0f;
     private float TimeRange = 30.0f;
+    private float TimeRange2 = 0.0f;
 
     private boolean EMGEnable = true;
     private boolean EMGRMSEnable = true;
@@ -116,7 +133,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         super(context);
         mContext = context;
         santeApps = (SanteApp) activity.getApplication();
-        Log.wtf("santeApps.GetEMGRMS(0);", String.valueOf(santeApps.GetEMGRMS(0)));
+        //Log.wtf("santeApps.GetEMGRMS(0);", String.valueOf(santeApps.GetEMGRMS(0)));
         SurfaceHolder mHolder;
         mHolder = getHolder();
         mHolder.addCallback(this);
@@ -186,6 +203,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         diff = 0.0;
         TimeStart = 0.0f;
         RMSCount = 0;
+        TimeStart2 = 0.0f;
 //         EMGData = null;
 //        LeadOffData = null;
 //         AccData = null;
@@ -205,6 +223,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         dataCount = 0;
         diff = 0.0;
         TimeStart = 0.0f;
+        TimeStart2 = 0.0f;
 
         Refresh();
     }
@@ -286,8 +305,19 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         return TimeStart;
     }
 
+    public float SetTimeStart2() {
+        return TimeStart2;
+    }
+
+    public float GetTimeStart2() {
+        return TimeStart2;
+    }
+
     public void SetTimeRange(float value) {
+        Log.wtf("MeasureView", "SetTimeRange");
         TimeRange = value;
+        //TimeStart2 = value ;
+        //TimeStart2 = (float) EMGCount / (float) BTService.SAMPLE_RATE;
         if (TimeStart + TimeRange < (float) EMGCount / (float) BTService.SAMPLE_RATE) {
             TimeStart = (float) EMGCount / (float) BTService.SAMPLE_RATE - TimeRange;
         }
@@ -295,6 +325,8 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         if (TimeStart + TimeRange > 300.0f) {
             TimeStart = 300.0f - TimeRange;
         }
+
+        //TimeStart2 = EMGCount / (float) BTService.SAMPLE_RATE;
 
         Refresh();
     }
@@ -314,6 +346,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 diff += ((double) (bufferGraph.getWidth() - 4) * (((double) (emg - EMGCount) / (double) BTService.SAMPLE_RATE) / (double) (TimeRange)));
 
                 TimeStart = TimeStart + (float) ((double) Math.ceil(diff) / (double) (bufferGraph.getWidth() - 4) * (double) (TimeRange));
+                TimeStart2 = TimeStart2 + (float) ((double) Math.ceil(diff) / (double) (bufferGraph.getWidth() - 4) * (double) (TimeRange));
 
                 tempCanvas.drawColor(ContextCompat.getColor(getContext(), android.R.color.transparent), PorterDuff.Mode.SRC);
                 //tempCanvas.drawColor(getResources().getColor(android.R.color.transparent), PorterDuff.Mode.SRC);
@@ -325,6 +358,10 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 bufferCanvas.drawBitmap(tempGraph, (int) Math.ceil(diff) * -1, 0, null);
 
 
+                diff = diff - Math.ceil(diff);
+            } else {
+                diff += ((double) (bufferGraph.getWidth() - 4) * (((double) (emg - EMGCount) / (double) BTService.SAMPLE_RATE) / (double) (TimeRange)));
+                TimeStart2 = TimeStart2 + (float) ((double) Math.ceil(diff) / (double) (bufferGraph.getWidth() - 4) * (double) (TimeRange));
                 diff = diff - Math.ceil(diff);
             }
 
@@ -713,13 +750,11 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                     if (j == 0 && !AccXEnable) continue;
 
                     xMinCount = (int) Math.max(Math.floor((double) TimeStart * (double) BTService.SAMPLE_RATE / 10.0), 0.0);
-                    xMinCount = (int) Math.max(Math.floor((double) TimeStart * (double) BTService.SAMPLE_RATE), 0.0);
                     xMaxCount = (int) Math.min(Math.ceil((double) (TimeStart + TimeRange) * ((double) BTService.SAMPLE_RATE / 10.0)), (double) dataCount);
-                    xMaxCount = (int) Math.min(Math.ceil((double) (TimeStart + TimeRange) * (double) BTService.SAMPLE_RATE), (double) EMGCount);
 
                     path.reset();
 
-                    yPos = bufferGraph.getHeight() * ((AccYMax - AccData[j][xMinCount]) / (AccYMax - AccYMin));
+                    //yPos = bufferGraph.getHeight() * ((AccYMax - AccData[j][xMinCount]) / (AccYMax - AccYMin));
                     yPos = bufferGraph.getHeight() * ((EMGYMax - EMGData[xMinCount]) / (EMGYMax - EMGYMin));
                     xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) xMinCount / ((float) BTService.SAMPLE_RATE / 10.0f)) - TimeStart) / (TimeRange));
 
@@ -1143,7 +1178,14 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
         //Log(info);
 
-        saveLog();
+        //deleteFile();
+
+        int deviceNum = 0;
+        if (!wearingPart.equals("ch1")) {
+            deviceNum = 1;
+        }
+        saveLog(deviceNum, timeLab);
+        //readCSVFile();
 
         export = "";
 
@@ -1161,17 +1203,373 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         //CreateFolder();
 
         //saveSNT(wearingPart, timeLab, firstTime, santeApp);
-        saveCSV(wearingPart, timeLab, firstTime, santeApp);
+        //saveCSV(wearingPart, timeLab, firstTime, santeApp);
+        //saveTxt(wearingPart, timeLab, firstTime, santeApp);
+
+    }
+
+    public void deleteFile() {
+
+        for (String fileName : psFileName) {
+            File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+ "/I-Motion Lab/" + fileName);
+            try {
+                Log.wtf("deleteFile", "try " + fileName);
+                if (file.exists()) {
+                    Log.wtf("deleteFile", "exists");
+                    file.delete();
+                }
+            } catch (Exception e) {
+                Log.wtf("fileDeleteFail", "fileDeleteFail");
+                e.printStackTrace();
+            }
+        }
 
 
     }
 
+
+    private void readCSVFile() {
+
+        //java.nio.file.Path path = Files.copy()
+        File oriFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" +psFileName.get(0));
+        File nFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + "1"+ "test" +psFileName.get(0));
+
+        FileOutputStream fileOutput = null;
+        try {
+
+            fileOutput = new FileOutputStream(nFile, true);
+            BufferedOutputStream bufOutput = new BufferedOutputStream(fileOutput);
+            bufOutput.write(String.format(
+                    UserInfo.getInstance().gender + "1," +
+                    UserInfo.getInstance().birth + "1," +
+                    UserInfo.getInstance().height + "1," +
+                    UserInfo.getInstance().weight + "1," +
+                    UserInfo.getInstance().alarm + "1," +
+                    "이거 되어야해" + "1," + "\r\n").getBytes());
+
+            bufOutput.flush();
+            fileOutput.flush();
+            bufOutput.close();
+            fileOutput.close();
+
+            /*RandomAccessFile oriFileCh = new RandomAccessFile(oriFile, "r");
+            RandomAccessFile nFileCh = new RandomAccessFile(nFile, "rw");
+
+            FileChannel oriFileChnal = oriFileCh.getChannel();
+            FileChannel nFileChnal = nFileCh.getChannel();
+
+            oriFileChnal.transferTo(0, oriFileChnal.size(), nFileChnal);*/
+
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        /*String fileName = psFileName.get(0);
+        File csv = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + fileName);
+
+        BufferedWriter bw = null; // 출력 스트림 생성
+
+        try {
+            bw = new BufferedWriter(new FileWriter(csv, true));
+            File nFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + "1"+ psFileName.get(0));
+            FileOutputStream fileOutput = new FileOutputStream(nFile);
+            BufferedOutputStream bufOutput = new BufferedOutputStream(fileOutput);
+            // csv파일의 기존 값에 이어쓰려면 위처럼 true를 지정하고, 기존 값을 덮어쓰려면 true를 삭제한다
+            String[] arrayList = new String[]{ "일" , "이" , "삼"};
+            for (int i = 0; i < arrayList.length; i++) {
+                String aData = "";
+                aData = arrayList[0] + "," + arrayList[1] + "," + arrayList[2];
+                // 한 줄에 넣을 각 데이터 사이에 ,를 넣는다
+                bw.write(aData);
+                // 작성한 데이터를 파일에 넣는다
+                bw.newLine(); // 개행
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (bw != null) {
+                    bw.flush(); // 남아있는 데이터까지 보내 준다
+                    bw.close(); // 사용한 BufferedWriter를 닫아 준다
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }*/
+
+    }
+
+    @SuppressLint("DefaultLocale")
     private void saveTxt(String wearingPart, ArrayList<String> timeLab,
                          String firstTime, SanteApp santeApp) {
 
-        FileOutputStream fileOutput = null;
-        BufferedOutputStream bufOutput = null;
 
+        try {
+
+            String saveFileName = UserInfo.getInstance().name;
+            saveFileName += DateFormat.format("yyyyMMdd_HHmmss_", new Date()).toString();
+            saveFileName += UserInfo.getInstance().spacial;
+            saveFileName += wearingPart + ".csv";
+
+            File saveFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + saveFileName);
+
+            FileOutputStream fileOutput = new FileOutputStream(saveFile, false);
+            BufferedOutputStream bufOutput = new BufferedOutputStream(fileOutput);
+            long measureTime =
+                    BTService.Time_Offset + UserInfo.getInstance().measureTime.getTime() * 10000L;
+
+            bufOutput.write(String.format(measureTime + "," +
+                            UserInfo.getInstance().gender + "," +
+                            UserInfo.getInstance().birth + "," +
+                            UserInfo.getInstance().height + "," +
+                            UserInfo.getInstance().weight + "," +
+                            UserInfo.getInstance().alarm + "," +
+                            EMGCount + "," +
+                            firstTime + ", \r\n"
+                    ).getBytes()
+            );
+
+            bufOutput.write(timeLab.size());
+            if (timeLab.size() > 0) {
+                for (int i = 0; i < timeLab.size(); i++) {
+                    bufOutput.write(String.format(timeLab.get(i) + ",").getBytes());
+                }
+
+            } else {
+                bufOutput.write(String.format("").getBytes());
+            }
+            bufOutput.write(String.format("\r\n").getBytes());
+
+            bufOutput.write(String.format(UserInfo.getInstance().name + "\r\n").getBytes(StandardCharsets.UTF_8));
+            bufOutput.write(String.format(UserInfo.getInstance().memo + "\r\n").getBytes(StandardCharsets.UTF_8));
+
+            int deviceNum = 0;
+            if (!wearingPart.equals("ch1")) {
+                deviceNum = 1;
+            }
+
+            writeDataInfo(santeApp, deviceNum, bufOutput);
+            //bufOutput.write(String.format("EMG, RMS, Acc-X, Acc-Y, Acc-Z, Gyro-X, Gyro-Y, Gyro-Z\r\n").getBytes());
+
+            float time = 0F;
+            float result;
+
+            for (int i = 0; i < EMGCount; i++) {
+                int tmp = (int) Math.floor((double) i / 10.0);
+                result = (float) (Math.floor(time * 10000) / 10000);
+
+                //double rmsData = RMSData[i];
+
+
+                double sampleRMSData =
+                        SampleRMS2(EMGData, i, santeApp.GetEMGRMS(deviceNum));
+
+                float fdata0 = AccData[0][tmp];
+                float fdata1 = AccData[1][tmp];
+                float fdata2 = AccData[2][tmp];
+
+                float fdata3 = GyroData[0][tmp];
+                float fdata4 = GyroData[1][tmp];
+                float fdata5 = GyroData[2][tmp];
+
+                float fdata6 = EMGData[i];
+                float fdata7 = LeadOffData[i];
+
+                String putData = Float.toString(time);
+
+                if (putData.equals("5.0E-4")) {
+                    putData = "0.0005";
+                } else if (putData.equals("0.0")) {
+                    putData = "0";
+                }
+
+
+                /*bufOutput.write(String.format(putData).getBytes());
+                dataOutputStream.writeDouble(fdata0);
+                //bufOutput.write(String.format(",").getBytes());
+                //dataOutputStream.write(",".getBytes());
+
+                dataOutputStream.writeDouble(fdata1);
+                //bufOutput.write(String.format(",").getBytes());
+
+                dataOutputStream.writeDouble(fdata2);
+                //bufOutput.write(String.format(",").getBytes());
+
+                dataOutputStream.writeDouble(fdata3);
+                //bufOutput.write(String.format(",").getBytes());
+
+                dataOutputStream.writeDouble(fdata4);
+                //bufOutput.write(String.format(",").getBytes());
+
+                dataOutputStream.writeDouble(fdata5);
+                bufOutput.write(String.format(",").getBytes());
+
+                dataOutputStream.writeDouble(fdata6);
+                bufOutput.write(String.format(",").getBytes());
+
+                dataOutputStream.writeDouble(fdata7);
+                bufOutput.write(String.format(",").getBytes());
+
+                dataOutputStream.writeDouble(sampleRMSData);
+                bufOutput.write(String.format(",").getBytes());*/
+
+                /*String f0 = String.valueOf(fdata0);
+                String f1 = String.valueOf(fdata1);
+                String f2 = String.valueOf(fdata2);
+                String f3 = String.valueOf(fdata3);
+                String f4 = String.valueOf(fdata4);
+                String f5 = String.valueOf(fdata5);
+                String f6 = String.valueOf(fdata6);
+                String f7 = String.valueOf(fdata7);
+                String s1 = String.valueOf(sampleRMSData);
+
+                bufOutput.write(
+                        String.format(f0 + ",",
+                                f1 + ",",
+                                f2 + ",",
+                                f3 + ",",
+                                f4 + ",",
+                                f5 + ",",
+                                f6 + ",",
+                                f7 + ",",
+                                s1 + ",",
+                                "\r\n"
+                        ).getBytes()
+                );*/
+
+
+                bufOutput.write(
+                        String.format(
+                                "%.8f, " + // 0
+                                        "%.8f, " + // 1
+                                        "%.8f, " + // 2
+                                        "%.8f, " + // 3
+                                        "%.8f, " + // 4
+                                        "%.8f, " + // 5
+                                        "%.8f, " + // 6
+                                        "%.8f, " + // 7
+                                        "%.8f\r\n", //8
+                                fdata0, fdata1, fdata2, fdata3,
+                                fdata4, fdata5, fdata6, fdata7,
+                                sampleRMSData
+                        ).getBytes()
+                );
+
+                time += 0.0005F;
+            }
+
+            listener.onSuccess(deviceNum);
+
+            bufOutput.flush();
+            fileOutput.flush();
+            bufOutput.close();
+            fileOutput.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    private void writeDataInfo(SanteApp santeApp, int deviceNum, BufferedOutputStream bufOutput) {
+
+        String AccHPF = "None";
+        String AccLPF = "None";
+        String GyroHPF = "None";
+        String GyroLPF = "None";
+        String EMGNotch = "Off";
+        String EMGHPF = "None";
+        String EMGLPF = "None";
+        String EMGRMS = "0.3s";
+
+        if (santeApp.GetAccHPF(deviceNum) == 0) {
+            AccHPF = "None";
+        } else if (santeApp.GetAccHPF(deviceNum) == 1) {
+            AccHPF = "0.5Hz";
+        } else if (santeApp.GetAccHPF(deviceNum) == 2) {
+            AccHPF = "1Hz";
+        }
+
+        if (santeApp.GetAccLPF(deviceNum) == 0) {
+            AccLPF = "None";
+        } else if (santeApp.GetAccLPF(deviceNum) == 1) {
+            AccLPF = "10Hz";
+        } else if (santeApp.GetAccLPF(deviceNum) == 2) {
+            AccLPF = "20Hz";
+        }
+
+        if (santeApp.GetGyroHPF(deviceNum) == 0) {
+            GyroHPF = "None";
+        } else if (santeApp.GetGyroHPF(deviceNum) == 1) {
+            GyroHPF = "0.5Hz";
+        } else if (santeApp.GetGyroHPF(deviceNum) == 2) {
+            GyroHPF = "1Hz";
+        }
+
+
+        if (santeApp.GetGyroLPF(deviceNum) == 0) {
+            GyroLPF = "None";
+        } else if (santeApp.GetGyroLPF(deviceNum) == 1) {
+            GyroLPF = "10Hz";
+        } else if (santeApp.GetGyroLPF(deviceNum) == 2) {
+            GyroLPF = "20Hz";
+        }
+
+
+        if (santeApp.GetEMGNotch(deviceNum) == 0) {
+            EMGNotch = "Notch Off";
+        } else {
+            EMGNotch = "Notch On";
+        }
+
+        if (santeApp.GetEMGHPF(deviceNum) == 0) {
+            EMGHPF = "None";
+        } else if (santeApp.GetEMGHPF(deviceNum) == 1) {
+            EMGHPF = "3Hz";
+        } else if (santeApp.GetEMGHPF(deviceNum) == 2) {
+            EMGHPF = "20Hz";
+        }
+
+        if (santeApp.GetEMGHPF(deviceNum) == 0) {
+            EMGLPF = "None";
+        } else if (santeApp.GetEMGHPF(deviceNum) == 1) {
+            EMGLPF = "250Hz";
+        } else if (santeApp.GetEMGHPF(deviceNum) == 2) {
+            EMGLPF = "500Hz";
+        }
+
+        if (santeApp.GetEMGRMS(deviceNum) == 0) {
+            EMGRMS = "0.05s";
+        } else if (santeApp.GetEMGRMS(deviceNum) == 1) {
+            EMGRMS = "0.1s";
+        } else if (santeApp.GetEMGRMS(deviceNum) == 2) {
+            EMGRMS = "0.3s";
+        } else if (santeApp.GetEMGRMS(deviceNum) == 3) {
+            EMGRMS = "0.5s";
+        } else if (santeApp.GetEMGRMS(deviceNum) == 4) {
+            EMGRMS = "1s";
+        }
+
+        try {
+            bufOutput.write(
+                    String.format(
+                            " ,Acc HPF," + AccHPF + ",Acc LPF," + AccLPF +
+                                    ",Gyro HPF," + GyroHPF + ",Gyro LPF," + GyroLPF +
+                                    ",EMG Notch," + EMGNotch + ",EMG HPF," + EMGHPF +
+                                    ",EMG LPF," + EMGLPF + ",EMG RMS," + EMGRMS + "\r\n").getBytes()
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -1506,7 +1904,6 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
             CSVWriter writer = new CSVWriter(out);
 
             List<String[]> data = new ArrayList<>();
-
             data.add(new String[]{
                     String.valueOf(BTService.Time_Offset + UserInfo.getInstance().measureTime.getTime() * 10000L)
                     , String.valueOf(UserInfo.getInstance().gender),
@@ -1693,7 +2090,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
 
     @SuppressLint("DefaultLocale")
-    private void saveLog() {
+    private void saveLog(int deviceNum, ArrayList<String> timeLab) {
         String outputStr = "";
         String str = "";
 
@@ -1715,6 +2112,8 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
             e.printStackTrace();
             return;
         }
+
+
 
         outputStr = DateFormat.format("yyyyMMdd", UserInfo.getInstance().measureTime).toString() + ", ";
         outputStr += DateFormat.format("HH", UserInfo.getInstance().measureTime).toString() + ", ";
@@ -1755,22 +2154,46 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         if (UserInfo.getInstance().alarm) outputStr += "On" + ", ";
         else outputStr += "Off" + ", ";
 
-        if (UserInfo.getInstance().leadoff) outputStr += "Yes" + "\r\n";
-        else outputStr += "No" + "\r\n";
+        /*if (UserInfo.getInstance().leadoff) outputStr += "Yes" + "\r\n";
+        else outputStr += "No" + "\r\n";*/
+
+        if (UserInfo.getInstance().leadoff) outputStr += "Yes, ";
+        else outputStr += "No, ";
+
+        if (timeLab.size() > 0) {
+            Log.wtf("timeLab", "timeLabSize" + timeLab.size());
+            for (int i = 0; i < timeLab.size(); i++) {
+                Log.wtf("timeLab", "timeLab" + i);
+                if (i == timeLab.size()-1) {
+                    outputStr += timeLab.get(i) + "\r\n";
+                }else {
+                    outputStr += timeLab.get(i) + ",";
+                }
+
+            }
+        }else {
+            Log.wtf("timeLab", "timeLabSize else");
+            outputStr += "\r\n";
+        }
 
 
         try {
             bufWriter.write(outputStr);
         } catch (Exception e) {
             e.printStackTrace();
+            listener.onFail();
         }
 
         try {
             bufWriter.close();
             fileOutput.close();
+            listener.onSuccess(deviceNum);
         } catch (Exception e) {
             e.printStackTrace();
+            listener.onFail();
         }
+
+
 
     }
 

@@ -11,6 +11,7 @@ import android.view.WindowManager;
 
 import com.physiolab.sante.UserInfo;
 import com.physiolab.sante.santemulti.DialogOnClick;
+import com.physiolab.sante.santemulti.Measure1chActivity;
 import com.physiolab.sante.santemulti.R;
 import com.physiolab.sante.santemulti.databinding.DialogDefaultBinding;
 
@@ -44,6 +45,7 @@ public class DefaultDialog extends BaseDialog{
         this.body = body;
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,13 +60,14 @@ public class DefaultDialog extends BaseDialog{
         binding.editMemo.setText(UserInfo.getInstance().memo);
         binding.btnConfirm.setOnClickListener(v -> {
             UserInfo.getInstance().memo = binding.editMemo.getText().toString();
-            listener.confirm();
+            listener.confirm(true);
             dismiss();
         });
         //binding.btnConfirm.setOnClickListener(mCloseButtonListener);
         binding.btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                listener.confirm(false);
                 dismiss();
             }
         });

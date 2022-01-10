@@ -30,19 +30,21 @@ public class MeasureFragment extends Fragment {
 
     private MeasureView mView = null;
 
-    /*private final float[] EMGData = new float[BTService.SAMPLE_RATE * 60 * 5];
-    private final double[] RMSData = new double[BTService.SAMPLE_RATE * 60 * 5];
-    private final double[] SampleRMSData = new double[BTService.SAMPLE_RATE * 60 * 5];
-    private final float[] LeadOffData = new float[BTService.SAMPLE_RATE * 60 * 5];
-    private final float[][] AccData = new float[3][(BTService.SAMPLE_RATE / 10) * 60 * 5];
-    private final float[][] GyroData = new float[3][(BTService.SAMPLE_RATE / 10) * 60 * 5];*/
+    private float[] EMGData = new float[BTService.SAMPLE_RATE * 60 * 40];
+    private double[] RMSData = new double[BTService.SAMPLE_RATE * 60 * 40];
+    private double[] SampleRMSData = new double[BTService.SAMPLE_RATE * 60 * 40];
+    private float[] LeadOffData = new float[BTService.SAMPLE_RATE * 60 * 40];
+    private float[][] AccData = new float[3][(BTService.SAMPLE_RATE / 10) * 60 * 40];
+    private float[][] GyroData = new float[3][(BTService.SAMPLE_RATE / 10) * 60 * 40];
+    // * 60 * 40    여기서 * 40 은 분(Minute)
 
-    private final float[] EMGData = new float[BTService.SAMPLE_RATE * 350 * 5];
+
+    /*private final float[] EMGData = new float[BTService.SAMPLE_RATE * 350 * 5];
     private final double[] RMSData = new double[BTService.SAMPLE_RATE * 350 * 5];
     private final double[] SampleRMSData = new double[BTService.SAMPLE_RATE * 350 * 5];
     private final float[] LeadOffData = new float[BTService.SAMPLE_RATE * 350 * 5];
     private final float[][] AccData = new float[3][(BTService.SAMPLE_RATE / 10) * 350 * 5];
-    private final float[][] GyroData = new float[3][(BTService.SAMPLE_RATE / 10) * 350 * 5];
+    private final float[][] GyroData = new float[3][(BTService.SAMPLE_RATE / 10) * 350 * 5];*/
 
 
     private int EMGCount = 0;
@@ -80,10 +82,17 @@ public class MeasureFragment extends Fragment {
 
     @SuppressLint("SimpleDateFormat")
     public boolean Add(ST_DATA_PROC data) {
-
+        boolean isRefresh = false;
         for (int i = 0; i < BTService.PACKET_SAMPLE_NUM; i++) {
-            //if (EMGCount >= BTService.SAMPLE_RATE * 60 * 5) return false;
-            if (EMGCount >= BTService.SAMPLE_RATE * 350 * 5) return false;
+            if (EMGCount >= BTService.SAMPLE_RATE * 60 * 40) return false;
+            /*if (EMGCount >= BTService.SAMPLE_RATE * 60 * 40) {
+            //if (EMGCount >= BTService.SAMPLE_RATE * 60 * 5) {
+                refrashData();
+                isRefresh = true;
+
+
+            }*/
+
 
             /**
              *
@@ -91,6 +100,8 @@ public class MeasureFragment extends Fragment {
              *  TODO: 데이터를 비우고 다시 쓰는 방법을 써야할거 같다.
              *
              */
+
+
 
             EMGData[EMGCount] = (float) data.Filted[i];
             LeadOffData[EMGCount] = (float) data.BPF_DC[i];
@@ -108,8 +119,12 @@ public class MeasureFragment extends Fragment {
 
 
         for (int i = 0; i < BTService.PACKET_SAMPLE_NUM / 10; i++) {
-            //if (dataCount >= (BTService.SAMPLE_RATE / 10) * 60 * 5) return false;
-            if (dataCount >= (BTService.SAMPLE_RATE / 10) * 350 * 5) return false;
+            if (dataCount >= (BTService.SAMPLE_RATE / 10) * 60 * 40) return false;
+            /*if (dataCount >= (BTService.SAMPLE_RATE / 10) * 60 * 40) {
+            //if (dataCount >= (BTService.SAMPLE_RATE / 10) * 60 * 5) {
+                refrashData();
+                isRefresh = true;
+            }*/
             for (int j = 0; j < 3; j++) {
                 AccData[j][dataCount] = (float) data.Acc[j][i];
                 GyroData[j][dataCount] = (float) data.Gyro[j][i];
@@ -120,6 +135,20 @@ public class MeasureFragment extends Fragment {
         //mView.SetCount(EMGCount, dataCount);
         mView.SetCount(EMGCount, dataCount, RMSCount);
         return true;
+    }
+
+    private void refrashData() {
+        EMGCount = 0;
+        RMSCount = 0;
+        dataCount = 0;
+        EMGData = new float[BTService.SAMPLE_RATE * 60 * 40];
+        RMSData = new double[BTService.SAMPLE_RATE * 60 * 40];
+        SampleRMSData = new double[BTService.SAMPLE_RATE * 60 * 40];
+        LeadOffData = new float[BTService.SAMPLE_RATE * 60 * 40];
+        AccData = new float[3][(BTService.SAMPLE_RATE / 10) * 60 * 40];
+        GyroData = new float[3][(BTService.SAMPLE_RATE / 10) * 60 * 40];
+        mView.Init();
+        mView.SetData(EMGData, RMSData, LeadOffData, AccData, GyroData, SampleRMSData);
     }
 
     private int setRMSFilter() {
@@ -223,6 +252,12 @@ public class MeasureFragment extends Fragment {
         return mView.GetTimeStart();
     }
 
+    public float GetTimeStart2() {
+        return mView.GetTimeStart2();
+    }
+
+
+
     public boolean GetEnable(int i) {
         return mView.GetEnable(i);
     }
@@ -269,7 +304,10 @@ public class MeasureFragment extends Fragment {
         //mView.SaveData(activity, info, context, timLab, progressDialog);
         mView.SaveData(wearingPart, activity, timLab, firstDataTime, santeApp);
 
+    }
 
+    public void deleteData(){
+        mView.deleteFile();
     }
 
     public float[][] getGyroData() {

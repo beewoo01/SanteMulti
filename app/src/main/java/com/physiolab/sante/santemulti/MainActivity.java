@@ -38,6 +38,7 @@ import android.widget.Toast;
 
 import com.physiolab.sante.BlueToothService.BTService;
 import com.physiolab.sante.ST_DATA_PROC;
+import com.physiolab.sante.UserInfo;
 
 import java.io.File;
 import java.util.Date;
@@ -768,7 +769,9 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        saveThread[index] = new DataSaveThread(new Date(), index);
+        //saveThread[index] = new DataSaveThread(new Date(), index);
+        //saveThread[index] = new DataSaveThread(new Date(), index);
+        saveThread[index] = new DataSaveThread(new Date(), index, this);
         saveThread[index].start();
         isSave[index] = true;
     }
