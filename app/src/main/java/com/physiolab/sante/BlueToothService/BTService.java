@@ -45,7 +45,7 @@ public class BTService extends Service {
     public native void SetGyroFilterJNI(long ptr,int hpf,int lpf);
 
     private final String TAG = "BTService";
-    private static final boolean D = false;
+    //private static final boolean D = false;
 
     public static final int MESSAGE_STATE_CHANGE = 1;
     public static final int MESSAGE_DEVICE_INFO = 2;
@@ -97,8 +97,9 @@ public class BTService extends Service {
     public static final int RESULT_CANCLE=-1;
     public static final int RESULT_OK=0;
 
-    public final static long Time_Offset = 621355968000000000L+9L*60L*60L*1000L*1000L*10L;
-    
+    //public final static long Time_Offset = 621355968000000000L+9L*60L*60L*1000L*1000L*10L;
+    private long Time_Offset = 621355968000000000L+9L*60L*60L*1000L*1000L*10L;
+
 
     // RFCOMM Protocol을 위한 UUID
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
@@ -141,13 +142,11 @@ public class BTService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        if (D) Log.d(TAG,"onBind");
         return mBinder;
     }
 
     @Override
     public void onCreate() {
-        if (D) Log.d(TAG,"onCreate");
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();    //안드로이드 기본 블루투스관리자 할당
 
         for(int i=0;i<MaxDeviceIndex;i++)
@@ -163,7 +162,7 @@ public class BTService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (D) Log.d(TAG,"onDestroy");
+        //if (D) Log.d(TAG,"onDestroy");
         for(int i=0;i<MaxDeviceIndex;i++)
         {
             ReleaseBTSocketFwk(btFwk[i]);
@@ -213,7 +212,7 @@ public class BTService extends Service {
 
     //현재의 연결상태를 설정함
     private void setState(int state,int index) {
-        if (D) Log.d(TAG, "setState() " + mState[index] + " -> " + state);
+
         mState[index] = state;
 
         // Give the new state to the Handler so the UI Activity can update
@@ -223,15 +222,15 @@ public class BTService extends Service {
     //장치가 블루투스를 지원하는지 여부를 반환함
     public boolean getDeviceState()
     {
-        if (D) Log.d(TAG, "Check the Bluetooth support");
+
         if(bluetoothAdapter == null)
         {
-            if (D) Log.d(TAG, "Bluetooth is not available");
+
             return false;
         }
         else
         {
-            if (D) Log.d(TAG, "Bluetooth is available");
+
             return true;
         }
     }
@@ -244,11 +243,10 @@ public class BTService extends Service {
             return false;
         }
 
-        if (D) Log.d(TAG, "Check the enabled Bluetooth");
+
         if(!bluetoothAdapter.isEnabled())
         {
             // 사용자에게 블루투스의 사용허가를 요청한다.
-            if (D) Log.d(TAG, "Bluetooth Enable Request");
             Intent i = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             ac.startActivityForResult(i, REQUEST_ENABLE_BT); //상위 액티비티에서 결과를 받아볼수 있음
             return false;
@@ -274,7 +272,6 @@ public class BTService extends Service {
 
     public void Init()
     {
-        if (D) Log.d(TAG, "Initialize Connect");
 
         for(int i=0;i<MaxDeviceIndex;i++) {
 
@@ -330,7 +327,6 @@ public class BTService extends Service {
 
     //장치가 연결되었을시 초기화 작업을 처리
     private synchronized void Connected(BluetoothSocket socket,int index) {
-        if (D) Log.d(TAG, "connected");
 
         // Cancel the thread that completed the connection
         if (mConnectThread[index] != null) {mConnectThread[index].cancel(); mConnectThread[index] = null;}
@@ -350,7 +346,6 @@ public class BTService extends Service {
     //데이터획득 명령을 보냄
     public void Start(int index)
     {
-        Log.wtf("", "");
         if (index>=MaxDeviceIndex) return;
 
         AddCmd(btFwk[index], CMD_BLU_D2P_DATA_REALTIME_START, 0);
@@ -395,8 +390,6 @@ public class BTService extends Service {
     public void Close(int index)
     {
         if (index>=MaxDeviceIndex) return;
-
-        if (D) Log.d(TAG, "Close Connect");
 
 
         // Cancel the thread that completed the connection
@@ -459,7 +452,6 @@ public class BTService extends Service {
         }
 
         public void run() {
-            if (D) Log.d(TAG, "BEGIN mConnectThread");
             setName("ConnectThread");
 
             // Always cancel discovery because it will slow down a connection
@@ -469,7 +461,6 @@ public class BTService extends Service {
 
             while(isLive)
             {
-                if (D) Log.d(TAG, "Try Connect");
 
                 // Make a connection to the BluetoothSocket
                 try {
@@ -480,12 +471,10 @@ public class BTService extends Service {
                     mmSocket.connect();
                 } catch (IOException e) {
                     //connectionFailed();
-                    if (D) Log.e(TAG, "connectionFailed", e);
                     // Close the socket
                     try {
                         mmSocket.close();
                     } catch (IOException e2) {
-                        if (D) Log.d(TAG, "unable to close() socket during connection failure", e2);
                     }
                 }
 
@@ -521,7 +510,7 @@ public class BTService extends Service {
             try {
                 mmSocket.close();
             } catch (IOException e) {
-                if (D) Log.d(TAG, "close() of connect socket failed", e);
+                e.printStackTrace();
             }
         }
     }
@@ -579,7 +568,6 @@ public class BTService extends Service {
                         try {
                             mmSocket.close();
                         } catch (IOException e) {
-                            if (D) Log.d(TAG, "close() of connect socket failed", e);
                         }
                         isLive=false;
                         break;
@@ -593,7 +581,7 @@ public class BTService extends Service {
                     try {
                         mmSocket.close();
                     } catch (IOException e) {
-                        if (D) Log.e(TAG, "close() of connect socket failed", e);
+                        e.printStackTrace();
                     }
                     isLive=false;
                     break;
@@ -626,7 +614,7 @@ public class BTService extends Service {
             try {
                 mmSocket.close();
             } catch (IOException e) {
-                if (D) Log.d(TAG, "close() of connect socket failed", e);
+                e.printStackTrace();
             }
         }
 

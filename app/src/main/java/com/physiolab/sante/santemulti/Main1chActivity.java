@@ -66,7 +66,7 @@ public class Main1chActivity extends AppCompatActivity {
     //private int isState = STATE_NONE;
     private final int[] isState = new int[]{STATE_NONE};
     private final int[] powerStatus = new int[]{BTService.POWER_NONE, BTService.POWER_NONE};
-    private static final boolean D = true;
+    //private static final boolean D = true;
     private final int PERMISSION_STORAGE = 1;
 
     private final float[] battLevel = new float[]{0.0f, 0.0f};
@@ -115,7 +115,6 @@ public class Main1chActivity extends AppCompatActivity {
                 UpdateSerial();
             }
         } else {
-            Log.d(TAG, "Bluetooth is not supported");
             finish();
         }
     }
@@ -151,7 +150,6 @@ public class Main1chActivity extends AppCompatActivity {
         binding.spinDevice.setAdapter(adapterDevice);
         binding.spinDevice.setOnItemSelectedListener(onSelChanged);
 
-        Log.d(TAG, "UpdateSerial Stop");
     }
 
     @Override
@@ -476,9 +474,7 @@ public class Main1chActivity extends AppCompatActivity {
 
                 case MESSAGE_DATA_OVERFLOW:
                     if (msg.arg1 == 0) {
-                        if (D) Log.d(TAG, "Device Queue OverFlow");
                     } else {
-                        if (D) Log.d(TAG, "Receive Queue OverFlow");
                     }
                     //StopSave(deviceIndex);
                     if (btService != null) btService.Close(deviceIndex);

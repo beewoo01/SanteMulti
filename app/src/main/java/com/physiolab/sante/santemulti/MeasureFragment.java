@@ -25,8 +25,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MeasureFragment extends Fragment {
-    private static final String TAG = "Fragment-Monitor";
-    private static final boolean D = true;
+    /*private static final String TAG = "Fragment-Monitor";
+    private static final boolean D = true;*/
 
     private MeasureView mView = null;
 
@@ -39,13 +39,6 @@ public class MeasureFragment extends Fragment {
     // * 60 * 40    여기서 * 40 은 분(Minute)
 
 
-    /*private final float[] EMGData = new float[BTService.SAMPLE_RATE * 350 * 5];
-    private final double[] RMSData = new double[BTService.SAMPLE_RATE * 350 * 5];
-    private final double[] SampleRMSData = new double[BTService.SAMPLE_RATE * 350 * 5];
-    private final float[] LeadOffData = new float[BTService.SAMPLE_RATE * 350 * 5];
-    private final float[][] AccData = new float[3][(BTService.SAMPLE_RATE / 10) * 350 * 5];
-    private final float[][] GyroData = new float[3][(BTService.SAMPLE_RATE / 10) * 350 * 5];*/
-
 
     private int EMGCount = 0;
     private int RMSCount = 0;
@@ -53,14 +46,14 @@ public class MeasureFragment extends Fragment {
     private String firstDataTime = null;
     private SanteApp santeApps;
 
-    public static MeasureFragment newInstance() {
-        return new MeasureFragment();
-    }
+
+
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        Log.d(TAG, "onCreateView");
+        //Log.d(TAG, "onCreateView");
 
         mView = new MeasureView(getActivity(), getActivity());
         santeApps = (SanteApp) getActivity().getApplication();
@@ -326,5 +319,21 @@ public class MeasureFragment extends Fragment {
 
     }
 
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mView = null;
+        EMGData = null;
+        RMSData = null;
+        SampleRMSData = null;
+        LeadOffData = null;
+        AccData = null;
+        GyroData = null;
+        EMGCount = 0;
+        RMSCount = 0;
+        dataCount = 0;
+        firstDataTime = null;
+        santeApps = null;
+        System.gc();
+    }
 }

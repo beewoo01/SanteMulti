@@ -66,7 +66,7 @@ import static com.physiolab.sante.BlueToothService.BTService.STATE_NONE;
 public class Main2chActivity extends AppCompatActivity {
 
     private static final String TAG = "Activity-MainTest";
-    private static final boolean D = true;
+    //private static final boolean D = true;
     private Activity2chMainBinding binding;
 
 
@@ -118,7 +118,6 @@ public class Main2chActivity extends AppCompatActivity {
         updateUI();
 
         binding.btnDeviceMeasure.setOnClickListener(v -> {
-            Log.wtf("btnDeviceMeasure", "Click");
             binding.birthEdt.removeTextChangedListener(textWatcher);
             isVail();
             /*if (isState[0] == STATE_NONE && isState[1] == STATE_NONE){
@@ -148,7 +147,6 @@ public class Main2chActivity extends AppCompatActivity {
 
         initView();
 
-        if (D) Log.d(TAG, "onCreate");
 
     }
 
@@ -170,19 +168,16 @@ public class Main2chActivity extends AppCompatActivity {
 
 
         if (TextUtils.isEmpty(binding.birthEdt.getText().toString()) || binding.birthEdt.getText().toString().length() < 1) {
-            Log.wtf("isVail", "birthEdt null" );
             binding.birthEdt.setText("1900-01-01");
             //showToast("측정자 생년월일을 입력해주세요");
         }
 
         if (TextUtils.isEmpty(binding.weightEdt.getText().toString()) || binding.weightEdt.getText().toString().length() < 1) {
-             Log.wtf("isVail", "weightEdt null" );
             binding.weightEdt.setText("10");
             //showToast("측정자 몸무게를 입력해주세요");
         }
 
         if (!binding.rbMale.isChecked() && !binding.rbFemale.isChecked()) {
-            Log.wtf("isVail", "rbMale null" );
             binding.rbMale.setChecked(true);
             //showToast("측정자 성별을 선택해주세요");
         }
@@ -474,7 +469,6 @@ public class Main2chActivity extends AppCompatActivity {
                                        IBinder service) {
             // 서비스와 연결되었을 때 호출되는 메서드
             // 서비스 객체를 전역변수로 저장
-            if (D) Log.d(TAG, "onServiceConnected");
             BTService.BTBinder mb = (BTService.BTBinder) service;
             btService = mb.getService(); // 서비스가 제공하는 메소드 호출하여
             btService.Init();
@@ -489,7 +483,6 @@ public class Main2chActivity extends AppCompatActivity {
 
         public void onServiceDisconnected(ComponentName name) {
             // 서비스와 연결이 끊겼을 때 호출되는 메서드
-            if (D) Log.d(TAG, "onServiceDisconnected");
             isService = false;
         }
     };
@@ -502,14 +495,12 @@ public class Main2chActivity extends AppCompatActivity {
                 UpdateSerial();
             }
         } else {
-            if (D) Log.d(TAG, "Bluetooth is not supported");
             finish();
         }
     }
 
 
     private void UpdateSerial() {
-        Log.d(TAG, "UpdateSerial Start");
 
 
         Set<BluetoothDevice> devices = btService.GetPairedDeviceList();
@@ -554,7 +545,6 @@ public class Main2chActivity extends AppCompatActivity {
         if (deviceAddress.length > 1) spinDevice[1].setSelection(1);
 
 
-        Log.d(TAG, "UpdateSerial Stop");
     }
 
 
@@ -693,7 +683,6 @@ public class Main2chActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Log.wtf("onResume", "OnRESUME");
         binding.birthEdt.addTextChangedListener(textWatcher);
         if (addedDeviceAddress != null) {
             UpdateSerial();
@@ -705,7 +694,6 @@ public class Main2chActivity extends AppCompatActivity {
     @Override
     protected void onRestart() {
         super.onRestart();
-        Log.wtf("onRestart", "onRestart");
     }
 
     /*private void showDiscoveredDevices() {
@@ -997,7 +985,6 @@ public class Main2chActivity extends AppCompatActivity {
                 case MESSAGE_STATE_CHANGE:
                     switch (msg.arg1) {
                         case STATE_CONNECTED:
-                            if (D) Log.d(TAG, "Device Connect");
                             isState[deviceIndex] = STATE_CONNECTED;
                             //isMeasure[deviceIndex] = false;
                             break;
@@ -1006,7 +993,6 @@ public class Main2chActivity extends AppCompatActivity {
                             break;
                         case STATE_NONE:
                             isState[deviceIndex] = STATE_NONE;
-                            if (D) Log.d(TAG, "Device Close");
                             break;
                     }
                     //StopSave(deviceIndex);
@@ -1045,9 +1031,9 @@ public class Main2chActivity extends AppCompatActivity {
 
                 case MESSAGE_DATA_OVERFLOW:
                     if (msg.arg1 == 0) {
-                        if (D) Log.d(TAG, "Device Queue OverFlow");
+
                     } else {
-                        if (D) Log.d(TAG, "Receive Queue OverFlow");
+
                     }
                     //StopSave(deviceIndex);
                     if (btService != null) btService.Close(deviceIndex);

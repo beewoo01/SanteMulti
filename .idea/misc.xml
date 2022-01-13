@@ -7,10 +7,10 @@
         <entry key="app/src/main/res/layout/activity1ch_main.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity2ch_main.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_connect_1ch.xml" value="0.25" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.2796352583586626" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.45" />
         <entry key="app/src/main/res/layout/activity_main_test.xml" value="0.375" />
-        <entry key="app/src/main/res/layout/activity_measure.xml" value="0.45" />
-        <entry key="app/src/main/res/layout/activity_measure_one.xml" value="0.375" />
+        <entry key="app/src/main/res/layout/activity_measure.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/activity_measure_one.xml" value="0.45" />
         <entry key="app/src/main/res/layout/activity_select.xml" value="0.2796352583586626" />
         <entry key="app/src/main/res/layout/dialog_acceleration.xml" value="0.25" />
         <entry key="app/src/main/res/layout/dialog_time.xml" value="0.1825" />

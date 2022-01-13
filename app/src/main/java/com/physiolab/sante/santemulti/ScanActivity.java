@@ -66,7 +66,6 @@ public class ScanActivity extends AppCompatActivity {
             bluetoothDevice = null;
             if (checkCoarseLocationPermassion()) {
                 Boolean bool = bluetoothAdapter.startDiscovery();
-                Log.d("Discovery : ", String.valueOf(bool));
             }
         });
 
@@ -162,7 +161,6 @@ public class ScanActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "디바이스를 찾는 중입니다.", Toast.LENGTH_SHORT).show();
 
             } else if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                Log.d("ACTION_FOUND", "이리오네");
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 if (device.getName() != null && device.getName().equalsIgnoreCase("TUG")) {
                     if (!pairedList.contains(device.getAddress())){
@@ -179,7 +177,7 @@ public class ScanActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "디바이스 찾기가 종료되었습니다.", Toast.LENGTH_SHORT).show();
 
             } else if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(action)){
-                Log.d("ACTIONBONDSTATECHANGED", "이리오네");
+
             }
 
         }
@@ -198,7 +196,6 @@ public class ScanActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d("생명주기", "onStop");
 
     }
 

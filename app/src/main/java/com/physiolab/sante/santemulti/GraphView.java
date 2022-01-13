@@ -15,7 +15,7 @@ import android.view.SurfaceView;
 
 public class GraphView  extends SurfaceView implements SurfaceHolder.Callback  {
     private static final String TAG = "SurfaceView-Graph";
-    private static final boolean D = false;
+    //private static final boolean D = false;
 
     private GraphViewThread gvThread;
     private SurfaceHolder mHolder;
@@ -202,7 +202,6 @@ public class GraphView  extends SurfaceView implements SurfaceHolder.Callback  {
     }
 
     private void Redraw() {
-        if (D) Log.d(TAG, "Redraw Start");
 
         synchronized (bufferCanvas) {
             gridCanvas.drawColor(Color.rgb(255,255,255));
@@ -245,7 +244,6 @@ public class GraphView  extends SurfaceView implements SurfaceHolder.Callback  {
 
         }
 
-        if (D) Log.d(TAG, "Redraw Stop");
     }
 
     class GraphViewThread extends Thread
@@ -256,7 +254,6 @@ public class GraphView  extends SurfaceView implements SurfaceHolder.Callback  {
         public GraphViewThread(SurfaceHolder h, GraphView v)
         {
             sHolder = h;
-            if (D) Log.d(TAG, "thread constructor");
         }
 
         public void setRunning(boolean run)

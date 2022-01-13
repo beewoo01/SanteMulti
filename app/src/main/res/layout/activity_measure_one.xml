@@ -144,7 +144,7 @@
             />
 
 
-        <RelativeLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/record_background"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -156,26 +156,51 @@
             app:layout_constraintTop_toTopOf="@+id/btn_section_record">
 
 
+
+
             <TextView
                 android:id="@+id/txt_watch_second"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:text="00:00:00"
-                android:textColor="@color/white" />
+                android:text="00:00"
+                android:textColor="@color/white"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintEnd_toStartOf="@id/txt_watch_millisecond"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                />
+
+            <TextView
+                android:id="@+id/txt_watch_millisecond"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=":00"
+                android:textColor="@color/white"
+                app:layout_constraintStart_toEndOf="@id/txt_watch_second"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+
+                />
+
+
 
             <ImageView
                 android:id="@+id/dropdown_menu_btn"
                 android:layout_width="@dimen/_10sdp"
                 android:layout_height="@dimen/_10sdp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
                 android:layout_marginHorizontal="@dimen/_5sdp"
                 android:src="@drawable/selectbox_arrow"
                 android:visibility="gone"
-                android:contentDescription="@string/dropdown" />
+                android:contentDescription="@string/dropdown"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                />
 
-        </RelativeLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout
             android:id="@+id/spinner_layout_parent"

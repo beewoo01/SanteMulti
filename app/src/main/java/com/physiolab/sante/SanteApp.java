@@ -129,7 +129,7 @@ public class SanteApp extends Application {
     public int GetLeadOff(int device) { return sharedPreferences.getInt("LeadOff"+device,defaultValue.LeadOff); }
 
     public boolean GetAlarm(int device) { return sharedPreferences.getBoolean("Alarm"+device,true); }
-    public boolean GetPreview(int device) { return sharedPreferences.getBoolean("Preview"+device,true); }
+    public boolean GetPreview(int device) { return sharedPreferences.getBoolean("Preview"+device,false); }
 
     public float GetDefaultAccMax() { return defaultValue.AccMax; }
     public float GetDefaultAccMin() { return defaultValue.AccMin; }

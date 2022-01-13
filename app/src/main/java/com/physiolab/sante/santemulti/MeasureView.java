@@ -15,6 +15,7 @@ import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Looper;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Gravity;
@@ -314,7 +315,6 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public void SetTimeRange(float value) {
-        Log.wtf("MeasureView", "SetTimeRange");
         TimeRange = value;
         //TimeStart2 = value ;
         //TimeStart2 = (float) EMGCount / (float) BTService.SAMPLE_RATE;
@@ -346,8 +346,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 diff += ((double) (bufferGraph.getWidth() - 4) * (((double) (emg - EMGCount) / (double) BTService.SAMPLE_RATE) / (double) (TimeRange)));
 
                 TimeStart = TimeStart + (float) ((double) Math.ceil(diff) / (double) (bufferGraph.getWidth() - 4) * (double) (TimeRange));
-                TimeStart2 = TimeStart2 + (float) ((double) Math.ceil(diff) / (double) (bufferGraph.getWidth() - 4) * (double) (TimeRange));
-
+                //TimeStart2 += 0.01f;
                 tempCanvas.drawColor(ContextCompat.getColor(getContext(), android.R.color.transparent), PorterDuff.Mode.SRC);
                 //tempCanvas.drawColor(getResources().getColor(android.R.color.transparent), PorterDuff.Mode.SRC);
                 tempCanvas.drawBitmap(bufferGraph, 0, 0, null);
@@ -360,9 +359,9 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
                 diff = diff - Math.ceil(diff);
             } else {
-                diff += ((double) (bufferGraph.getWidth() - 4) * (((double) (emg - EMGCount) / (double) BTService.SAMPLE_RATE) / (double) (TimeRange)));
-                TimeStart2 = TimeStart2 + (float) ((double) Math.ceil(diff) / (double) (bufferGraph.getWidth() - 4) * (double) (TimeRange));
-                diff = diff - Math.ceil(diff);
+                /*diff += ((double) (bufferGraph.getWidth() - 4) * (((double) (emg - EMGCount) / (double) BTService.SAMPLE_RATE) / (double) (TimeRange)));
+                TimeStart2 += 0.01f;
+                diff = diff - Math.ceil(diff);*/
             }
 
 
@@ -1039,7 +1038,6 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
         public GraphViewThread(SurfaceHolder h, MeasureView v) {
             sHolder = h;
-            Log.d(TAG, "thread constructor");
         }
 
         public void setRunning(boolean run) {
@@ -1108,7 +1106,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         }
     }*/
 
-    private void WriteString(List<String[]> list, String str) {
+    /*private void WriteString(List<String[]> list, String str) {
         byte[] bytes;
         int length = 0;
 
@@ -1136,14 +1134,12 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     //폴더 만들기
     private void CreateFolder() {
         //File f = new File(getContext().getExternalFilesDir(null) + "/I-Motion Lab/");
         File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/");
-        //File f = new File(getContext().getFilesDir(), "/Sante/");
-        //File f = new File(getContext().getExternalFilesDir(null) + "/Sante/");
 
         if (f.exists()) {
             if (!f.isDirectory()) {
@@ -1152,8 +1148,8 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         } else {
             try {
                 boolean ret = f.mkdirs();
-                if (ret) Log.d(TAG, "Folder Create");
-                else Log.d(TAG, "Folder Not Create");
+                /*if (ret) Log.d(TAG, "Folder Create");
+                else Log.d(TAG, "Folder Not Create");*/
             } catch (Exception e) {
                 e.printStackTrace();
                 return;
@@ -1206,20 +1202,21 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         //saveCSV(wearingPart, timeLab, firstTime, santeApp);
         //saveTxt(wearingPart, timeLab, firstTime, santeApp);
 
+        /*SaveTxtThread saveTxtThread = new SaveTxtThread(wearingPart, timeLab, firstTime, santeApp);
+        saveTxtThread.start();*/
+
     }
 
     public void deleteFile() {
 
         for (String fileName : psFileName) {
-            File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+ "/I-Motion Lab/" + fileName);
+            //File file = new File(getContext().getExternalFilesDir(null) + "/I-Motion Lab/" + fileName);
+            File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/I-Motion Lab/" + fileName);
             try {
-                Log.wtf("deleteFile", "try " + fileName);
                 if (file.exists()) {
-                    Log.wtf("deleteFile", "exists");
                     file.delete();
                 }
             } catch (Exception e) {
-                Log.wtf("fileDeleteFail", "fileDeleteFail");
                 e.printStackTrace();
             }
         }
@@ -1227,85 +1224,146 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
     }
 
+    /*class SaveTxtThread extends Thread {
 
-    private void readCSVFile() {
+        private final String wearingPart;
+        private final ArrayList<String> timeLab;
+        private final String firstTime;
+        private final SanteApp santeApp;
 
-        //java.nio.file.Path path = Files.copy()
-        File oriFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" +psFileName.get(0));
-        File nFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + "1"+ "test" +psFileName.get(0));
+        public SaveTxtThread(String wearingPart, ArrayList<String> timeLab,
+                             String firstTime, SanteApp santeApp) {
 
-        FileOutputStream fileOutput = null;
-        try {
+            this.wearingPart = wearingPart;
+            this.timeLab = timeLab;
+            this.firstTime = firstTime;
+            this.santeApp = santeApp;
 
-            fileOutput = new FileOutputStream(nFile, true);
-            BufferedOutputStream bufOutput = new BufferedOutputStream(fileOutput);
-            bufOutput.write(String.format(
-                    UserInfo.getInstance().gender + "1," +
-                    UserInfo.getInstance().birth + "1," +
-                    UserInfo.getInstance().height + "1," +
-                    UserInfo.getInstance().weight + "1," +
-                    UserInfo.getInstance().alarm + "1," +
-                    "이거 되어야해" + "1," + "\r\n").getBytes());
-
-            bufOutput.flush();
-            fileOutput.flush();
-            bufOutput.close();
-            fileOutput.close();
-
-            /*RandomAccessFile oriFileCh = new RandomAccessFile(oriFile, "r");
-            RandomAccessFile nFileCh = new RandomAccessFile(nFile, "rw");
-
-            FileChannel oriFileChnal = oriFileCh.getChannel();
-            FileChannel nFileChnal = nFileCh.getChannel();
-
-            oriFileChnal.transferTo(0, oriFileChnal.size(), nFileChnal);*/
-
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
 
+        @SuppressLint("DefaultLocale")
+        @Override
+        public void run() {
+            super.run();
 
-        /*String fileName = psFileName.get(0);
-        File csv = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + fileName);
 
-        BufferedWriter bw = null; // 출력 스트림 생성
-
-        try {
-            bw = new BufferedWriter(new FileWriter(csv, true));
-            File nFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + "1"+ psFileName.get(0));
-            FileOutputStream fileOutput = new FileOutputStream(nFile);
-            BufferedOutputStream bufOutput = new BufferedOutputStream(fileOutput);
-            // csv파일의 기존 값에 이어쓰려면 위처럼 true를 지정하고, 기존 값을 덮어쓰려면 true를 삭제한다
-            String[] arrayList = new String[]{ "일" , "이" , "삼"};
-            for (int i = 0; i < arrayList.length; i++) {
-                String aData = "";
-                aData = arrayList[0] + "," + arrayList[1] + "," + arrayList[2];
-                // 한 줄에 넣을 각 데이터 사이에 ,를 넣는다
-                bw.write(aData);
-                // 작성한 데이터를 파일에 넣는다
-                bw.newLine(); // 개행
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
             try {
-                if (bw != null) {
-                    bw.flush(); // 남아있는 데이터까지 보내 준다
-                    bw.close(); // 사용한 BufferedWriter를 닫아 준다
+
+                String saveFileName = UserInfo.getInstance().name;
+                saveFileName += DateFormat.format("yyyyMMdd_HHmmss_", new Date()).toString();
+                saveFileName += UserInfo.getInstance().spacial;
+                saveFileName += wearingPart + ".csv";
+
+                File saveFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + saveFileName);
+
+                FileOutputStream fileOutput = new FileOutputStream(saveFile, false);
+                BufferedOutputStream bufOutput = new BufferedOutputStream(fileOutput);
+                long measureTime =
+                        BTService.Time_Offset + UserInfo.getInstance().measureTime.getTime() * 10000L;
+
+                bufOutput.write(String.format(measureTime + "," +
+                                UserInfo.getInstance().gender + "," +
+                                UserInfo.getInstance().birth + "," +
+                                UserInfo.getInstance().height + "," +
+                                UserInfo.getInstance().weight + "," +
+                                UserInfo.getInstance().alarm + "," +
+                                EMGCount + "," +
+                                firstTime + ", \r\n"
+                        ).getBytes()
+                );
+
+                bufOutput.write(timeLab.size());
+                if (timeLab.size() > 0) {
+                    for (int i = 0; i < timeLab.size(); i++) {
+                        bufOutput.write(String.format(timeLab.get(i) + ",").getBytes());
+                    }
+
+                } else {
+                    bufOutput.write(String.format("").getBytes());
                 }
+                bufOutput.write(String.format("\r\n").getBytes());
+
+                bufOutput.write(String.format(UserInfo.getInstance().name + "\r\n").getBytes(StandardCharsets.UTF_8));
+                bufOutput.write(String.format(UserInfo.getInstance().memo + "\r\n").getBytes(StandardCharsets.UTF_8));
+
+                int deviceNum = 0;
+                if (!wearingPart.equals("ch1")) {
+                    deviceNum = 1;
+                }
+
+                writeDataInfo(santeApp, deviceNum, bufOutput);
+                //bufOutput.write(String.format("EMG, RMS, Acc-X, Acc-Y, Acc-Z, Gyro-X, Gyro-Y, Gyro-Z\r\n").getBytes());
+
+                float time = 0F;
+                float result;
+
+                for (int i = 0; i < EMGCount; i++) {
+                    int tmp = (int) Math.floor((double) i / 10.0);
+                    result = (float) (Math.floor(time * 10000) / 10000);
+
+                    //double rmsData = RMSData[i];
+
+
+                    double sampleRMSData =
+                            SampleRMS2(EMGData, i, santeApp.GetEMGRMS(deviceNum));
+
+                    float fdata0 = AccData[0][tmp];
+                    float fdata1 = AccData[1][tmp];
+                    float fdata2 = AccData[2][tmp];
+
+                    float fdata3 = GyroData[0][tmp];
+                    float fdata4 = GyroData[1][tmp];
+                    float fdata5 = GyroData[2][tmp];
+
+                    float fdata6 = EMGData[i];
+                    float fdata7 = LeadOffData[i];
+
+                    String putData = Float.toString(time);
+
+                    if (putData.equals("5.0E-4")) {
+                        putData = "0.0005";
+                    } else if (putData.equals("0.0")) {
+                        putData = "0";
+                    }
+
+
+                    bufOutput.write(String.format(putData).getBytes());
+                    bufOutput.write(
+                            String.format(
+                                    "%.8f, " + // 0
+                                            "%.8f, " + // 1
+                                            "%.8f, " + // 2
+                                            "%.8f, " + // 3
+                                            "%.8f, " + // 4
+                                            "%.8f, " + // 5
+                                            "%.8f, " + // 6
+                                            "%.8f, " + // 7
+                                            "%.8f\r\n", //8
+                                    fdata0, fdata1, fdata2, fdata3,
+                                    fdata4, fdata5, fdata6, fdata7,
+                                    sampleRMSData
+                            ).getBytes()
+                    );
+
+                    time += 0.0005F;
+                }
+
+                listener.onSuccess(deviceNum);
+
+                bufOutput.flush();
+                fileOutput.flush();
+                bufOutput.close();
+                fileOutput.close();
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }*/
+        }
+    }*/
 
-    }
-
-    @SuppressLint("DefaultLocale")
+    /*@SuppressLint("DefaultLocale")
     private void saveTxt(String wearingPart, ArrayList<String> timeLab,
                          String firstTime, SanteApp santeApp) {
 
@@ -1417,9 +1475,9 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 bufOutput.write(String.format(",").getBytes());
 
                 dataOutputStream.writeDouble(sampleRMSData);
-                bufOutput.write(String.format(",").getBytes());*/
+                bufOutput.write(String.format(",").getBytes());*//*
 
-                /*String f0 = String.valueOf(fdata0);
+                *//*String f0 = String.valueOf(fdata0);
                 String f1 = String.valueOf(fdata1);
                 String f2 = String.valueOf(fdata2);
                 String f3 = String.valueOf(fdata3);
@@ -1441,9 +1499,9 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                                 s1 + ",",
                                 "\r\n"
                         ).getBytes()
-                );*/
+                );*//*
 
-
+                bufOutput.write(String.format(putData).getBytes());
                 bufOutput.write(
                         String.format(
                                 "%.8f, " + // 0
@@ -1478,9 +1536,9 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         }
 
 
-    }
+    }*/
 
-    private void writeDataInfo(SanteApp santeApp, int deviceNum, BufferedOutputStream bufOutput) {
+    /*private void writeDataInfo(SanteApp santeApp, int deviceNum, BufferedOutputStream bufOutput) {
 
         String AccHPF = "None";
         String AccLPF = "None";
@@ -1570,7 +1628,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
 
     /*private void saveSNT(String wearingPart, ArrayList<String> timeLab,
@@ -1891,7 +1949,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
     }*/
 
-    private void saveCSV(String wearingPart, ArrayList<String> timeLab,
+    /*private void saveCSV(String wearingPart, ArrayList<String> timeLab,
                          String firstTime, SanteApp santeApp) {
         try {
             CreateFolder();
@@ -1904,8 +1962,9 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
             CSVWriter writer = new CSVWriter(out);
 
             List<String[]> data = new ArrayList<>();
+            long Time_Offset = 621355968000000000L+9L*60L*60L*1000L*1000L*10L;
             data.add(new String[]{
-                    String.valueOf(BTService.Time_Offset + UserInfo.getInstance().measureTime.getTime() * 10000L)
+                    String.valueOf(Time_Offset + UserInfo.getInstance().measureTime.getTime() * 10000L)
                     , String.valueOf(UserInfo.getInstance().gender),
                     UserInfo.getInstance().birth,
                     UserInfo.getInstance().height,
@@ -2032,8 +2091,8 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
             float result;
 
 
-            /*Log.wtf("EMGCount", String.valueOf(EMGCount));
-            Log.wtf("EMGData.length", String.valueOf(EMGData.length));*/
+            *//*Log.wtf("EMGCount", String.valueOf(EMGCount));
+            Log.wtf("EMGData.length", String.valueOf(EMGData.length));*//*
             for (int i = 0; i < EMGCount; i++) {
 
                 int tmp = (int) Math.floor((double) i / 10.0);
@@ -2045,8 +2104,8 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 double sampleRMSData = SampleRMSData[i];
 
                 //sampleRMSData = SampleRMS(EMGData, i);
-                /*Log.wtf("santeApp.GetEMGRMS(deviceNum)",
-                        String.valueOf(santeApp.GetEMGRMS(deviceNum)));*/
+                *//*Log.wtf("santeApp.GetEMGRMS(deviceNum)",
+                        String.valueOf(santeApp.GetEMGRMS(deviceNum)));*//*
                 sampleRMSData = SampleRMS2(EMGData, i, santeApp.GetEMGRMS(deviceNum));
 
                 float fdata0 = AccData[0][tmp];
@@ -2086,11 +2145,12 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
             listener.onFail();
         }
 
-    }
+    }*/
 
 
     @SuppressLint("DefaultLocale")
     private void saveLog(int deviceNum, ArrayList<String> timeLab) {
+
         String outputStr = "";
         String str = "";
 
@@ -2112,7 +2172,6 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
             e.printStackTrace();
             return;
         }
-
 
 
         outputStr = DateFormat.format("yyyyMMdd", UserInfo.getInstance().measureTime).toString() + ", ";
@@ -2157,22 +2216,20 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         /*if (UserInfo.getInstance().leadoff) outputStr += "Yes" + "\r\n";
         else outputStr += "No" + "\r\n";*/
 
-        if (UserInfo.getInstance().leadoff) outputStr += "Yes, ";
-        else outputStr += "No, ";
+        if (UserInfo.getInstance().leadoff) outputStr += "Yes";
+        else outputStr += "No";
+
 
         if (timeLab.size() > 0) {
-            Log.wtf("timeLab", "timeLabSize" + timeLab.size());
             for (int i = 0; i < timeLab.size(); i++) {
-                Log.wtf("timeLab", "timeLab" + i);
-                if (i == timeLab.size()-1) {
-                    outputStr += timeLab.get(i) + "\r\n";
-                }else {
-                    outputStr += timeLab.get(i) + ",";
+                if (i == timeLab.size() - 1) {
+                    outputStr += ", " + timeLab.get(i) + "\r\n";
+                } else {
+                    outputStr += ", " + timeLab.get(i);
                 }
 
             }
-        }else {
-            Log.wtf("timeLab", "timeLabSize else");
+        } else {
             outputStr += "\r\n";
         }
 
@@ -2194,7 +2251,6 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         }
 
 
-
     }
 
 
@@ -2203,7 +2259,8 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         CreateFolder();
 
 
-        File logFile = new File(getContext().getExternalFilesDir(null) + "/I-Motion Lab/" + "/Sante_TUG.log");
+        //File logFile = new File(getContext().getExternalFilesDir(null) + "/I-Motion Lab/" + "/I_Motion_TUG.log");
+        File logFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + "/I_Motion_TUG.log");
 
         FileOutputStream fileOutput = null;
         BufferedWriter bufWriter = null;
@@ -2303,19 +2360,19 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
     public double SampleRMS2(float[] EMGData, int size, int sec) {
         double result = 0;
-        int conInt = 10;
+        int conInt = 100;
         /*if (sec == 0) {
             conInt = 10;
         } else */
 
         if (sec == 1) {
-            conInt = 20;
-        } else if (sec == 2) {
-            conInt = 60;
-        } else if (sec == 3) {
-            conInt = 100;
-        } else if (sec == 4) {
             conInt = 200;
+        } else if (sec == 2) {
+            conInt = 600;
+        } else if (sec == 3) {
+            conInt = 1000;
+        } else if (sec == 4) {
+            conInt = 2000;
         }
 
 

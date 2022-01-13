@@ -36,9 +36,10 @@ public class DataSaveThread extends Thread {
     private final SanteApp santeApp;
     private int EMGCount = 0;
     private String firstDataTime = null;
-    private FileChannel fileChannel;
+    //private FileChannel fileChannel;
 
-    public static ArrayList<String> psFileName = new ArrayList<>();
+    public static ArrayList<String> psFileName;
+    private Activity activity;
 
 
     public DataSaveThread(Date time, int index, Activity activity) {
@@ -47,15 +48,12 @@ public class DataSaveThread extends Thread {
         deviceIndex = index;
         queue.clear();
         santeApp = (SanteApp) activity.getApplication();
+        this.activity = activity;
+        psFileName = new ArrayList<>();
     }
 
     public void setFirstDataTime(String firstDataTime) {
         this.firstDataTime = firstDataTime;
-    }
-
-    public void addTimeLab(String lab) {
-        timeLab.add(lab);
-
     }
 
 
@@ -64,7 +62,6 @@ public class DataSaveThread extends Thread {
     }
 
     public void cancle() {
-        Log.wtf("DataSaveThread", "cancle");
         /*try {
 
             fileChannel.position(0);
@@ -99,20 +96,22 @@ public class DataSaveThread extends Thread {
         boolean isFileExist = false;
         boolean isDirExist = CreateFolder();
 
-        File saveFile;
+        File saveFile = null;
 
 
         isFileExist = false;
+
         if (isDirExist) {
             int saveDevice = deviceIndex + 1;
             String saveFileName = UserInfo.getInstance().name;
             saveFileName += DateFormat.format("yyyyMMdd_HHmmss_", measureTime).toString();
             saveFileName += UserInfo.getInstance().spacial + "_";
             saveFileName += "ch" + saveDevice + ".csv";
-            Log.wtf("saveFileName", saveFileName);
+            //Log.wtf("saveFileName", saveFileName);
             psFileName.add(saveFileName);
 
             saveFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + saveFileName);
+            //saveFile = new File(activity.getExternalFilesDir(null).getAbsolutePath() + "/I-Motion Lab/" + saveFileName);
 
             try {
                 fileOutput = new FileOutputStream(saveFile, false);
@@ -124,13 +123,32 @@ public class DataSaveThread extends Thread {
             }
         }
 
-        if (!isFileExist) return;
+
+
+        /*try {
+            if (saveFile.createNewFile()){
+                isFileExist = true;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            isFileExist = false;
+        }
+
+        if (!isFileExist) {
+            int saveDevice = deviceIndex + 1;
+            String saveFileName = UserInfo.getInstance().name;
+            saveFileName += DateFormat.format("yyyyMMdd_HHmmss_", measureTime).toString();
+            saveFileName += UserInfo.getInstance().spacial + "_";
+            saveFileName += "ch" + saveDevice + ".csv";
+            saveFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + saveFileName);
+            return;
+        }*/
 
 
         try {
-
+            long Time_Offset = 621355968000000000L+9L*60L*60L*1000L*1000L*10L;
             long measureTime =
-                    BTService.Time_Offset + UserInfo.getInstance().measureTime.getTime() * 10000L;
+                    Time_Offset + UserInfo.getInstance().measureTime.getTime() * 10000L;
 
             bufOutput.write(String.format(measureTime + "," +
                             UserInfo.getInstance().gender + "," +
@@ -193,7 +211,6 @@ public class DataSaveThread extends Thread {
                                         data.Acc[2][index],data.Gyro[0][index],data.Gyro[1][index],data.Gyro[2][index])
                                         .getBytes());*/
                         } catch (IOException e) {
-
                             e.printStackTrace();
                         }
                         EMGCount++;
@@ -279,7 +296,7 @@ public class DataSaveThread extends Thread {
 
                 int len;
                 while ((len = inputStream.read()) > 0) {
-                    Log.wtf("buf[len]", String.valueOf(buf[len]));
+
                     fileOutput.write(buf, 0, len);
                 }
             } catch (IOException e) {
@@ -427,6 +444,7 @@ public class DataSaveThread extends Thread {
 
     private boolean CreateFolder() {
         boolean ret = false;
+        //File f = new File(activity.getExternalFilesDir(null).getAbsolutePath(), "/I-Motion Lab/");
         File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/");
 
         //Log.d("SaveTest","Create Folder 1");

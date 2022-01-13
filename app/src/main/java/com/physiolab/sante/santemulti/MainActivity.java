@@ -48,8 +48,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String TAG = "Activity-Main";
-    private static final boolean D = true;
+    //private static final String TAG = "Activity-Main";
+    //private static final boolean D = true;
 
     private BTService btService = null;
     private boolean isService = false;
@@ -96,7 +96,6 @@ public class MainActivity extends AppCompatActivity {
                                        IBinder service) {
             // 서비스와 연결되었을 때 호출되는 메서드
             // 서비스 객체를 전역변수로 저장
-            if (D) Log.d(TAG, "onServiceConnected");
             BTService.BTBinder mb = (BTService.BTBinder) service;
             btService = mb.getService(); // 서비스가 제공하는 메소드 호출하여
             btService.Init();
@@ -111,7 +110,6 @@ public class MainActivity extends AppCompatActivity {
 
         public void onServiceDisconnected(ComponentName name) {
             // 서비스와 연결이 끊겼을 때 호출되는 메서드
-            if (D) Log.d(TAG, "onServiceDisconnected");
             isService = false;
         }
     };
@@ -135,7 +133,6 @@ public class MainActivity extends AppCompatActivity {
                 conn, // 서비스와 연결에 대한 정의
                 Context.BIND_AUTO_CREATE);
 
-        if (D) Log.d(TAG, "onCreate");
     }
 
     @Override
@@ -201,7 +198,6 @@ public class MainActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (D) Log.d(TAG, "onActivityResult " + resultCode);
 
         switch (requestCode) {
             case BTService.REQUEST_ENABLE_BT:
@@ -209,7 +205,6 @@ public class MainActivity extends AppCompatActivity {
                 if (resultCode == Activity.RESULT_OK) {
                     UpdateSerial();
                 } else {
-                    if (D) Log.d(TAG, "Bluetooth is not enabled");
                     finish();
                 }
                 break;
@@ -225,7 +220,6 @@ public class MainActivity extends AppCompatActivity {
                 UpdateSerial();
             }
         } else {
-            if (D) Log.d(TAG, "Bluetooth is not supported");
             finish();
         }
     }
@@ -247,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
                 case BTService.MESSAGE_STATE_CHANGE:
                     switch (msg.arg1) {
                         case BTService.STATE_CONNECTED:
-                            if (D) Log.d(TAG, "Device Connect");
+
                             isState[deviceIndex] = BTService.STATE_CONNECTED;
                             isMeasure[deviceIndex] = false;
                             break;
@@ -256,7 +250,6 @@ public class MainActivity extends AppCompatActivity {
                             break;
                         case BTService.STATE_NONE:
                             isState[deviceIndex] = BTService.STATE_NONE;
-                            if (D) Log.d(TAG, "Device Close");
                             break;
                     }
                     StopSave(deviceIndex);
@@ -316,30 +309,26 @@ public class MainActivity extends AppCompatActivity {
                 case BTService.MESSAGE_COMMAND_RECEIVE:
                     switch (msg.arg1) {
                         case BTService.CMD_BLU_DEV_INITIALIZE:
-                            if (D) Log.d(TAG, "Received Initialize COMMAND");
                             break;
                         case BTService.CMD_BLU_D2P_DATA_REALTIME_START:
-                            if (D) Log.d(TAG, "Received Data Transfer Start COMMAND");
                             isMeasure[deviceIndex] = true;
                             UpdateUI();
                             break;
                         case BTService.CMD_BLU_D2P_DATA_STOP:
-                            if (D) Log.d(TAG, "Received Data Transfer Stop COMMAND");
                             StopSave(deviceIndex);
                             isMeasure[deviceIndex] = false;
                             UpdateUI();
                             break;
                         case BTService.CMD_BLU_COMM_START:
-                            if (D) Log.d(TAG, "Received Communication Start COMMAND");
                             break;
                     }
                     break;
 
                 case BTService.MESSAGE_DATA_OVERFLOW:
                     if (msg.arg1 == 0) {
-                        if (D) Log.d(TAG, "Device Queue OverFlow");
+
                     } else {
-                        if (D) Log.d(TAG, "Receive Queue OverFlow");
+
                     }
                     StopSave(deviceIndex);
                     if (btService != null) btService.Close(deviceIndex);
@@ -616,7 +605,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void UpdateSerial() {
-        Log.d(TAG, "UpdateSerial Start");
 
         Set<BluetoothDevice> devices = btService.GetPairedDeviceList();
         String[] deviceAddress = new String[devices.size()];
@@ -651,7 +639,6 @@ public class MainActivity extends AppCompatActivity {
         if (deviceAddress.length > 1) spinDevice[1].setSelection(1);
         else if (deviceAddress.length > 1) spinDevice[1].setSelection(1);
 
-        Log.d(TAG, "UpdateSerial Stop");
     }
 
     public class SpinnerAdapter extends ArrayAdapter<String> {
@@ -752,8 +739,8 @@ public class MainActivity extends AppCompatActivity {
         } else {
             try {
                 boolean ret = f.mkdirs();
-                if (ret) Log.d(TAG, "Folder Create");
-                else Log.d(TAG, "Folder Not Create");
+                /*if (ret) Log.d(TAG, "Folder Create");
+                else Log.d(TAG, "Folder Not Create");*/
             } catch (Exception e) {
                 e.printStackTrace();
                 return;
