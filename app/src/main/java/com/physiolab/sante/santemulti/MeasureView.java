@@ -1162,6 +1162,8 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
     public void SaveData(String wearingPart, Activity activity,
                          ArrayList<String> timeLab, String firstTime,
                          SanteApp santeApp) {
+
+
         listener = (SaveFileListener) activity;
 
         //this.progressDialog = progressDialog;
@@ -1196,6 +1198,9 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         //export += ".snt";
         export += ".csv";
 
+        /*SaveTxtThread saveTxtThread = new SaveTxtThread(wearingPart, timeLab, firstTime, santeApp);
+        saveTxtThread.start();*/
+
         //CreateFolder();
 
         //saveSNT(wearingPart, timeLab, firstTime, santeApp);
@@ -1209,7 +1214,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
     public void deleteFile() {
 
-        for (String fileName : psFileName) {
+        /*for (String fileName : psFileName) {
             //File file = new File(getContext().getExternalFilesDir(null) + "/I-Motion Lab/" + fileName);
             File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/I-Motion Lab/" + fileName);
             try {
@@ -1219,12 +1224,12 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
+        }*/
 
 
     }
 
-    /*class SaveTxtThread extends Thread {
+    class SaveTxtThread extends Thread {
 
         private final String wearingPart;
         private final ArrayList<String> timeLab;
@@ -1249,18 +1254,18 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
             try {
 
+                long Time_Offset = 621355968000000000L + 9L * 60L * 60L * 1000L * 1000L * 10L;
                 String saveFileName = UserInfo.getInstance().name;
                 saveFileName += DateFormat.format("yyyyMMdd_HHmmss_", new Date()).toString();
                 saveFileName += UserInfo.getInstance().spacial;
-                saveFileName += wearingPart + ".csv";
+                saveFileName += wearingPart + "gg.csv";
 
                 File saveFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + saveFileName);
 
                 FileOutputStream fileOutput = new FileOutputStream(saveFile, false);
                 BufferedOutputStream bufOutput = new BufferedOutputStream(fileOutput);
                 long measureTime =
-                        BTService.Time_Offset + UserInfo.getInstance().measureTime.getTime() * 10000L;
-
+                        Time_Offset + UserInfo.getInstance().measureTime.getTime() * 10000L;
                 bufOutput.write(String.format(measureTime + "," +
                                 UserInfo.getInstance().gender + "," +
                                 UserInfo.getInstance().birth + "," +
@@ -1294,7 +1299,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 writeDataInfo(santeApp, deviceNum, bufOutput);
                 //bufOutput.write(String.format("EMG, RMS, Acc-X, Acc-Y, Acc-Z, Gyro-X, Gyro-Y, Gyro-Z\r\n").getBytes());
 
-                float time = 0F;
+                float time = 0.0000F;
                 float result;
 
                 for (int i = 0; i < EMGCount; i++) {
@@ -1327,10 +1332,11 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                     }
 
 
-                    bufOutput.write(String.format(putData).getBytes());
+                    //bufOutput.write(String.format("%.4"result).getBytes());
                     bufOutput.write(
                             String.format(
-                                    "%.8f, " + // 0
+                                    "%.4f, " +
+                                            "%.8f, " + // 0
                                             "%.8f, " + // 1
                                             "%.8f, " + // 2
                                             "%.8f, " + // 3
@@ -1339,7 +1345,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                                             "%.8f, " + // 6
                                             "%.8f, " + // 7
                                             "%.8f\r\n", //8
-                                    fdata0, fdata1, fdata2, fdata3,
+                                    result, fdata0, fdata1, fdata2, fdata3,
                                     fdata4, fdata5, fdata6, fdata7,
                                     sampleRMSData
                             ).getBytes()
@@ -1347,7 +1353,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
                     time += 0.0005F;
                 }
-
+                Log.wtf("SaveTxtThread", "saveTextFile");
                 listener.onSuccess(deviceNum);
 
                 bufOutput.flush();
@@ -1361,7 +1367,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 e.printStackTrace();
             }
         }
-    }*/
+    }
 
     /*@SuppressLint("DefaultLocale")
     private void saveTxt(String wearingPart, ArrayList<String> timeLab,
@@ -1477,7 +1483,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 dataOutputStream.writeDouble(sampleRMSData);
                 bufOutput.write(String.format(",").getBytes());*//*
 
-                *//*String f0 = String.valueOf(fdata0);
+     *//*String f0 = String.valueOf(fdata0);
                 String f1 = String.valueOf(fdata1);
                 String f2 = String.valueOf(fdata2);
                 String f3 = String.valueOf(fdata3);
@@ -1538,7 +1544,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
     }*/
 
-    /*private void writeDataInfo(SanteApp santeApp, int deviceNum, BufferedOutputStream bufOutput) {
+    private void writeDataInfo(SanteApp santeApp, int deviceNum, BufferedOutputStream bufOutput) {
 
         String AccHPF = "None";
         String AccLPF = "None";
@@ -1628,7 +1634,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }*/
+    }
 
 
     /*private void saveSNT(String wearingPart, ArrayList<String> timeLab,
@@ -2244,7 +2250,8 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         try {
             bufWriter.close();
             fileOutput.close();
-            listener.onSuccess(deviceNum);
+            //여기 데이터 저장
+            //listener.onSuccess(deviceNum);
         } catch (Exception e) {
             e.printStackTrace();
             listener.onFail();

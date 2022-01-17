@@ -160,8 +160,8 @@ public class DataSaveThread extends Thread {
                     ).getBytes()
             );
 
-            bufOutput.write(String.format(UserInfo.getInstance().name + "\r\n").getBytes("UTF-8"));
-            bufOutput.write(String.format(UserInfo.getInstance().memo + "\r\n").getBytes("UTF-8"));
+            bufOutput.write(String.format(UserInfo.getInstance().name + "\r\n").getBytes("EUC-KR"));
+            bufOutput.write(String.format(UserInfo.getInstance().memo + "\r\n").getBytes("EUC-KR"));
 
             writeDataInfo(bufOutput);
 
@@ -193,8 +193,8 @@ public class DataSaveThread extends Thread {
                                             data.Gyro[0][index],
                                             data.Gyro[1][index],
                                             data.Gyro[2][index],
-                                            data.BPF_DC[i], //Lead Off
                                             data.Filted[i], //EMG Data
+                                            data.BPF_DC[i], //Lead Off
                                             SampleRMS2(data.Filted, data.Filted.length, santeApp.GetEMGRMS(deviceIndex))//RMS
                                             //data.RMS[i]
 
@@ -309,16 +309,16 @@ public class DataSaveThread extends Thread {
 
     public double SampleRMS2(double[] EMGData, int size, int sec) {
         double result = 0;
-        int conInt = 10;
+        int conInt = 100;
 
         if (sec == 1) {
-            conInt = 20;
-        } else if (sec == 2) {
-            conInt = 60;
-        } else if (sec == 3) {
-            conInt = 100;
-        } else if (sec == 4) {
             conInt = 200;
+        } else if (sec == 2) {
+            conInt = 600;
+        } else if (sec == 3) {
+            conInt = 1000;
+        } else if (sec == 4) {
+            conInt = 2000;
         }
 
 

@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -45,6 +46,11 @@ public class DefaultDialog extends BaseDialog{
         this.body = body;
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Log.wtf("DefaultDialog", "onBackPressed");
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

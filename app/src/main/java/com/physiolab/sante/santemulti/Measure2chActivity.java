@@ -18,11 +18,13 @@ import android.media.AudioManager;
 import android.media.SoundPool;
 import android.media.ToneGenerator;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
+import android.text.format.DateFormat;
 import android.transition.Slide;
 import android.transition.Transition;
 import android.transition.TransitionManager;
@@ -48,6 +50,7 @@ import com.physiolab.sante.UserInfo;
 import com.physiolab.sante.dialog.DefaultDialog;
 import com.physiolab.sante.santemulti.databinding.ActivityMeasureBinding;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -98,7 +101,7 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
 
     private SoundPool sPool;
 
-    private boolean isFirst = true;
+    private final boolean[] isFirst = new boolean[]{true, true};
     private boolean isStop = true;
 
     int handleflag = 0;// 0 - > 쓰레드 안돔 // 1 도는중 // 2 다끝나고 진행중
@@ -113,11 +116,13 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
 
     private TextView[] txtReadOffs = new TextView[2];
 
-    private DataSaveThread[] saveThread = new DataSaveThread[2];
+    private DataSaveThread2[] saveThread = new DataSaveThread2[2];
 
     private boolean[] isSave = new boolean[]{false, false};
 
     private boolean isDestroy = false;
+
+    private String[] saveFileName = new String[2];
 
 
     private final Spinner_Re_Adapter recordAdapter = new Spinner_Re_Adapter(new ArrayList<>());
@@ -223,12 +228,21 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
         binding.dropdownMenuBtn.setVisibility(View.VISIBLE);
 
         binding.backImb.setOnClickListener(v -> {
-            if (isStart) {
-                MeasureStop();
+
+            if (isStart | isPreview) {
+                btService.Stop(0);
+                btService.Stop(1);
+                deleteFile();
+                isStart = false;
+                isPreview = false;
             }
+
+            santeApps[0].SetPreview(false, 0);
+            santeApps[1].SetPreview(false, 1);
             isDestroy = true;
             finish();
         });
+
         binding.recordRecyclerview.setAdapter(recordAdapter);
         binding.recordRecyclerview.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         binding.recordRecyclerview.setHasFixedSize(true);
@@ -572,11 +586,11 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
 
 
     private void MeasureStop() {
+
         if (isStart | isPreview) {
             btService.Stop(0);
             btService.Stop(1);
         }
-
 
         if (isStart) {
             if (handleflag == 2 || !isAlarm) {
@@ -588,13 +602,13 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
                                 Measure2chActivity.this, recordAdapter.getItems(),
                                 santeApps[0]);
                     } else {
-                        fragMeasure[0].deleteData();
-                        //fragMeasure[1].deleteData();
+                        deleteFile();
                     }
 
                 }, "알림", "측정결과를 저장하시겠습니까?");
                 defaultDialog.show();
             }
+
         } else {
             StopSave(0);
             StopSave(1);
@@ -602,7 +616,8 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
 
         isStart = false;
         isPreview = false;
-        isFirst = true;
+        /*isFirst[0] = true;
+        isFirst[1] = true;*/
         santeApps[0].SetPreview(isPreview, 0);
         santeApps[1].SetPreview(isPreview, 1);
         UpdateUI(0);
@@ -627,6 +642,7 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
     }
 
 
+    @SuppressLint("HandlerLeak,SimpleDateFormat")
     private class MessageHandler extends Handler {
         private int deviceIndex = -1;
 
@@ -710,14 +726,15 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
                                     txtReadOffs[deviceIndex].setVisibility(View.INVISIBLE);
                                 }
 
-                                if (isFirst) {
+                                if (isFirst[deviceIndex] && !isPreview) {
+                                    isFirst[deviceIndex] = false;
                                     long time = System.currentTimeMillis();
                                     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm:ss.SSSZ");
                                     String firstDataTime = sdf.format(time);
                                     fragMeasure[deviceIndex].SetFirstDataTime(firstDataTime);
-                                    StartSave(0);
-                                    StartSave(1);
-                                    isFirst = false;
+                                    UserInfo.getInstance().spacial = binding.testNameEdt.getText().toString();
+                                    StartSave(deviceIndex);
+                                    //StartSave(1);
                                 }
 
                                 if (!fragMeasure[deviceIndex].Add(data)) {
@@ -864,6 +881,8 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
                 isPreview = false;
 
                 isStart = true;
+                isFirst[0] = true;
+                isFirst[1] = true;
 
                 hasData = true;
 
@@ -1500,12 +1519,11 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
 
     private void BeepPlay() {
         tone.startTone(ToneGenerator.TONE_DTMF_S, 100);
-
         sPool.play(beepNum, 1f, 1f, 0, 0, 1f);
     }
 
 
-    private void StartSave(int index) {
+    /*private void StartSave(int index) {
         StopSave(index);
 
         if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -1521,6 +1539,70 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
         saveThread[index].start();
         saveThread[index].setFirstDataTime(firstDataTime);
         isSave[index] = true;
+    }*/
+
+    @SuppressLint("SimpleDateFormat")
+    private void StartSave(int index) {
+        StopSave(index);
+
+        Log.wtf("StartSave", "StartSave");
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(getApplicationContext(), "저장소 접근 권한이 없어서\n데이터가 저장되지 않았습니다.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        long time = System.currentTimeMillis();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm:ss.SSSZ");
+        String firstDataTime = sdf.format(time);
+        boolean isDirExist = createFolder();
+        if (isDirExist) {
+            int saveIndex = index + 1;
+            saveFileName[index] = UserInfo.getInstance().name;
+            saveFileName[index] += DateFormat.format("yyyyMMdd_HHmmss_", new Date()).toString();
+            saveFileName[index] += UserInfo.getInstance().spacial + "_";
+            saveFileName[index] += "ch" + saveIndex + ".csv";
+            File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + saveFileName[index]);
+
+            saveThread[index] = new DataSaveThread2(file, index, santeApps[index], firstDataTime);
+            isSave[index] = true;
+            saveThread[index].start();
+
+        }
+    }
+
+    private void deleteFile() {
+        Log.wtf("deleteFile", "deleteFile");
+        File file1 = new File(Environment.getExternalStorageDirectory().getAbsolutePath(),
+                "/I-Motion Lab/" + saveFileName[0]);
+        File file2 = new File(Environment.getExternalStorageDirectory().getAbsolutePath(),
+                "/I-Motion Lab/" + saveFileName[1]);
+
+        if (file1.exists()) {
+            file1.delete();
+            saveFileName[0] = null;
+        }
+
+        if (file2.exists()) {
+            file2.delete();
+            saveFileName[1] = null;
+        }
+    }
+
+    private boolean createFolder() {
+        boolean ret = false;
+        File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/");
+
+        if (f.exists()) {
+            ret = f.isDirectory();
+        } else {
+            try {
+                ret = f.mkdir();
+            } catch (Exception e) {
+                e.printStackTrace();
+                ret = false;
+            }
+        }
+        return ret;
     }
 
 
