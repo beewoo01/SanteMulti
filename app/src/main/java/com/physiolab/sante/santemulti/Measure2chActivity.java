@@ -584,6 +584,8 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
         return String.format("%02d:%02d:%02d",m,s,ms);
     }*/
 
+    private boolean isSaveDone[] = new boolean[2];
+    private boolean isSaveDiClick = false;
 
     private void MeasureStop() {
 
@@ -594,6 +596,8 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
 
         if (isStart) {
             if (handleflag == 2 || !isAlarm) {
+                StopSave(0);
+                StopSave(1);
                 defaultDialog = new DefaultDialog(this, (DialogOnClick) isSave -> {
                     if (isSave) {
                         UserInfo.getInstance().watchCnt = cntWatch;
@@ -601,6 +605,11 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
                         fragMeasure[0].SaveData("ch1",
                                 Measure2chActivity.this, recordAdapter.getItems(),
                                 santeApps[0]);
+
+                        isSaveDiClick = true;
+                        binding.saveProgressBar.setVisibility(View.VISIBLE);
+                        finishSave();
+
                     } else {
                         deleteFile();
                     }
@@ -628,17 +637,28 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
     public void onSuccess(int device) {
 
         if (device == 1) {
-            Toast.makeText(this, "파일 저장에 성공하였습니다.", Toast.LENGTH_SHORT).show();
+            isSaveDone[1] = true;
         } else {
-            //fragMeasure[1].SaveData("left", MeasureActivity.this, recordAdapter.getItems());
+            isSaveDone[0] = true;
             fragMeasure[1].SaveData("ch2", Measure2chActivity.this,
                     recordAdapter.getItems(), santeApps[1]);
+        }
+        finishSave();
+    }
+
+    private void finishSave() {
+        if (isSaveDiClick && isSaveDone[0] && isSaveDone[1]) {
+            runOnUiThread(() -> {
+                binding.saveProgressBar.setVisibility(View.GONE);
+                Toast.makeText(this, "파일 저장에 성공하였습니다.", Toast.LENGTH_SHORT).show();
+            });
         }
     }
 
     @Override
     public void onFail() {
         Toast.makeText(this, "파일 저장에 실패하였습니다.", Toast.LENGTH_SHORT).show();
+        //binding.saveProgressBar.setVisibility(View.GONE);
     }
 
 
@@ -863,6 +883,7 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
 
         binding.btnStart.setOnClickListener(v -> { /// 측정시작
 
+
             recordAdapter.removeAllItem();
             UserInfo.getInstance().measureTime = new Date(System.currentTimeMillis());
             timeThread[0] = new TimeThread(0);
@@ -891,7 +912,9 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
 
 
                 isWatch = true;
-
+                isSaveDone[0] = false;
+                isSaveDone[1] = false;
+                isSaveDiClick = false;
 
                 SetWatch(cntWatch, 1);
                 //baseTime = SystemClock.elapsedRealtime();
@@ -1546,7 +1569,8 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
         StopSave(index);
 
         Log.wtf("StartSave", "StartSave");
-        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(getApplicationContext(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(getApplicationContext(), "저장소 접근 권한이 없어서\n데이터가 저장되지 않았습니다.", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -1563,7 +1587,9 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
             saveFileName[index] += "ch" + saveIndex + ".csv";
             File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + saveFileName[index]);
 
-            saveThread[index] = new DataSaveThread2(file, index, santeApps[index], firstDataTime);
+            saveThread[index] =
+                    new DataSaveThread2(file, index, santeApps[index], firstDataTime, this);
+
             isSave[index] = true;
             saveThread[index].start();
 
@@ -1608,17 +1634,27 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
 
     private void StopSave(int index) {
         isSave[index] = false;
+        Log.wtf("isLive", "이거 나오냐?");
         if (saveThread[index] != null) {
             saveThread[index].cancle();
 
             if (saveThread[index].isAlive()) {
+                Log.wtf("saveThread", "isAlive if");
                 try {
                     saveThread[index].join(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                } finally {
+                    Log.wtf("saveThread", "finally join" + index);
+                    Log.wtf("saveThread", "finally join" + index);
+                    //saveThread[index] = null;
                 }
+            } else {
+                Log.wtf("saveThread", "isAlive else");
             }
-            saveThread[index] = null;
+            Log.wtf("saveThread", "join" + index);
+
+
         }
     }
 

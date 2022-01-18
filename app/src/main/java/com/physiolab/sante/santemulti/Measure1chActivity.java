@@ -115,6 +115,8 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
 
     private String saveFileName = null;
 
+    private boolean isSaveDone = false;
+
     //private File file = null;
 
     private final Spinner_Re_Adapter recordAdapter = new Spinner_Re_Adapter(new ArrayList<>());
@@ -574,6 +576,8 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
                 else cntWatch = 0;
 
                 isWatch = true;
+                isSaveDone = false;
+                isSaveDiClick = false;
                 //baseTime = SystemClock.elapsedRealtime();
                 //timerHandler.sendEmptyMessage(0);
                 SetWatch(cntWatch);
@@ -831,7 +835,7 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
         Toast.makeText(Measure1chActivity.this, msg, Toast.LENGTH_SHORT).show();
     }
 
-
+    private boolean isSaveDiClick = false;
     private void MeasureStop() {
         if (isStart | isPreview) {
             btService.Stop(device);
@@ -847,6 +851,12 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
                         UserInfo.getInstance().watchCnt = cntWatch;
                         UserInfo.getInstance().spacial = binding.testNameEdt.getText().toString();
                         fragMeasure.SaveData("ch1", Measure1chActivity.this, recordAdapter.getItems(), santeApps);
+                        binding.saveProgressBar.setVisibility(View.VISIBLE);
+                        if (isSaveDone) {
+                            binding.saveProgressBar.setVisibility(View.GONE);
+                            Toast.makeText(getApplicationContext(), "데이터 저장에 성공하였습니다.", Toast.LENGTH_SHORT).show();
+                        }
+                        isSaveDiClick = true;
                     } else {
                         deleteFile();
                         //fragMeasure.deleteData();
@@ -933,9 +943,17 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
 
     @Override
     public void onSuccess(int device) {
-        //Toast.makeText(getApplicationContext(), "데이터 저장에 성공하였습니다.", Toast.LENGTH_SHORT).show();
-        //Handler handler = new Handler(Looper.getMainLooper());
-        runOnUiThread(() -> Toast.makeText(getApplicationContext(), "데이터 저장에 성공하였습니다.", Toast.LENGTH_SHORT).show());
+        Log.wtf("onSuccess", "0");
+        runOnUiThread(() -> {
+            Log.wtf("onSuccess", "00");
+            if (isSaveDiClick) {
+                Toast.makeText(getApplicationContext(), "데이터 저장에 성공하였습니다.", Toast.LENGTH_SHORT).show();
+                binding.saveProgressBar.setVisibility(View.GONE);
+            }
+
+        });
+
+        isSaveDone = true;
 
     }
 
@@ -1280,7 +1298,7 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
             saveFileName += "ch" + index + ".csv";
             File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + saveFileName);
 
-            saveThread = new DataSaveThread2(file, index, santeApps, firstDataTime);
+            saveThread = new DataSaveThread2(file, index, santeApps, firstDataTime, this);
             isSave[index] = true;
             saveThread.start();
 
@@ -1323,7 +1341,7 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
                     e.printStackTrace();
                 }
             }
-            saveThread = null;
+            //saveThread = null;
 
             //isFirst = true;
         }

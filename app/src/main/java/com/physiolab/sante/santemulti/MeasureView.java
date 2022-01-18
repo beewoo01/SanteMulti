@@ -394,65 +394,6 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
             }
 
 
-            /*if (EMGRMSEnable) {
-
-                int conInt = santeApps.GetEMGRMS(0);
-
-                switch (conInt) {
-                    case 0: {
-                        conInt = 10;
-                        break;
-                    }
-
-                    case 1: {
-                        conInt = 20;
-                        break;
-                    }
-
-                    case 2: {
-                        conInt = 60;
-                        break;
-                    }
-
-                    case 3: {
-                        conInt = 100;
-                        break;
-                    }
-
-                    case 4: {
-                        conInt = 200;
-                        break;
-                    }
-                }
-
-                path.reset();
-                if (EMGCount == 0) {
-                    yPos = bufferGraph.getHeight() * ((EMGYMax - EMGData[EMGCount]) / (EMGYMax - EMGYMin));
-                    xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) EMGCount / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
-                    path.moveTo(xPos, yPos);
-
-                } else {
-                    yPos = bufferGraph.getHeight() * ((EMGYMax - EMGData[EMGCount - refresh]) / (EMGYMax - EMGYMin));
-                    xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) (EMGCount - refresh) / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
-                    path.moveTo(xPos, yPos);
-
-                    for (int i = refresh - 1; i > 0; i--) {
-                        yPos = bufferGraph.getHeight() * ((EMGYMax - RMS(EMGData, conInt, i)) / (EMGYMax - EMGYMin));
-                        xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) (EMGCount - i) / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
-                        path.lineTo(xPos, yPos);
-                    }
-                }
-
-                *//*for (int i = EMGCount; i < emg; i++) {
-                    yPos = bufferGraph.getHeight() * ((EMGYMax - RMS(EMGData, conInt, i)) / (EMGYMax - EMGYMin));
-                    xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) i / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
-
-                    path.lineTo(xPos, yPos);
-                }*//*
-                bufferCanvas.drawPath(path, RMSPnt);
-            }*/
-
-
             //if (GyroEnable)
             {
 
@@ -672,7 +613,6 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
             bufferCanvas.drawColor(getResources().getColor(android.R.color.transparent), PorterDuff.Mode.SRC);
 
-
             if (EMGEnable) {
                 xMinCount = (int) Math.max(Math.floor((double) TimeStart * (double) BTService.SAMPLE_RATE), 0.0);
                 xMaxCount = (int) Math.min(Math.ceil((double) (TimeStart + TimeRange) * (double) BTService.SAMPLE_RATE), (double) EMGCount);
@@ -784,34 +724,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
                 for (int i = xMinCount + 1; i < xMaxCount; i++) {
                     //Log.wtf("EMGEnable!!!", "여기옴?11111111");
-                    int conInt = santeApps.GetEMGRMS(0);
 
-                    switch (conInt) {
-                        case 0: {
-                            conInt = 10;
-                            break;
-                        }
-
-                        case 1: {
-                            conInt = 20;
-                            break;
-                        }
-
-                        case 2: {
-                            conInt = 60;
-                            break;
-                        }
-
-                        case 3: {
-                            conInt = 100;
-                            break;
-                        }
-
-                        case 4: {
-                            conInt = 200;
-                            break;
-                        }
-                    }
                     //yPos = bufferGraph.getHeight() * ((RMSMin - RMS(EMGData, conInt, i)) / (RMSMax - RMSMin));
                     yPos = (float) (bufferGraph.getHeight() * ((RMSMax - SampleRMSData[i]) / (RMSMax - RMSMin)));
                     xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) i / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
@@ -884,7 +797,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
             case 1:
                 return (GyroXEnable || GyroYEnable || GyroZEnable);
             case 2:
-                return EMGEnable;
+                return (EMGEnable || EMGRMSEnable);
             default:
                 return false;
         }
@@ -904,7 +817,6 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 break;
             case 2:
                 axis[0] = EMGEnable;
-                //axis[1] = EMGEnable;
                 axis[1] = EMGRMSEnable;
                 axis[2] = EMGEnable;
                 break;
@@ -943,9 +855,15 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 Refresh();
                 return (GyroXEnable || GyroYEnable || GyroZEnable);
             case 2:
-                EMGEnable = !EMGEnable;
+                if (EMGEnable || EMGRMSEnable) {
+                    EMGEnable = false;
+                    EMGRMSEnable = false;
+                } else {
+                    EMGEnable = true;
+                    EMGRMSEnable = true;
+                }
                 Refresh();
-                return EMGEnable;
+                return (EMGEnable || EMGRMSEnable);
             default:
                 return false;
         }
@@ -971,7 +889,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 EMGEnable = x;
                 EMGRMSEnable = y;
                 Refresh();
-                return EMGEnable;
+                return (EMGEnable || EMGRMSEnable);
             default:
                 return false;
         }
@@ -2475,7 +2393,6 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         } else return 0;
 
     }
-
 
     public double SampleRMS(float[] EMGData, int few) {
         double result = 0;

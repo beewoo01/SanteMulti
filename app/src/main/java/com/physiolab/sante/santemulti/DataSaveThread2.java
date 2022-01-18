@@ -1,6 +1,8 @@
 package com.physiolab.sante.santemulti;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
@@ -33,12 +35,13 @@ public class DataSaveThread2 extends Thread{
     private String firstDataTime;
     private int conInt = 100;
     private final ArrayList<Double> EMGData = new ArrayList<>();
-
+    private boolean isSucess = false;
+    private SaveFileListener saveFileListener;
     //private FileChannel fileChannel;
 
 
 
-    public DataSaveThread2(File file, int index, SanteApp santeApp, String firstDataTime) {
+    public DataSaveThread2(File file, int index, SanteApp santeApp, String firstDataTime, Activity activity) {
         super();
         //measureTime = time;
         deviceIndex = index;
@@ -47,10 +50,12 @@ public class DataSaveThread2 extends Thread{
         this.santeApp = santeApp;
         this.firstDataTime = firstDataTime;
         setRmsFilte();
+        saveFileListener = (SaveFileListener) activity;
     }
 
     public void Add(ST_DATA_PROC d) {
         queue.add(d);
+
     }
 
     public void cancle() {
@@ -131,17 +136,21 @@ public class DataSaveThread2 extends Thread{
 
                     if (data == null) continue;
 
+                    //Log.wtf("Add", String.valueOf(EMGData.size()));
+
                     //EMGData.addAll(new ArrayList(Arrays.asList(data.Filted)));
                     //ArrayList<Double> sublist = new ArrayList<Double>(Arrays.asList(data.Filted));
-                    EMGData.addAll(Arrays.asList(ArrayUtils.toObject(data.Filted)));
 
+                    EMGData.addAll(Arrays.asList(ArrayUtils.toObject(data.Filted)));
                     if (EMGData.size() > (conInt + BTService.PACKET_SAMPLE_NUM)) {
                         EMGData.subList(0, EMGData.size() - (conInt + BTService.PACKET_SAMPLE_NUM)).clear();
                     }
 
+                    //Log.wtf("queue", String.valueOf(EMGData.size()));
 
                     int index = 0;
                     for (int i = 0; i < BTService.PACKET_SAMPLE_NUM; i++) {
+                        //BTService.PACKET_SAMPLE_NUM = 40
                         index = (int) Math.floor((double) i / 10.0);
 
                         //EMGData.add(data.Filted[i]);
@@ -176,28 +185,36 @@ public class DataSaveThread2 extends Thread{
 
             }
 
-            Log.wtf("FileSave", "FileSave END");
+
+            isSucess = true;
+            saveFileListener.onSuccess(deviceIndex);
+
+            Log.wtf("FileSave", "FileSave END22222");
 
             try {
                 bufOutput.flush();
+                Log.wtf("FileSave", "FileSave END1111");
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
             try {
                 fileOutput.flush();
+                Log.wtf("FileSave", "FileSave END2222");
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
             try {
                 bufOutput.close();
+                Log.wtf("FileSave", "FileSave END3333");
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
             try {
                 fileOutput.close();
+                Log.wtf("FileSave", "FileSave END4444");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -209,13 +226,19 @@ public class DataSaveThread2 extends Thread{
 
     public double SampleRMS2(int position) {
         double result = 0;
-        int poi = position;
-        if (EMGData.size() < conInt){
-            poi = 0;
+        //int poi = position;
+
+        int subSize;
+        int length = EMGData.size();
+        if (length < conInt + BTService.PACKET_SAMPLE_NUM) {
+            //poi = 0;
+            subSize = 0;
+        } else {
+            subSize = position - BTService.PACKET_SAMPLE_NUM;
         }
 
 
-        for (int i = poi; i < EMGData.size(); i++) {
+        for (int i = 0; i < EMGData.size() - subSize; i++) {
             double data = EMGData.get(i);
 
             result += Math.pow(data , 2);

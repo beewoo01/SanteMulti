@@ -217,12 +217,6 @@ public class PopupActivity  extends AppCompatActivity {
                     }
                     else if (requestType==BTService.REQUEST_EMG_FILTER)
                     {
-
-                        /*Log.d("POPUPACTIVITY1", String.valueOf(requestType));
-                        Log.d("POPUPACTIVITY2", String.valueOf(requestType));
-                        Log.d("POPUPACTIVITY3", String.valueOf(requestType));
-                        Log.d("POPUPACTIVITY4", String.valueOf(requestType));
-                        Log.d("POPUPACTIVITY5", String.valueOf(requestType));*/
                         spinDevice = (Spinner)findViewById(R.id.spin_notch);
                         app[i].SetEMGNotch(spinDevice.getSelectedItemPosition(), i);
 
