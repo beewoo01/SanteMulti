@@ -24,7 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-public class DataSaveThread2 extends Thread{
+public class DataSaveThread2 extends Thread {
     private boolean isLive = false;
     //private final Date measureTime;
     private final int deviceIndex;
@@ -38,7 +38,6 @@ public class DataSaveThread2 extends Thread{
     private boolean isSucess = false;
     private SaveFileListener saveFileListener;
     //private FileChannel fileChannel;
-
 
 
     public DataSaveThread2(File file, int index, SanteApp santeApp, String firstDataTime, Activity activity) {
@@ -97,13 +96,13 @@ public class DataSaveThread2 extends Thread{
             }
 
 
-        }catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
 
         if (isDirExist) {
             try {
-                long Time_Offset = 621355968000000000L+9L*60L*60L*1000L*1000L*10L;
+                long Time_Offset = 621355968000000000L + 9L * 60L * 60L * 1000L * 1000L * 10L;
                 long measureTime =
                         Time_Offset + UserInfo.getInstance().measureTime.getTime() * 10000L;
 
@@ -143,6 +142,7 @@ public class DataSaveThread2 extends Thread{
 
                     EMGData.addAll(Arrays.asList(ArrayUtils.toObject(data.Filted)));
                     if (EMGData.size() > (conInt + BTService.PACKET_SAMPLE_NUM)) {
+                        //Log.wtf("EMGDatasize11", String.valueOf(EMGData.size()));
                         EMGData.subList(0, EMGData.size() - (conInt + BTService.PACKET_SAMPLE_NUM)).clear();
                     }
 
@@ -220,32 +220,86 @@ public class DataSaveThread2 extends Thread{
             }
         }
 
-
-
     }
+
+    /*private boolean test = false;
+    private boolean test2 = true;
+
 
     public double SampleRMS2(int position) {
         double result = 0;
-        //int poi = position;
+        int poi = position;
 
         int subSize;
         int length = EMGData.size();
         if (length < conInt + BTService.PACKET_SAMPLE_NUM) {
-            //poi = 0;
+            poi = 0;
             subSize = 0;
         } else {
-            subSize = position - BTService.PACKET_SAMPLE_NUM;
+            //POSITION = 0
+            //poi = 0
+            //subSize = 40
+            subSize = BTService.PACKET_SAMPLE_NUM - position;
+
+        }
+        if (test2) {
+            if (EMGData.size() == 640) {
+                test = true;
+                test2 = false;
+            }
         }
 
+        if (test) {
+            Log.wtf("poi?", String.valueOf(poi));
+            Log.wtf("subSize?", String.valueOf(subSize));
+        }
 
-        for (int i = 0; i < EMGData.size() - subSize; i++) {
+        for (int i = poi; i < EMGData.size() - subSize; i++) {
             double data = EMGData.get(i);
+            if (test) {
+                if (i == 0) {
+                    Log.wtf("data00", String.valueOf(data));
+                } else if (i == (EMGData.size() - subSize) - 1) {
+                    Log.wtf("dataendend", String.valueOf(data));
+                }
 
-            result += Math.pow(data , 2);
+                if (i == (EMGData.size() - subSize)) {
+                    Log.wtf("data????", String.valueOf(data));
+                }
+            }
+
+            result += Math.pow(data, 2);
         }
-        result = Math.sqrt(result / EMGData.size());
+        if (test) {
+            Log.wtf("pow????", String.valueOf(result));
+        }
 
+        result = Math.sqrt(result / EMGData.size() - (poi + subSize));
+        if (test) {
+            Log.wtf("result sqrt", String.valueOf(result));
+            Log.wtf("result size", String.valueOf(EMGData.size() - (poi + subSize)));
+            test = false;
+        }
         return result;
+    }*/
+
+    public double SampleRMS2(int position) {
+        double result = 0;
+        int poi = position + 1;
+        int sub = 40 - poi;
+        if (EMGData.size() < (conInt + 40)) {
+            poi = 0;
+            sub = 0;
+        }
+
+        for (int i = poi; i < EMGData.size() - sub; i++) {
+            double data = EMGData.get(i);
+            result += Math.pow(data, 2);
+        }
+
+        result = Math.sqrt(result / (EMGData.size() - (poi + sub)));
+        return result;
+
     }
 
     private void writeDataInfo(BufferedOutputStream bufOutput) {
