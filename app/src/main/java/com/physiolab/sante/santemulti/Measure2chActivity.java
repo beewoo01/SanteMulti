@@ -928,6 +928,8 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
                 UserInfo.getInstance().measureTime = new Date(now);
                 UserInfo.getInstance().alarm = isAlarm;
                 UserInfo.getInstance().watchCnt = 0;
+                fragMeasure[0].setRMSFilte(0);
+                fragMeasure[1].setRMSFilte(1);
 
                 cntIgnore = 25;
 
@@ -1634,26 +1636,16 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
 
     private void StopSave(int index) {
         isSave[index] = false;
-        Log.wtf("isLive", "이거 나오냐?");
         if (saveThread[index] != null) {
             saveThread[index].cancle();
 
             if (saveThread[index].isAlive()) {
-                Log.wtf("saveThread", "isAlive if");
                 try {
                     saveThread[index].join(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
-                } finally {
-                    Log.wtf("saveThread", "finally join" + index);
-                    Log.wtf("saveThread", "finally join" + index);
-                    //saveThread[index] = null;
                 }
-            } else {
-                Log.wtf("saveThread", "isAlive else");
             }
-            Log.wtf("saveThread", "join" + index);
-
 
         }
     }

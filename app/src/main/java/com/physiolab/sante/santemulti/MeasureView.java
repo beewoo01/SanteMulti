@@ -212,7 +212,23 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         Refresh();
     }
 
-    public void SetData(float[] emg, double[] rms, float[] leadoff, float[][] acc, float[][] gyro, double[] sampleRmsData) {
+    public void SetData(float[] emg, float[] leadoff, float[][] acc, float[][] gyro, double[] sampleRmsData) {
+        EMGData = emg;
+        SampleRMSData = sampleRmsData;
+        LeadOffData = leadoff;
+        AccData = acc;
+        GyroData = gyro;
+        EMGCount = 0;
+        RMSCount = 0;
+        dataCount = 0;
+        diff = 0.0;
+        TimeStart = 0.0f;
+        TimeStart2 = 0.0f;
+
+        Refresh();
+    }
+
+    /*public void SetData(float[] emg, double[] rms, float[] leadoff, float[][] acc, float[][] gyro, double[] sampleRmsData) {
         EMGData = emg;
         RMSData = rms;
         SampleRMSData = sampleRmsData;
@@ -227,7 +243,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         TimeStart2 = 0.0f;
 
         Refresh();
-    }
+    }*/
 
     public void PrevPage() {
         TimeStart = TimeStart - TimeRange;
@@ -723,14 +739,13 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 path.moveTo(xPos, yPos);
 
                 for (int i = xMinCount + 1; i < xMaxCount; i++) {
-                    //Log.wtf("EMGEnable!!!", "여기옴?11111111");
 
-                    //yPos = bufferGraph.getHeight() * ((RMSMin - RMS(EMGData, conInt, i)) / (RMSMax - RMSMin));
                     yPos = (float) (bufferGraph.getHeight() * ((RMSMax - SampleRMSData[i]) / (RMSMax - RMSMin)));
                     xPos = 2 + (bufferGraph.getWidth() - 4) * ((((float) i / (float) BTService.SAMPLE_RATE) - TimeStart) / (TimeRange));
 
                     path.lineTo(xPos, yPos);
                 }
+
                 bufferCanvas.drawPath(path, RMSPnt);
             }
 
@@ -1055,6 +1070,28 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
     }*/
 
     //폴더 만들기
+    private boolean CreateFolder2() {
+        //File f = new File(getContext().getExternalFilesDir(null) + "/I-Motion Lab/");
+        File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/");
+        boolean ret = false;
+        if (f.exists()) {
+            if (!f.isDirectory()) {
+                ret = false;
+            } else {
+                ret = true;
+            }
+        } else {
+            try {
+                ret = f.mkdir();
+            } catch (Exception e) {
+                e.printStackTrace();
+                ret = false;
+            }
+        }
+        return ret;
+    }
+
+    //폴더 만들기
     private void CreateFolder() {
         //File f = new File(getContext().getExternalFilesDir(null) + "/I-Motion Lab/");
         File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/");
@@ -1130,24 +1167,135 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
     }
 
-    public void deleteFile() {
+    private SaveDataThread sdThread;
 
-        /*for (String fileName : psFileName) {
-            //File file = new File(getContext().getExternalFilesDir(null) + "/I-Motion Lab/" + fileName);
-            File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/I-Motion Lab/" + fileName);
-            try {
-                if (file.exists()) {
-                    file.delete();
+    public void SaveData2(int device, Context context, ArrayList<String> timeLab, String firstTime, SanteApp santeApp) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(context, "저장소 접근 권한이 없어서\n데이터가 저장되지 않았습니다.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (sdThread != null) {
+            if (sdThread.isAlive()) {
+                try {
+                    sdThread.join(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
-        }*/
+        }
+        sdThread = new SaveDataThread(context, new Date(), device);
+        sdThread.start();
 
 
     }
 
-    class SaveTxtThread extends Thread {
+
+    class SaveDataThread extends Thread {
+        private Context context;
+        private Date date;
+        private int device;
+
+        public SaveDataThread(Context context, Date date, int device) {
+            this.context = context;
+            this.date = date;
+            this.device = device;
+        }
+
+        @SuppressLint("DefaultLocale")
+        @Override
+        public void run() {
+            super.run();
+            FileOutputStream fileOutput = null;
+            BufferedOutputStream bufOutput = null;
+
+            boolean isFileExist = false;
+            boolean isDirExist = CreateFolder2();
+            boolean isExportExist = false;
+
+            String export = DateFormat.format("yyyyMMdd_HHmmss", date).toString();
+            File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + export);
+
+            try {
+                if (isDirExist) {
+                    fileOutput = new FileOutputStream(file.getAbsolutePath(), false);
+                    bufOutput = new BufferedOutputStream(fileOutput);
+                    isExportExist = true;
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                isExportExist = false;
+            }
+
+            if (isDirExist && isExportExist) {
+                try {
+                    long Time_Offset = 621355968000000000L + 9L * 60L * 60L * 1000L * 1000L * 10L;
+                    long measureTime =
+                            Time_Offset + UserInfo.getInstance().measureTime.getTime() * 10000L;
+
+                    bufOutput.write(String.format(measureTime + "," +
+                                    UserInfo.getInstance().gender + "," +
+                                    UserInfo.getInstance().birth + "," +
+                                    UserInfo.getInstance().height + "," +
+                                    UserInfo.getInstance().weight + "," +
+                                    UserInfo.getInstance().alarm + "\r\n"
+                            ).getBytes()
+                    );
+
+                    bufOutput.write(String.format(UserInfo.getInstance().name + "\r\n").getBytes("EUC-KR"));
+                    bufOutput.write(String.format(UserInfo.getInstance().memo + "\r\n").getBytes("EUC-KR"));
+                    writeDataInfo(santeApps, device, bufOutput);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                float time = 0.0000F;
+                int index = 0;
+                for (int i = 0; i < EMGCount; i++) {
+                    index = (int) Math.floor((double) i / 10.0);
+
+                    try {
+                        bufOutput.write(
+                                String.format("%.4f, " +
+                                                "%.8f, " +
+                                                "%.8f, " +
+                                                "%.8f, " +
+                                                "%.8f, " +
+                                                "%.8f, " +
+                                                "%.8f, " +
+                                                "%.8f\r\n",
+                                                //"%.8f\r\n",
+                                                //"%.8f\r\n",
+                                                time,
+                                        AccData[0][index],
+                                        AccData[1][index],
+                                        AccData[2][index],
+                                        GyroData[0][index],
+                                        GyroData[1][index],
+                                        GyroData[2][index],
+                                        EMGData[i] //EMG Data
+                                        //data.BPF_DC[i], //Lead Off
+                                        //SampleRMS2(data.Filted, data.Filted.length, santeApp.GetEMGRMS(deviceIndex))//RMS
+                                        //SampleRMS2(i)//RMS
+                                        //data.RMS[i]
+
+                                ).getBytes()
+                        );
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    time += 0.0005F;
+                }
+
+            }
+
+
+        }
+    }
+
+    /*class SaveTxtThread extends Thread {
 
         private final String wearingPart;
         private final ArrayList<String> timeLab;
@@ -1285,7 +1433,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
                 e.printStackTrace();
             }
         }
-    }
+    }*/
 
     /*@SuppressLint("DefaultLocale")
     private void saveTxt(String wearingPart, ArrayList<String> timeLab,
@@ -2393,6 +2541,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         } else return 0;
 
     }
+
 
     public double SampleRMS(float[] EMGData, int few) {
         double result = 0;

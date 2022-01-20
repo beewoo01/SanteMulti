@@ -498,7 +498,6 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
     @SuppressLint({"ClickableViewAccessibility", "SetTextI18n"})
     private void InitControl() {
         fragMeasure = (MeasureFragment) getSupportFragmentManager().findFragmentById(R.id.frag_graph_measure);
-
         fragMeasure.SetAccRange(santeApps.GetAccMax(device), santeApps.GetAccMin(device));
         fragMeasure.SetGyroRange(santeApps.GetGyroMax(device), santeApps.GetGyroMin(device));
         fragMeasure.SetEMGRange(santeApps.GetEMGMax(device), santeApps.GetEMGMin(device));
@@ -588,6 +587,7 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
                 UserInfo.getInstance().measureTime = new Date(now);
                 UserInfo.getInstance().alarm = isAlarm;
                 UserInfo.getInstance().watchCnt = 0;
+                fragMeasure.setRMSFilte(device);
 
                 cntIgnore = 25;
 
@@ -1195,7 +1195,6 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
                                 } else binding.txtLeadoff.setVisibility(View.INVISIBLE);
 
 
-                                //Log.wtf("isFirst", String.valueOf(isFirst));
                                 if (isFirst && !isPreview) {
                                     isFirst = false;
                                     long time = System.currentTimeMillis();
@@ -1295,7 +1294,8 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
             saveFileName = UserInfo.getInstance().name;
             saveFileName += DateFormat.format("yyyyMMdd_HHmmss_", new Date()).toString();
             saveFileName += UserInfo.getInstance().spacial + "_";
-            saveFileName += "ch" + index + ".csv";
+            int device = index+1;
+            saveFileName += "ch" + device + ".csv";
             File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + saveFileName);
 
             saveThread = new DataSaveThread2(file, index, santeApps, firstDataTime, this);

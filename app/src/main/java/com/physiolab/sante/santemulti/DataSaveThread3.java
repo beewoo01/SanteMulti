@@ -2,7 +2,6 @@ package com.physiolab.sante.santemulti;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
@@ -21,10 +20,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 
-public class DataSaveThread2 extends Thread {
+public class DataSaveThread3 extends Thread {
     private boolean isLive = false;
     //private final Date measureTime;
     private final int deviceIndex;
@@ -37,7 +35,7 @@ public class DataSaveThread2 extends Thread {
     private final ArrayList<Double> EMGData = new ArrayList<>();
     private final SaveFileListener saveFileListener;
 
-    public DataSaveThread2(File file, int index, SanteApp santeApp, String firstDataTime, Activity activity) {
+    public DataSaveThread3(File file, int index, SanteApp santeApp, String firstDataTime, Activity activity) {
         super();
         deviceIndex = index;
         this.file = file;
@@ -94,128 +92,7 @@ public class DataSaveThread2 extends Thread {
             e.printStackTrace();
         }
 
-        if (isDirExist) {
-            try {
-                long Time_Offset = 621355968000000000L + 9L * 60L * 60L * 1000L * 1000L * 10L;
-                long measureTime =
-                        Time_Offset + UserInfo.getInstance().measureTime.getTime() * 10000L;
 
-                bufOutput.write(String.format(measureTime + "," +
-                                UserInfo.getInstance().gender + "," +
-                                UserInfo.getInstance().birth + "," +
-                                UserInfo.getInstance().height + "," +
-                                UserInfo.getInstance().weight + "," +
-                                UserInfo.getInstance().alarm + "," +
-                                firstDataTime + "\r\n"
-                        ).getBytes()
-                );
-
-                bufOutput.write(String.format(UserInfo.getInstance().name + "\r\n").getBytes("EUC-KR"));
-                bufOutput.write(String.format(UserInfo.getInstance().memo + "\r\n").getBytes("EUC-KR"));
-
-                writeDataInfo(bufOutput);
-
-                //bufOutput.write(String.format("EMG, RMS, Acc-X, Acc-Y, Acc-Z, Gyro-X, Gyro-Y, Gyro-Z\r\n").getBytes());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            float time = 0.0000F;
-
-            while (isLive) {
-                while (queue.size() > 0) {
-
-                    ST_DATA_PROC data = queue.poll();
-
-                    if (data == null) continue;
-
-                    //Log.wtf("Add", String.valueOf(EMGData.size()));
-
-                    //EMGData.addAll(new ArrayList(Arrays.asList(data.Filted)));
-                    //ArrayList<Double> sublist = new ArrayList<Double>(Arrays.asList(data.Filted));
-
-                    EMGData.addAll(Arrays.asList(ArrayUtils.toObject(data.Filted)));
-                    if (EMGData.size() > (conInt + BTService.PACKET_SAMPLE_NUM)) {
-                        //Log.wtf("EMGDatasize11", String.valueOf(EMGData.size()));
-                        EMGData.subList(0, EMGData.size() - (conInt + BTService.PACKET_SAMPLE_NUM)).clear();
-                    }
-
-                    //Log.wtf("queue", String.valueOf(EMGData.size()));
-
-                    int index = 0;
-                    for (int i = 0; i < BTService.PACKET_SAMPLE_NUM; i++) {
-                        //BTService.PACKET_SAMPLE_NUM = 40
-                        index = (int) Math.floor((double) i / 10.0);
-
-                        //EMGData.add(data.Filted[i]);
-
-                        try {
-
-                            bufOutput.write(
-                                    String.format("%.4f, " +//1
-                                                    "%.8f, " +//2
-                                                    "%.8f, " +//3
-                                                    "%.8f, " +//4
-                                                    "%.8f, " +//5
-                                                    "%.8f, " +//6
-                                                    "%.8f, " +//7
-                                                    "%.8f\r\n" ,//8
-                                                    //"%.8f\r\n",
-                                                    //"%.8f\r\n",
-                                            time,//1
-                                            data.Acc[0][index],//2
-                                            data.Acc[1][index],//3
-                                            data.Acc[2][index],//4
-                                            data.Gyro[0][index],//5
-                                            data.Gyro[1][index],//6
-                                            data.Gyro[2][index],//7
-                                            data.Filted[i] //EMG Data//8
-                                            //data.BPF_DC[i], //Lead Off
-                                            //SampleRMS2(data.Filted, data.Filted.length, santeApp.GetEMGRMS(deviceIndex))//RMS
-                                            //SampleRMS2(i)//RMS
-                                            //data.RMS[i]
-
-                                    ).getBytes()
-                            );
-
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-
-                        time += 0.0005F;
-                        //EMGCount++;
-                    }
-                }
-
-            }
-
-            Log.wtf("isLive", "끝");
-            saveFileListener.onSuccess(deviceIndex);
-
-            try {
-                bufOutput.flush();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                fileOutput.flush();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                bufOutput.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                fileOutput.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
 
     }
 

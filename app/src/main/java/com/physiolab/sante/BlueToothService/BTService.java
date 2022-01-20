@@ -97,6 +97,8 @@ public class BTService extends Service {
     public static final int RESULT_CANCLE=-1;
     public static final int RESULT_OK=0;
 
+    public static final int MaxMinute = 20;
+
     //public final static long Time_Offset = 621355968000000000L+9L*60L*60L*1000L*1000L*10L;
     private long Time_Offset = 621355968000000000L+9L*60L*60L*1000L*1000L*10L;
 

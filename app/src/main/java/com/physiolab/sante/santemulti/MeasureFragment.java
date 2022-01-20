@@ -18,8 +18,11 @@ import com.physiolab.sante.BlueToothService.BTService;
 import com.physiolab.sante.ST_DATA_PROC;
 import com.physiolab.sante.SanteApp;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,14 +33,14 @@ public class MeasureFragment extends Fragment {
 
     private MeasureView mView = null;
 
-    private float[] EMGData = new float[BTService.SAMPLE_RATE * 60 * 40];
-    private double[] RMSData = new double[BTService.SAMPLE_RATE * 60 * 40];
-    private double[] SampleRMSData = new double[BTService.SAMPLE_RATE * 60 * 40];
-    private float[] LeadOffData = new float[BTService.SAMPLE_RATE * 60 * 40];
-    private float[][] AccData = new float[3][(BTService.SAMPLE_RATE / 10) * 60 * 40];
-    private float[][] GyroData = new float[3][(BTService.SAMPLE_RATE / 10) * 60 * 40];
-    // * 60 * 40    여기서 * 40 은 분(Minute)
+    private float[] EMGData = new float[BTService.SAMPLE_RATE * 60 * BTService.MaxMinute];
+    //private double[] RMSData = new double[BTService.SAMPLE_RATE * 60 * 40];
+    private double[] SampleRMSData = new double[BTService.SAMPLE_RATE * 60 * BTService.MaxMinute];
+    private float[] LeadOffData = new float[BTService.SAMPLE_RATE * 60 * BTService.MaxMinute];
+    private float[][] AccData = new float[3][(BTService.SAMPLE_RATE / 10) * 60 * BTService.MaxMinute];
+    private float[][] GyroData = new float[3][(BTService.SAMPLE_RATE / 10) * 60 * BTService.MaxMinute];
 
+    // * 60 * 40    여기서 * 40 은 분(Minute)
 
 
     private int EMGCount = 0;
@@ -46,18 +49,18 @@ public class MeasureFragment extends Fragment {
     private String firstDataTime = null;
     private SanteApp santeApps;
 
-
-
+    private int conInt = 100;
+    //private ArrayList<Double> emgArrList = new ArrayList<>();
 
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        //Log.d(TAG, "onCreateView");
 
         mView = new MeasureView(getActivity(), getActivity());
         santeApps = (SanteApp) getActivity().getApplication();
-        mView.SetData(EMGData, RMSData, LeadOffData, AccData, GyroData, SampleRMSData);
+        //mView.SetData(EMGData, RMSData, LeadOffData, AccData, GyroData, SampleRMSData);
+        mView.SetData(EMGData, LeadOffData, AccData, GyroData, SampleRMSData);
 
         return mView;
     }
@@ -75,49 +78,28 @@ public class MeasureFragment extends Fragment {
 
     @SuppressLint("SimpleDateFormat")
     public boolean Add(ST_DATA_PROC data) {
-        boolean isRefresh = false;
+
         for (int i = 0; i < BTService.PACKET_SAMPLE_NUM; i++) {
-            if (EMGCount >= BTService.SAMPLE_RATE * 60 * 40) return false;
-            /*if (EMGCount >= BTService.SAMPLE_RATE * 60 * 40) {
-            //if (EMGCount >= BTService.SAMPLE_RATE * 60 * 5) {
-                refrashData();
-                isRefresh = true;
-
-
-            }*/
-
-
-            /**
-             *
-             *  TODO: 2022/01/07  배열 사이즈를 강제로 늘이다보니 사이즈가 맞지않는다.
-             *  TODO: 데이터를 비우고 다시 쓰는 방법을 써야할거 같다.
-             *
-             */
-
-
+            if (EMGCount >= BTService.SAMPLE_RATE * 60 * BTService.MaxMinute) return false;
 
             EMGData[EMGCount] = (float) data.Filted[i];
             LeadOffData[EMGCount] = (float) data.BPF_DC[i];
 
 
-            RMSData[EMGCount] = data.RMS[i];
+            //RMSData[EMGCount] = data.RMS[i];
 
-            SampleRMSData[EMGCount] = RMS(EMGData, setRMSFilter(), RMSCount);
+            SampleRMSData[EMGCount] = RMS(EMGData, conInt, RMSCount);
+            //SampleRMSData[EMGCount] = SampleRMS2(i);
 
             EMGCount++;
             RMSCount++;
 
         }
-        //RMSCount = (int) Math.sqrt(EMGCount);
 
 
         for (int i = 0; i < BTService.PACKET_SAMPLE_NUM / 10; i++) {
-            if (dataCount >= (BTService.SAMPLE_RATE / 10) * 60 * 40) return false;
-            /*if (dataCount >= (BTService.SAMPLE_RATE / 10) * 60 * 40) {
-            //if (dataCount >= (BTService.SAMPLE_RATE / 10) * 60 * 5) {
-                refrashData();
-                isRefresh = true;
-            }*/
+            if (dataCount >= (BTService.SAMPLE_RATE / 10) * 60 * BTService.MaxMinute) return false;
+
             for (int j = 0; j < 3; j++) {
                 AccData[j][dataCount] = (float) data.Acc[j][i];
                 GyroData[j][dataCount] = (float) data.Gyro[j][i];
@@ -130,21 +112,44 @@ public class MeasureFragment extends Fragment {
         return true;
     }
 
-    private void refrashData() {
+    public void setRMSFilte(int deviceIndex) {
+        conInt = 100;
+        switch (santeApps.GetEMGRMS(deviceIndex)) {
+            case 1:
+                conInt = 200;
+                break;
+
+            case 2:
+                conInt = 600;
+                break;
+
+            case 3:
+                conInt = 1000;
+                break;
+
+            case 4:
+                conInt = 2000;
+                break;
+
+        }
+    }
+
+    /*private void refrashData() {
         EMGCount = 0;
         RMSCount = 0;
         dataCount = 0;
         EMGData = new float[BTService.SAMPLE_RATE * 60 * 40];
-        RMSData = new double[BTService.SAMPLE_RATE * 60 * 40];
+        //RMSData = new double[BTService.SAMPLE_RATE * 60 * 40];
         SampleRMSData = new double[BTService.SAMPLE_RATE * 60 * 40];
         LeadOffData = new float[BTService.SAMPLE_RATE * 60 * 40];
         AccData = new float[3][(BTService.SAMPLE_RATE / 10) * 60 * 40];
         GyroData = new float[3][(BTService.SAMPLE_RATE / 10) * 60 * 40];
         mView.Init();
-        mView.SetData(EMGData, RMSData, LeadOffData, AccData, GyroData, SampleRMSData);
-    }
+        mView.SetData(EMGData, LeadOffData, AccData, GyroData, SampleRMSData);
+        //mView.SetData(EMGData, RMSData, LeadOffData, AccData, GyroData, SampleRMSData);
+    }*/
 
-    private int setRMSFilter() {
+    /*private int setRMSFilter() {
         int result = 10;
 
         switch (santeApps.GetEMGRMS(0)) {
@@ -174,11 +179,26 @@ public class MeasureFragment extends Fragment {
             }
         }
         return result;
-    }
+    }*/
 
     public float RMS(float[] EMGData, int m, int count) {
         float result = 0;
-        if (count > 0) {
+        int start = 0;
+        int end = count;
+
+        if (count >= m) {
+            start = count - m ;
+        }
+
+        for (int i = start; i < end; i++) {
+            result += Math.pow(EMGData[i], 2);
+        }
+        result = (float) Math.sqrt(result / (count - start));
+
+        return result;
+
+
+        /*if (count > 0) {
             for (int i = 0; i < m; i++) {
                 if (count < m)
                     break;
@@ -187,7 +207,7 @@ public class MeasureFragment extends Fragment {
             result = (float) Math.sqrt(result / m);
             return result;
 
-        } else return 0;
+        } else return 0;*/
 
     }
 
@@ -250,7 +270,6 @@ public class MeasureFragment extends Fragment {
     }
 
 
-
     public boolean GetEnable(int i) {
         return mView.GetEnable(i);
     }
@@ -299,8 +318,11 @@ public class MeasureFragment extends Fragment {
 
     }
 
-    public void deleteData(){
-        mView.deleteFile();
+    public void SaveData2(int device, Activity activity
+            , ArrayList<String> timLab, SanteApp santeApp) {
+        //mView.SaveData(activity, info, context, timLab, progressDialog);
+        mView.SaveData2(device+1, activity, timLab, firstDataTime, santeApp);
+
     }
 
     public float[][] getGyroData() {
@@ -324,7 +346,7 @@ public class MeasureFragment extends Fragment {
         super.onDestroy();
         mView = null;
         EMGData = null;
-        RMSData = null;
+        //RMSData = null;
         SampleRMSData = null;
         LeadOffData = null;
         AccData = null;
@@ -336,4 +358,25 @@ public class MeasureFragment extends Fragment {
         santeApps = null;
         System.gc();
     }
+
+
+    /*public double SampleRMS2(int position) {
+        double result = 0;
+        int poi = position + 1;
+        int sub = 40 - poi;
+
+        if (emgArrList.size() < (conInt + 40)) {
+            poi = 0;
+            sub = 0;
+        }
+
+        for (int i = poi; i < emgArrList.size() - sub; i++) {
+            double data = emgArrList.get(i);
+            result += Math.pow(data, 2);
+        }
+
+        result = Math.sqrt(result / (emgArrList.size() - (poi + sub)));
+        return result;
+
+    }*/
 }
