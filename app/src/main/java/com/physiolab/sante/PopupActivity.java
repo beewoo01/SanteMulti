@@ -475,7 +475,8 @@ public class PopupActivity  extends AppCompatActivity {
                 //spinDevice.setOnItemSelectedListener(onSelChanged);
 
                 spinDevice = findViewById(R.id.spin_rms);
-                adapterDevice = new SpinnerAdapter(this, android.R.layout.simple_spinner_item, new String[] {"0.05s", "0.1s", "0.3s", "0.5s", "1s"});
+                adapterDevice = new SpinnerAdapter(this, android.R.layout.simple_spinner_item, new String[] {"0.05s", "0.1s", "0.3s"});
+                //RMS 설정 Spinner 0.005 = 0, 0.1 = 1, 0.3 = 2, 0.5 = 3, 1 = 4
                 spinDevice.setAdapter(adapterDevice);
                 spinDevice.setSelection(app.GetEMGRMS(i));
 

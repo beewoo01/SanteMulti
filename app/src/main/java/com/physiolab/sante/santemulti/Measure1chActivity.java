@@ -851,9 +851,11 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
                         UserInfo.getInstance().watchCnt = cntWatch;
                         UserInfo.getInstance().spacial = binding.testNameEdt.getText().toString();
                         fragMeasure.SaveData("ch1", Measure1chActivity.this, recordAdapter.getItems(), santeApps);
-                        binding.saveProgressBar.setVisibility(View.VISIBLE);
+                        //binding.saveProgressBar.setVisibility(View.VISIBLE);
+                        binding.saveProgressLayout.setVisibility(View.VISIBLE);
                         if (isSaveDone) {
-                            binding.saveProgressBar.setVisibility(View.GONE);
+                            //binding.saveProgressBar.setVisibility(View.GONE);
+                            binding.saveProgressLayout.setVisibility(View.GONE);
                             Toast.makeText(getApplicationContext(), "데이터 저장에 성공하였습니다.", Toast.LENGTH_SHORT).show();
                         }
                         isSaveDiClick = true;
@@ -947,8 +949,11 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
         runOnUiThread(() -> {
             Log.wtf("onSuccess", "00");
             if (isSaveDiClick) {
-                Toast.makeText(getApplicationContext(), "데이터 저장에 성공하였습니다.", Toast.LENGTH_SHORT).show();
-                binding.saveProgressBar.setVisibility(View.GONE);
+                //Toast.makeText(getApplicationContext(), "데이터 저장에 성공하였습니다.", Toast.LENGTH_SHORT).show();
+                //binding.saveProgressBar.setVisibility(View.GONE);
+                //binding.saveProgressLayout.setVisibility(View.GONE);
+                binding.saveProgressLayout.setVisibility(View.VISIBLE);
+                binding.percentTxv.setText(String.valueOf(device));
             }
 
         });

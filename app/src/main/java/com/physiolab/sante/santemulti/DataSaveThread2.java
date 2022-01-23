@@ -36,6 +36,7 @@ public class DataSaveThread2 extends Thread {
     private int conInt = 100;
     private final ArrayList<Double> EMGData = new ArrayList<>();
     private final SaveFileListener saveFileListener;
+    private int saveProcess;
 
     public DataSaveThread2(File file, int index, SanteApp santeApp, String firstDataTime, Activity activity) {
         super();
@@ -64,11 +65,11 @@ public class DataSaveThread2 extends Thread {
             conInt = 200;
         } else if (sec == 2) {
             conInt = 600;
-        } else if (sec == 3) {
+        }/* else if (sec == 3) {
             conInt = 1000;
         } else if (sec == 4) {
             conInt = 2000;
-        }
+        }*/
     }
 
     @SuppressLint("DefaultLocale")
@@ -121,7 +122,8 @@ public class DataSaveThread2 extends Thread {
             }
 
             float time = 0.0000F;
-
+            boolean isDone = false;
+            int allProcess = 0;
             while (isLive) {
                 while (queue.size() > 0) {
 
@@ -129,18 +131,10 @@ public class DataSaveThread2 extends Thread {
 
                     if (data == null) continue;
 
-                    //Log.wtf("Add", String.valueOf(EMGData.size()));
-
-                    //EMGData.addAll(new ArrayList(Arrays.asList(data.Filted)));
-                    //ArrayList<Double> sublist = new ArrayList<Double>(Arrays.asList(data.Filted));
-
                     EMGData.addAll(Arrays.asList(ArrayUtils.toObject(data.Filted)));
                     if (EMGData.size() > (conInt + BTService.PACKET_SAMPLE_NUM)) {
-                        //Log.wtf("EMGDatasize11", String.valueOf(EMGData.size()));
                         EMGData.subList(0, EMGData.size() - (conInt + BTService.PACKET_SAMPLE_NUM)).clear();
                     }
-
-                    //Log.wtf("queue", String.valueOf(EMGData.size()));
 
                     int index = 0;
                     for (int i = 0; i < BTService.PACKET_SAMPLE_NUM; i++) {
@@ -159,8 +153,8 @@ public class DataSaveThread2 extends Thread {
                                                     "%.8f, " +//5
                                                     "%.8f, " +//6
                                                     "%.8f, " +//7
-                                                    "%.8f\r\n" ,//8
-                                                    //"%.8f\r\n",
+                                                    "%.8f," +//8
+                                                    "%.8f\r\n",
                                                     //"%.8f\r\n",
                                             time,//1
                                             data.Acc[0][index],//2
@@ -169,10 +163,10 @@ public class DataSaveThread2 extends Thread {
                                             data.Gyro[0][index],//5
                                             data.Gyro[1][index],//6
                                             data.Gyro[2][index],//7
-                                            data.Filted[i] //EMG Data//8
+                                            data.Filted[i], //EMG Data//8
                                             //data.BPF_DC[i], //Lead Off
                                             //SampleRMS2(data.Filted, data.Filted.length, santeApp.GetEMGRMS(deviceIndex))//RMS
-                                            //SampleRMS2(i)//RMS
+                                            SampleRMS2(i)//RMS
                                             //data.RMS[i]
 
                                     ).getBytes()
@@ -185,12 +179,24 @@ public class DataSaveThread2 extends Thread {
                         time += 0.0005F;
                         //EMGCount++;
                     }
+
+                    if (!isLive) {
+                        if (!isDone) {
+                            isDone = true;
+                            allProcess = queue.size();
+                        }
+                        saveProcess++;
+                        int percent = (int) ((double) saveProcess / (double) allProcess * 100);
+                        Log.wtf("savePercentage", String.valueOf(percent));
+                        //Log.wtf("savePercentage", String.valueOf(percent));
+                        saveFileListener.onSuccess(percent);
+                    }
                 }
 
             }
 
             Log.wtf("isLive", "끝");
-            saveFileListener.onSuccess(deviceIndex);
+            //saveFileListener.onSuccess(deviceIndex);
 
             try {
                 bufOutput.flush();

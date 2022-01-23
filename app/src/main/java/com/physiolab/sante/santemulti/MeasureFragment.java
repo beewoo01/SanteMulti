@@ -123,13 +123,13 @@ public class MeasureFragment extends Fragment {
                 conInt = 600;
                 break;
 
-            case 3:
+            /*case 3:
                 conInt = 1000;
                 break;
 
             case 4:
                 conInt = 2000;
-                break;
+                break;*/
 
         }
     }

@@ -2442,10 +2442,6 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
             conInt = 200;
         } else if (sec == 2) {
             conInt = 600;
-        } else if (sec == 3) {
-            conInt = 1000;
-        } else if (sec == 4) {
-            conInt = 2000;
         }
 
 
