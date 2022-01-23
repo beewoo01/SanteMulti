@@ -363,8 +363,6 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
 
         txtReadOffs = null;
 
-        saveThread = null;
-
         isSave = null;
 
         isState = null;
@@ -584,7 +582,8 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
         return String.format("%02d:%02d:%02d",m,s,ms);
     }*/
 
-    private boolean isSaveDone[] = new boolean[2];
+    //private boolean isSaveDone[] = new boolean[2];
+    private boolean isSaveDone = false;
     private boolean isSaveDiClick = false;
 
     private void MeasureStop() {
@@ -607,8 +606,11 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
                                 santeApps[0]);
 
                         isSaveDiClick = true;
-                        binding.saveProgressBar.setVisibility(View.VISIBLE);
-                        finishSave();
+                        if (isSaveDone) {
+                            finishSave();
+                        }
+                        //binding.saveProgressBar.setVisibility(View.VISIBLE);
+
 
                     } else {
                         deleteFile();
@@ -633,26 +635,49 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
         UpdateUI(1);
     }
 
-    @Override
-    public void onSuccess(int device) {
+    private int[] savePercent = new int[2];
 
-        if (device == 1) {
-            isSaveDone[1] = true;
-        } else {
-            isSaveDone[0] = true;
-            fragMeasure[1].SaveData("ch2", Measure2chActivity.this,
-                    recordAdapter.getItems(), santeApps[1]);
+    @Override
+    public void onSuccess(int device, int percent) {
+        savePercent[device] = percent;
+        int lowPercent = percent;
+
+        for (int i : savePercent) {
+            if (lowPercent < i) lowPercent = i;
         }
+        if (lowPercent == 100) {
+            isSaveDone = true;
+        }
+        int finalLowPercent = lowPercent;
+        runOnUiThread(() -> {
+            binding.saveProgressLayout.setVisibility(View.VISIBLE);
+            binding.saveTwoProgressLayout.setVisibility(View.VISIBLE);
+            if (device == 0) {
+                binding.percentTxv.setText(String.valueOf(percent));
+            }else {
+                binding.twoPercentTxv.setText(String.valueOf(percent));
+            }
+
+        });
+
         finishSave();
+
     }
 
     private void finishSave() {
-        if (isSaveDiClick && isSaveDone[0] && isSaveDone[1]) {
+        if (isSaveDiClick && isSaveDone) {
             runOnUiThread(() -> {
-                binding.saveProgressBar.setVisibility(View.GONE);
                 Toast.makeText(this, "파일 저장에 성공하였습니다.", Toast.LENGTH_SHORT).show();
             });
+            isSaveDone = false;
+            isSaveDiClick = false;
         }
+        /*if (isSaveDiClick && isSaveDone[0] && isSaveDone[1]) {
+            runOnUiThread(() -> {
+                *//*binding.saveProgressBar.setVisibility(View.GONE);
+                Toast.makeText(this, "파일 저장에 성공하였습니다.", Toast.LENGTH_SHORT).show();*//*
+            });
+        }*/
     }
 
     @Override
@@ -912,8 +937,9 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
 
 
                 isWatch = true;
-                isSaveDone[0] = false;
-                isSaveDone[1] = false;
+                isSaveDone = false;
+                /*isSaveDone[0] = false;
+                isSaveDone[1] = false;*/
                 isSaveDiClick = false;
 
                 SetWatch(cntWatch, 1);
@@ -1638,14 +1664,16 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
         isSave[index] = false;
         if (saveThread[index] != null) {
             saveThread[index].cancle();
+            Log.wtf("StopSave", "cancle");
 
-            if (saveThread[index].isAlive()) {
+            /*if (saveThread[index].isAlive()) {
                 try {
-                    saveThread[index].join(1000);
+                    //saveThread[index].join(1000);
+                    saveThread[index].join(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-            }
+            }*/
 
         }
     }

@@ -1257,24 +1257,25 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
                     try {
                         bufOutput.write(
-                                String.format("%.4f, " +
-                                                "%.8f, " +
-                                                "%.8f, " +
-                                                "%.8f, " +
-                                                "%.8f, " +
-                                                "%.8f, " +
-                                                "%.8f, " +
-                                                "%.8f\r\n",
+                                String.format("%.4f, " + //1
+                                                "%.8f, " + //2
+                                                "%.8f, " + //3
+                                                "%.8f, " + //4
+                                                "%.8f, " + //5
+                                                "%.8f, " + //6
+                                                "%.8f, " + //7
+                                                "%.8f\r\n", //8
                                                 //"%.8f\r\n",
                                                 //"%.8f\r\n",
-                                                time,
-                                        AccData[0][index],
-                                        AccData[1][index],
-                                        AccData[2][index],
-                                        GyroData[0][index],
-                                        GyroData[1][index],
-                                        GyroData[2][index],
-                                        EMGData[i] //EMG Data
+                                                time, //
+                                        AccData[0][index], //1
+                                        AccData[1][index], //2
+                                        AccData[2][index], //3
+                                        GyroData[0][index], //4
+                                        GyroData[1][index], //5
+                                        GyroData[2][index], //6
+                                        EMGData[i], //EMG Data //7
+                                        SampleRMSData[i]
                                         //data.BPF_DC[i], //Lead Off
                                         //SampleRMS2(data.Filted, data.Filted.length, santeApp.GetEMGRMS(deviceIndex))//RMS
                                         //SampleRMS2(i)//RMS

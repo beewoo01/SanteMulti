@@ -124,9 +124,7 @@ public class DataSaveThread2 extends Thread {
             float time = 0.0000F;
             boolean isDone = false;
             int allProcess = 0;
-            while (isLive) {
-                while (queue.size() > 0) {
-
+            while (isLive || queue.size() > 0) {
                     ST_DATA_PROC data = queue.poll();
 
                     if (data == null) continue;
@@ -181,21 +179,24 @@ public class DataSaveThread2 extends Thread {
                     }
 
                     if (!isLive) {
+                        /*Log.wtf("queue.size()", String.valueOf(queue.size()));
+                        Log.wtf("deviceIndex", String.valueOf(deviceIndex));*/
                         if (!isDone) {
                             isDone = true;
                             allProcess = queue.size();
                         }
                         saveProcess++;
                         int percent = (int) ((double) saveProcess / (double) allProcess * 100);
-                        Log.wtf("savePercentage", String.valueOf(percent));
+
                         //Log.wtf("savePercentage", String.valueOf(percent));
-                        saveFileListener.onSuccess(percent);
+                        //saveFileListener.onSuccess(deviceIndex, percent);
+                        if (percent % 10 == 0) {
+                            saveFileListener.onSuccess(deviceIndex, percent);
+                        }
+
                     }
-                }
 
             }
-
-            Log.wtf("isLive", "끝");
             //saveFileListener.onSuccess(deviceIndex);
 
             try {
@@ -318,10 +319,6 @@ public class DataSaveThread2 extends Thread {
             EMGRMS = "0.1s";
         } else if (santeApp.GetEMGRMS(deviceIndex) == 2) {
             EMGRMS = "0.3s";
-        } else if (santeApp.GetEMGRMS(deviceIndex) == 3) {
-            EMGRMS = "0.5s";
-        } else if (santeApp.GetEMGRMS(deviceIndex) == 4) {
-            EMGRMS = "1s";
         }
 
         try {

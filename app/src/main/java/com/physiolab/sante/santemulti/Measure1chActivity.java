@@ -944,16 +944,16 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
     };*/
 
     @Override
-    public void onSuccess(int device) {
-        Log.wtf("onSuccess", "0");
+    public void onSuccess(int device, int percent) {
+        //Log.wtf("onSuccess", "0");
         runOnUiThread(() -> {
-            Log.wtf("onSuccess", "00");
+            //Log.wtf("onSuccess", "00");
             if (isSaveDiClick) {
                 //Toast.makeText(getApplicationContext(), "데이터 저장에 성공하였습니다.", Toast.LENGTH_SHORT).show();
                 //binding.saveProgressBar.setVisibility(View.GONE);
                 //binding.saveProgressLayout.setVisibility(View.GONE);
                 binding.saveProgressLayout.setVisibility(View.VISIBLE);
-                binding.percentTxv.setText(String.valueOf(device));
+                binding.percentTxv.setText(String.valueOf(percent));
             }
 
         });
