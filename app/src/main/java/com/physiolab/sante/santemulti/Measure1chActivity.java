@@ -23,7 +23,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
 import android.text.format.DateFormat;
@@ -49,6 +48,8 @@ import com.physiolab.sante.ScreenSize;
 import com.physiolab.sante.Spinner_Re_Adapter;
 import com.physiolab.sante.UserInfo;
 import com.physiolab.sante.dialog.DefaultDialog;
+import com.physiolab.sante.dialog.SaveDialogDialog;
+import com.physiolab.sante.listener.SaveFileDialogListener;
 import com.physiolab.sante.santemulti.databinding.ActivityMeasureOneBinding;
 
 import java.io.File;
@@ -115,11 +116,16 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
 
     private String saveFileName = null;
 
-    private boolean isSaveDone = false;
+
 
     //private File file = null;
 
     private final Spinner_Re_Adapter recordAdapter = new Spinner_Re_Adapter(new ArrayList<>());
+    private SaveDialogDialog saveDialog = null;
+    private SaveFileDialogListener saveFileListener = null;
+    private boolean isSaveDiClick = false;
+    private boolean isSaveDone = false;
+    private int savePercent = 0;
 
     private final ServiceConnection conn = new ServiceConnection() {
         public void onServiceConnected(ComponentName name,
@@ -577,6 +583,7 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
                 isWatch = true;
                 isSaveDone = false;
                 isSaveDiClick = false;
+                savePercent = 0;
                 //baseTime = SystemClock.elapsedRealtime();
                 //timerHandler.sendEmptyMessage(0);
                 SetWatch(cntWatch);
@@ -835,7 +842,7 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
         Toast.makeText(Measure1chActivity.this, msg, Toast.LENGTH_SHORT).show();
     }
 
-    private boolean isSaveDiClick = false;
+
     private void MeasureStop() {
         if (isStart | isPreview) {
             btService.Stop(device);
@@ -851,46 +858,27 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
                         UserInfo.getInstance().watchCnt = cntWatch;
                         UserInfo.getInstance().spacial = binding.testNameEdt.getText().toString();
                         fragMeasure.SaveData("ch1", Measure1chActivity.this, recordAdapter.getItems(), santeApps);
-                        //binding.saveProgressBar.setVisibility(View.VISIBLE);
-                        binding.saveProgressLayout.setVisibility(View.VISIBLE);
+
                         if (isSaveDone) {
-                            //binding.saveProgressBar.setVisibility(View.GONE);
-                            binding.saveProgressLayout.setVisibility(View.GONE);
-                            Toast.makeText(getApplicationContext(), "데이터 저장에 성공하였습니다.", Toast.LENGTH_SHORT).show();
+                            showToast("파일 저장에 성공하였습니다.");
+                        }else {
+                            isSaveDiClick = true;
                         }
-                        isSaveDiClick = true;
+                        //showSaveDialog2();
+
+
                     } else {
                         deleteFile();
-                        //fragMeasure.deleteData();
                     }
                 }, "알림", "측정결과를 저장하시겠습니까?");
-                /*defaultDialog = new DefaultDialog(this, () -> {
-                    UserInfo.getInstance().watchCnt = cntWatch;
-                    UserInfo.getInstance().spacial = binding.testNameEdt.getText().toString();
-                    fragMeasure.SaveData("ch1", Measure1chActivity.this,
-                            recordAdapter.getItems(), santeApps);
-                }, "알림", "측정결과를 저장하시겠습니까?");*/
+
                 defaultDialog.show();
             }
         }
-        /*if (isStart && handleflag == 2) {
-            Log.wtf("MeasureStop", "444444444");
-
-            defaultDialog = new DefaultDialog(this, () -> {
-                UserInfo.getInstance().watchCnt = cntWatch;
-                UserInfo.getInstance().spacial = binding.testNameEdt.getText().toString();
-                fragMeasure.SaveData("ch1", MeasureOneActivity.this, recordAdapter.getItems());
-            }, "알림", "측정결과를 저장하시겠습니까?");
-            defaultDialog.show();
-
-        }*/
 
         isStart = false;
         isPreview = false;
-        //isFirst = true;
-        /*binding.btnAccAxis.setEnabled(true);
-        binding.btnGyroAxis.setEnabled(true);
-        binding.btnEmgAxis.setEnabled(true);*/
+
         santeApps.SetPreview(isPreview, device);
         UpdateUI();
     }
@@ -943,22 +931,60 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
         }
     };*/
 
+
     @Override
     public void onSuccess(int device, int percent) {
-        //Log.wtf("onSuccess", "0");
+        savePercent = percent;
+        if (savePercent >= 100) isSaveDone = true;
+
         runOnUiThread(() -> {
-            //Log.wtf("onSuccess", "00");
-            if (isSaveDiClick) {
-                //Toast.makeText(getApplicationContext(), "데이터 저장에 성공하였습니다.", Toast.LENGTH_SHORT).show();
-                //binding.saveProgressBar.setVisibility(View.GONE);
-                //binding.saveProgressLayout.setVisibility(View.GONE);
-                binding.saveProgressLayout.setVisibility(View.VISIBLE);
-                binding.percentTxv.setText(String.valueOf(percent));
+
+            /*if (saveDialog == null && isSaveDiClick) {
+                saveDialog = new SaveDialogDialog(Measure1chActivity.this, savePercent);
+                saveFileListener = saveDialog;
+                saveDialog.show();
+            }*/
+
+            if (saveFileListener != null) {
+                saveFileListener.onPercent(savePercent);
             }
 
-        });
+            if (isSaveDiClick) {
+                if (savePercent >= 100) {
+                    if (saveDialog != null) {
+                        saveDialog.dismiss();
+                        saveFileListener = null;
+                        saveDialog = null;
+                    }
+                    showToast("파일 저장에 성공하였습니다.");
+                }else {
+                    if (saveDialog == null) {
+                        saveDialog = new SaveDialogDialog(Measure1chActivity.this, savePercent);
+                        saveFileListener = saveDialog;
+                        saveDialog.show();
+                    }
+                }
+            }
 
-        isSaveDone = true;
+
+
+            /*if (isSaveDiClick) {
+                Log.wtf("onSuccess saveFileListener", "isSaveDiClick true");
+                if (savePercent >= 100) {
+
+                    Log.wtf("onSuccess savePercent", "isSaveDiClick savePercent 100");
+                    if (saveDialog != null) {
+                        Log.wtf("onSuccess saveDialog", "saveDialog not null");
+                        saveDialog.dismiss();
+                        saveDialog = null;
+                        saveFileListener = null;
+                    }
+
+                    showToast("파일 저장에 성공하였습니다.");
+                }
+            }*/
+
+        });
 
     }
 
@@ -966,6 +992,32 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
     public void onFail() {
         Toast.makeText(getApplicationContext(), "데이터 저장에 실패하였습니다.", Toast.LENGTH_SHORT).show();
     }
+
+    /*private void showSaveDialog() {
+        Log.wtf("isSaveDiClick", "isSaveDiClick");
+        if (!isSaveDone) {
+            Log.wtf("isSaveDiClick", "isSaveDone false");
+            Log.wtf("isSaveDiClick percent", String.valueOf(savePercent));
+            saveDialog = new SaveDialogDialog(Measure1chActivity.this, savePercent);
+            saveFileListener = saveDialog;
+            saveDialog.show();
+        }
+
+    }
+
+    private void showSaveDialog2() {
+        if (savePercent >= 100) {
+            Log.wtf("showSaveDialog2", "savePercent 100 : " +savePercent);
+            isSaveDone = true;
+            showToast("파일 저장에 성공하였습니다.");
+        }else {
+            Log.wtf("showSaveDialog2", "savePercent else : " +savePercent);
+            saveDialog = new SaveDialogDialog(Measure1chActivity.this, savePercent);
+            saveFileListener = saveDialog;
+            saveDialog.show();
+        }
+
+    }*/
 
     //타이머 핸들러 김인호
     class TimeThread extends Handler {
@@ -1276,6 +1328,7 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
     private void deleteFile() {
         Log.wtf("deleteFile", "deleteFile");
         File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + saveFileName);
+        //File file = new File(Measure1chActivity.this.getExternalFilesDir(null), "/I-Motion Lab/" + saveFileName);
         if (file.exists()) {
             file.delete();
             saveFileName = null;
@@ -1295,13 +1348,17 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm:ss.SSSZ");
         String firstDataTime = sdf.format(time);
         boolean isDirExist = createFolder();
+
+
         if (isDirExist) {
+
             saveFileName = UserInfo.getInstance().name;
             saveFileName += DateFormat.format("yyyyMMdd_HHmmss_", new Date()).toString();
             saveFileName += UserInfo.getInstance().spacial + "_";
             int device = index+1;
             saveFileName += "ch" + device + ".csv";
             File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + saveFileName);
+            //File file = new File(Measure1chActivity.this.getExternalFilesDir(null), "/I-Motion Lab/" + saveFileName);
 
             saveThread = new DataSaveThread2(file, index, santeApps, firstDataTime, this);
             isSave[index] = true;
@@ -1319,6 +1376,7 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
     private boolean createFolder() {
         boolean ret = false;
         File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/");
+        //File f = new File(Measure1chActivity.this.getExternalFilesDir(null), "/I-Motion Lab/");
 
         if (f.exists()) {
             ret = f.isDirectory();

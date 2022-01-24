@@ -1133,9 +1133,9 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
         //deleteFile();
 
-        int deviceNum = 0;
+        int deviceNum = 1;
         if (!wearingPart.equals("ch1")) {
-            deviceNum = 1;
+            deviceNum = 2;
         }
         saveLog(deviceNum, timeLab);
         //readCSVFile();
@@ -1684,10 +1684,6 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
             EMGRMS = "0.1s";
         } else if (santeApp.GetEMGRMS(deviceNum) == 2) {
             EMGRMS = "0.3s";
-        } else if (santeApp.GetEMGRMS(deviceNum) == 3) {
-            EMGRMS = "0.5s";
-        } else if (santeApp.GetEMGRMS(deviceNum) == 4) {
-            EMGRMS = "1s";
         }
 
         try {
@@ -2255,7 +2251,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         if (UserInfo.getInstance().gender) outputStr += "남" + ", ";
         else outputStr += "여" + ", ";
 
-        outputStr += "tug1" + ", ";
+        outputStr += "tug" + deviceNum + ", ";
 
         str = UserInfo.getInstance().memo.replace(",", " ");
         str = str.replace("\r", " ");

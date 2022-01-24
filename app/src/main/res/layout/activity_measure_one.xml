@@ -20,7 +20,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-
             >
 
             <ImageButton
@@ -693,30 +692,6 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-    <RelativeLayout
-        android:id="@+id/save_progressLayout"
-        android:layout_width="@dimen/_200sdp"
-        android:layout_height="@dimen/_130sdp"
-        android:background="@color/white"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        >
-
-        <TextView
-            android:id="@+id/percent_txv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="100"
-            android:textColor="@color/black"
-            tools:textSize="@dimen/_50sdp"
-            />
-
-    </RelativeLayout>
 
     <!--<ProgressBar
         android:id="@+id/save_progressBar"

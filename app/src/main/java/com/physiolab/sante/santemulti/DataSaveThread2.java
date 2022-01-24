@@ -218,6 +218,7 @@ public class DataSaveThread2 extends Thread {
             }
 
             try {
+                saveFileListener.onSuccess(deviceIndex, 100);
                 fileOutput.close();
             } catch (IOException e) {
                 e.printStackTrace();

@@ -48,6 +48,8 @@ import com.physiolab.sante.ScreenSize;
 import com.physiolab.sante.Spinner_Re_Adapter;
 import com.physiolab.sante.UserInfo;
 import com.physiolab.sante.dialog.DefaultDialog;
+import com.physiolab.sante.dialog.SaveDialogDialog;
+import com.physiolab.sante.listener.SaveFileDialogListener;
 import com.physiolab.sante.santemulti.databinding.ActivityMeasureBinding;
 
 import java.io.File;
@@ -126,6 +128,13 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
 
 
     private final Spinner_Re_Adapter recordAdapter = new Spinner_Re_Adapter(new ArrayList<>());
+
+    private boolean isSaveDone = false;
+    private boolean isSaveDiClick = false;
+
+    private int[] savePercent = new int[2];
+    private SaveDialogDialog saveDialog = null;
+    private SaveFileDialogListener saveFileListener = null;
 
     private ServiceConnection conn = new ServiceConnection() {
         public void onServiceConnected(ComponentName name,
@@ -408,17 +417,12 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
         binding.btnWatchstop.setSelected(isWatch);
 
         txtReadOffs[device].setVisibility(View.INVISIBLE);
-        /*binding.txtLeadoff.setVisibility(View.INVISIBLE);
-        binding.txtLeadoff2.setVisibility(View.INVISIBLE);*/
+
         if (isService) {
 
             switch (isState[device]) {
                 case BTService.STATE_NONE:
                 case BTService.STATE_CONNECTING:
-
-//                    devState.setBackgroundColor(getResources().getColor(R.color.DeviceStateConnecting1));
-
-                    //                    devState.setBackgroundColor(getResources().getColor(R.color.DeviceStateDisconnect));
 
                     binding.btnStart.setEnabled(false);
                     binding.btnWatchstop.setEnabled(false);
@@ -427,7 +431,7 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
                     break;
 
                 case BTService.STATE_CONNECTED:
-//                    devState.setBackgroundColor(getResources().getColor(R.color.DeviceStateConnect));
+
                     if (isStart) {
 
                         binding.btnStart.setEnabled(false);
@@ -561,7 +565,6 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
             second = second % 60;
 
             binding.txtWatchSecond.setText(String.format("%02d:%02d:%02d", minute, second, milliSecond));
-//        txtWatchMilliSecond.setText(String.format("",));
         }
 
 
@@ -583,8 +586,7 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
     }*/
 
     //private boolean isSaveDone[] = new boolean[2];
-    private boolean isSaveDone = false;
-    private boolean isSaveDiClick = false;
+
 
     private void MeasureStop() {
 
@@ -605,9 +607,17 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
                                 Measure2chActivity.this, recordAdapter.getItems(),
                                 santeApps[0]);
 
-                        isSaveDiClick = true;
+                        fragMeasure[1].SaveData("ch2",
+                                Measure2chActivity.this, recordAdapter.getItems(),
+                                santeApps[0]);
+
+
                         if (isSaveDone) {
                             finishSave();
+                        } else {
+                            isSaveDiClick = true;
+                            showSaveDialog();
+
                         }
                         //binding.saveProgressBar.setVisibility(View.VISIBLE);
 
@@ -635,43 +645,63 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
         UpdateUI(1);
     }
 
-    private int[] savePercent = new int[2];
+
 
     @Override
     public void onSuccess(int device, int percent) {
         savePercent[device] = percent;
+
         int lowPercent = percent;
 
         for (int i : savePercent) {
             if (lowPercent < i) lowPercent = i;
         }
-        if (lowPercent == 100) {
-            isSaveDone = true;
-        }
+        if (lowPercent >= 100) isSaveDone = true;
+
         int finalLowPercent = lowPercent;
         runOnUiThread(() -> {
-            binding.saveProgressLayout.setVisibility(View.VISIBLE);
-            binding.saveTwoProgressLayout.setVisibility(View.VISIBLE);
-            if (device == 0) {
-                binding.percentTxv.setText(String.valueOf(percent));
-            }else {
-                binding.twoPercentTxv.setText(String.valueOf(percent));
+            if (saveFileListener != null) {
+                saveFileListener.onPercent(finalLowPercent);
+
+                if (isSaveDiClick && isSaveDone) {
+                    finishSave();
+                }
             }
 
         });
 
-        finishSave();
+        //finishSave();
+
+    }
+
+    private void showSaveDialog() {
+        if (!isSaveDone && isSaveDiClick) {
+            int paramPercent = 0;
+            for (int i : savePercent) {
+                if (paramPercent >= i) paramPercent = i;
+            }
+            saveDialog = new SaveDialogDialog(Measure2chActivity.this, paramPercent);
+            saveFileListener = saveDialog;
+            saveDialog.show();
+        }
 
     }
 
     private void finishSave() {
-        if (isSaveDiClick && isSaveDone) {
+
+        if (isSaveDone) {
             runOnUiThread(() -> {
                 Toast.makeText(this, "파일 저장에 성공하였습니다.", Toast.LENGTH_SHORT).show();
             });
-            isSaveDone = false;
-            isSaveDiClick = false;
+
+            if (saveDialog != null) {
+                saveDialog.dismiss();
+                saveDialog = null;
+                saveFileListener = null;
+            }
         }
+
+
         /*if (isSaveDiClick && isSaveDone[0] && isSaveDone[1]) {
             runOnUiThread(() -> {
                 *//*binding.saveProgressBar.setVisibility(View.GONE);
@@ -682,7 +712,7 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
 
     @Override
     public void onFail() {
-        Toast.makeText(this, "파일 저장에 실패하였습니다.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "로그 파일 저장에 실패하였습니다.", Toast.LENGTH_SHORT).show();
         //binding.saveProgressBar.setVisibility(View.GONE);
     }
 
@@ -938,9 +968,9 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
 
                 isWatch = true;
                 isSaveDone = false;
-                /*isSaveDone[0] = false;
-                isSaveDone[1] = false;*/
                 isSaveDiClick = false;
+                savePercent[0] = 0;
+                savePercent[1] = 0;
 
                 SetWatch(cntWatch, 1);
                 //baseTime = SystemClock.elapsedRealtime();
@@ -1614,13 +1644,13 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
             saveFileName[index] += UserInfo.getInstance().spacial + "_";
             saveFileName[index] += "ch" + saveIndex + ".csv";
             File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + saveFileName[index]);
+            //File file = new File(Measure2chActivity.this.getExternalFilesDir(null), "/I-Motion Lab/" + saveFileName[index]);
 
             saveThread[index] =
                     new DataSaveThread2(file, index, santeApps[index], firstDataTime, this);
 
             isSave[index] = true;
             saveThread[index].start();
-
         }
     }
 
@@ -1630,6 +1660,11 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
                 "/I-Motion Lab/" + saveFileName[0]);
         File file2 = new File(Environment.getExternalStorageDirectory().getAbsolutePath(),
                 "/I-Motion Lab/" + saveFileName[1]);
+
+        /*File file1 = new File(Measure2chActivity.this.getExternalFilesDir(null),
+                "/I-Motion Lab/" + saveFileName[0]);
+        File file2 = new File(Measure2chActivity.this.getExternalFilesDir(null),
+                "/I-Motion Lab/" + saveFileName[1]);*/
 
         if (file1.exists()) {
             file1.delete();
@@ -1645,6 +1680,7 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
     private boolean createFolder() {
         boolean ret = false;
         File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/");
+        //File f = new File(Measure2chActivity.this.getExternalFilesDir(null) + "/I-Motion Lab/");
 
         if (f.exists()) {
             ret = f.isDirectory();
@@ -1666,15 +1702,15 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
             saveThread[index].cancle();
             Log.wtf("StopSave", "cancle");
 
-            /*if (saveThread[index].isAlive()) {
+            if (saveThread[index].isAlive()) {
                 try {
-                    //saveThread[index].join(1000);
-                    saveThread[index].join(100);
+                    saveThread[index].join(1000);
+                    //saveThread[index].join(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-            }*/
-
+            }
+            saveThread[index] = null;
         }
     }
 

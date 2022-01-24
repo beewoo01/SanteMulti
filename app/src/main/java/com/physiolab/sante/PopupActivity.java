@@ -459,7 +459,6 @@ public class PopupActivity  extends AppCompatActivity {
                 spinDevice.setSelection(app.GetEMGNotch(i));
                 //spinDevice.setOnItemSelectedListener(onSelChanged);
 
-                // TODO: 4/23/21 여기가 EMG_HPF 값인거 같음
                 spinDevice = (Spinner)findViewById(R.id.spin_hpf);
                 adapterDevice = new SpinnerAdapter(this, android.R.layout.simple_spinner_item,new String[] {"HPF None","HPF 3Hz","HPF 20Hz"});
 //            adapterDevice.SetTextSize((float) (screen.standardSize_X / div));
