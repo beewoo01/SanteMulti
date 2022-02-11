@@ -117,7 +117,6 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
     private String saveFileName = null;
 
 
-
     //private File file = null;
 
     private final Spinner_Re_Adapter recordAdapter = new Spinner_Re_Adapter(new ArrayList<>());
@@ -861,11 +860,9 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
 
                         if (isSaveDone) {
                             showToast("파일 저장에 성공하였습니다.");
-                        }else {
+                        } else {
                             isSaveDiClick = true;
                         }
-                        //showSaveDialog2();
-
 
                     } else {
                         deleteFile();
@@ -939,12 +936,6 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
 
         runOnUiThread(() -> {
 
-            /*if (saveDialog == null && isSaveDiClick) {
-                saveDialog = new SaveDialogDialog(Measure1chActivity.this, savePercent);
-                saveFileListener = saveDialog;
-                saveDialog.show();
-            }*/
-
             if (saveFileListener != null) {
                 saveFileListener.onPercent(savePercent);
             }
@@ -957,7 +948,7 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
                         saveDialog = null;
                     }
                     showToast("파일 저장에 성공하였습니다.");
-                }else {
+                } else {
                     if (saveDialog == null) {
                         saveDialog = new SaveDialogDialog(Measure1chActivity.this, savePercent);
                         saveFileListener = saveDialog;
@@ -1355,7 +1346,7 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
             saveFileName = UserInfo.getInstance().name;
             saveFileName += DateFormat.format("yyyyMMdd_HHmmss_", new Date()).toString();
             saveFileName += UserInfo.getInstance().spacial + "_";
-            int device = index+1;
+            int device = index + 1;
             saveFileName += "ch" + device + ".csv";
             File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + saveFileName);
             //File file = new File(Measure1chActivity.this.getExternalFilesDir(null), "/I-Motion Lab/" + saveFileName);
@@ -1383,7 +1374,7 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
         } else {
             try {
                 ret = f.mkdir();
-            }catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 ret = false;
             }
