@@ -1,14 +1,22 @@
 package com.physiolab.sante.santemulti;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.Manifest;
 import android.content.Intent;
 import android.media.SoundPool;
 import android.media.ToneGenerator;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.physiolab.sante.dialog.SanteGuideDialog;
 import com.physiolab.sante.santemulti.databinding.ActivitySelectBinding;
+
+import java.util.Map;
+import java.util.Observer;
 
 public class SelectActivity extends AppCompatActivity {
 
@@ -27,22 +35,60 @@ public class SelectActivity extends AppCompatActivity {
 
     }
 
-    private void initView(){
+    private void initView() {
 
-        binding.btnOneMeasure.setOnClickListener( v -> {
+        binding.btnOneMeasure.setOnClickListener(v -> {
             startActivity(new Intent(SelectActivity.this, Main1chActivity.class));
+            /*if (isGetbluetoocePermission) {
+                startActivity(new Intent(SelectActivity.this, Main1chActivity.class));
+            } else {
+                checkPermission();
+            }*/
+
+
         });
 
-        binding.btnTwoMeasure.setOnClickListener( v -> {
+        binding.btnTwoMeasure.setOnClickListener(v -> {
             startActivity(new Intent(SelectActivity.this, Main2chActivity.class));
         });
 
-        binding.santeIntroduce.setOnClickListener( v-> {
+        binding.santeIntroduce.setOnClickListener(v -> {
             SanteGuideDialog santeGuideDialog = new SanteGuideDialog(this);
             santeGuideDialog.show();
         });
 
     }
+
+    private boolean isGetbluetoocePermission = false;
+
+    /*private void checkPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            requestPermissionsLauncher.launch(new String[]{
+                    Manifest.permission.BLUETOOTH,
+                    Manifest.permission.BLUETOOTH_CONNECT
+            });
+        }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            requestPermissionsLauncher.launch(new String[]{
+                    Manifest.permission.BLUETOOTH
+            });
+        }
+
+    }
+
+    private final ActivityResultLauncher<String[]> requestPermissionsLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
+                for (Map.Entry<String, Boolean> i : result.entrySet()) {
+                    Log.wtf("i.getValue()", String.valueOf(i.getValue()));
+                    if (!i.getValue()) {
+                        isGetbluetoocePermission = false;
+                        return;
+                    }else {
+                        isGetbluetoocePermission = true;
+                    }
+
+                }
+
+            });*/
 
     /*private void BeepInit2() {
         tone = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, ToneGenerator.MAX_VOLUME);

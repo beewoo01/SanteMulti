@@ -37,6 +37,7 @@ public class DataSaveThread2 extends Thread {
     private final ArrayList<Double> EMGData = new ArrayList<>();
     private final SaveFileListener saveFileListener;
     private int saveProcess;
+    private final Activity activity;
 
     public DataSaveThread2(File file, int index, SanteApp santeApp, String firstDataTime, Activity activity) {
         super();
@@ -47,6 +48,7 @@ public class DataSaveThread2 extends Thread {
         this.firstDataTime = firstDataTime;
         setRmsFilte();
         saveFileListener = (SaveFileListener) activity;
+        this.activity = activity;
     }
 
     public void Add(ST_DATA_PROC d) {
@@ -103,7 +105,7 @@ public class DataSaveThread2 extends Thread {
 
                 bufOutput.write(String.format(measureTime + "," +
                                 UserInfo.getInstance().gender + "," +
-                                UserInfo.getInstance().birth + "," +
+                                "=\"" + UserInfo.getInstance().birth + "\"" + "," +
                                 UserInfo.getInstance().height + "," +
                                 UserInfo.getInstance().weight + "," +
                                 UserInfo.getInstance().alarm + "," +
@@ -124,12 +126,22 @@ public class DataSaveThread2 extends Thread {
             float time = 0.0000F;
             boolean isDone = false;
             int allProcess = 0;
-            while (isLive || queue.size() > 0) {
+            while (isLive) {
+                if (queue.size() <= 0) {
+                    try {
+                        sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+                while (queue.size() > 0) {
                     ST_DATA_PROC data = queue.poll();
 
                     if (data == null) continue;
 
                     EMGData.addAll(Arrays.asList(ArrayUtils.toObject(data.Filted)));
+
                     if (EMGData.size() > (conInt + BTService.PACKET_SAMPLE_NUM)) {
                         EMGData.subList(0, EMGData.size() - (conInt + BTService.PACKET_SAMPLE_NUM)).clear();
                     }
@@ -153,7 +165,7 @@ public class DataSaveThread2 extends Thread {
                                                     "%.8f, " +//7
                                                     "%.8f," +//8
                                                     "%.8f\r\n",
-                                                    //"%.8f\r\n",
+                                            //"%.8f\r\n",
                                             time,//1
                                             data.Acc[0][index],//2
                                             data.Acc[1][index],//3
@@ -179,8 +191,6 @@ public class DataSaveThread2 extends Thread {
                     }
 
                     if (!isLive) {
-                        /*Log.wtf("queue.size()", String.valueOf(queue.size()));
-                        Log.wtf("deviceIndex", String.valueOf(deviceIndex));*/
                         if (!isDone) {
                             isDone = true;
                             allProcess = queue.size();
@@ -196,7 +206,83 @@ public class DataSaveThread2 extends Thread {
 
                     }
 
+                }
+
             }
+
+            /*while (isLive || queue.size() > 0) {
+                ST_DATA_PROC data = queue.poll();
+
+                if (data == null) continue;
+
+                EMGData.addAll(Arrays.asList(ArrayUtils.toObject(data.Filted)));
+                if (EMGData.size() > (conInt + BTService.PACKET_SAMPLE_NUM)) {
+                    EMGData.subList(0, EMGData.size() - (conInt + BTService.PACKET_SAMPLE_NUM)).clear();
+                }
+
+                int index = 0;
+                for (int i = 0; i < BTService.PACKET_SAMPLE_NUM; i++) {
+                    //BTService.PACKET_SAMPLE_NUM = 40
+                    index = (int) Math.floor((double) i / 10.0);
+
+                    //EMGData.add(data.Filted[i]);
+
+                    try {
+
+                        bufOutput.write(
+                                String.format("%.4f, " +//1
+                                                "%.8f, " +//2
+                                                "%.8f, " +//3
+                                                "%.8f, " +//4
+                                                "%.8f, " +//5
+                                                "%.8f, " +//6
+                                                "%.8f, " +//7
+                                                "%.8f," +//8
+                                                "%.8f\r\n",
+                                        //"%.8f\r\n",
+                                        time,//1
+                                        data.Acc[0][index],//2
+                                        data.Acc[1][index],//3
+                                        data.Acc[2][index],//4
+                                        data.Gyro[0][index],//5
+                                        data.Gyro[1][index],//6
+                                        data.Gyro[2][index],//7
+                                        data.Filted[i], //EMG Data//8
+                                        //data.BPF_DC[i], //Lead Off
+                                        //SampleRMS2(data.Filted, data.Filted.length, santeApp.GetEMGRMS(deviceIndex))//RMS
+                                        SampleRMS2(i)//RMS
+                                        //data.RMS[i]
+
+                                ).getBytes()
+                        );
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    time += 0.0005F;
+                    //EMGCount++;
+                }
+
+                if (!isLive) {
+                        *//*Log.wtf("queue.size()", String.valueOf(queue.size()));
+                        Log.wtf("deviceIndex", String.valueOf(deviceIndex));*//*
+                    if (!isDone) {
+                        isDone = true;
+                        allProcess = queue.size();
+                    }
+                    saveProcess++;
+                    int percent = (int) ((double) saveProcess / (double) allProcess * 100);
+
+                    //Log.wtf("savePercentage", String.valueOf(percent));
+                    //saveFileListener.onSuccess(deviceIndex, percent);
+                    if (percent % 10 == 0) {
+                        saveFileListener.onSuccess(deviceIndex, percent);
+                    }
+
+                }
+
+            }*/
             //saveFileListener.onSuccess(deviceIndex);
 
             try {

@@ -1,5 +1,7 @@
 package com.physiolab.sante.santemulti;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -15,6 +17,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -41,6 +44,7 @@ import com.physiolab.sante.UserInfo;
 import com.physiolab.sante.santemulti.databinding.Activity1chMainBinding;
 
 
+import java.util.Map;
 import java.util.Set;
 
 import static com.physiolab.sante.BlueToothService.BTService.MESSAGE_COMMAND_RECEIVE;
@@ -175,7 +179,7 @@ public class Main1chActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        binding.editAge.addTextChangedListener(textWatcher);
+        binding.birthEdt.addTextChangedListener(textWatcher);
     }
 
     @Override
@@ -201,8 +205,6 @@ public class Main1chActivity extends AppCompatActivity {
 
         screen = new ScreenSize();
         screen.getStandardSize(this);
-
-        //binding.editAge.addTextChangedListener(textWatcher);
 
 
         binding.backContainer.setOnClickListener(v -> finish());
@@ -253,23 +255,8 @@ public class Main1chActivity extends AppCompatActivity {
 
 
         binding.btnDeviceMeasure.setOnClickListener(v -> {
+
             isVaild();
-        });
-
-        binding.searchDevice.setOnClickListener(v -> {
-            /*Intent intent = new Intent();
-            String sPath =
-                    getExternalFilesDir(null) + "/I-Motion Lab";*/
-            //Environment.getExternalStorageState() + "/I-Motion Lab/";
-
-            /*Uri uri = Uri.parse(sPath);
-            intent.setAction(Intent.ACTION_VIEW);*/
-            //intent.setDataAndType(uri, "*/*");
-            //startActivity(intent);
-
-            Intent intent = new Intent(this, ScanActivity.class);
-            intent.putExtra("pairedArray", deviceAddress);
-            startActivity(intent);
         });
 
     }
@@ -280,8 +267,9 @@ public class Main1chActivity extends AppCompatActivity {
         if (isState[0] == STATE_NONE) {
             showToast("기기를 연결해주세요");
             return;
+
         } else if (batt <= 0) {
-            showToast("측정기기 배터리를 충전해 주세요");
+            showToast("측정기기 배터리를 충전해주세요");
             return;
 
         } else if (TextUtils.isEmpty(binding.editName.getText().toString()) || binding.editName.getText().toString().length() < 1) {
@@ -289,12 +277,17 @@ public class Main1chActivity extends AppCompatActivity {
             return;
         }
 
+        if (!TextUtils.isEmpty(binding.birthEdt.getText().toString()) && binding.birthEdt.getText().toString().length() < 10) {
+            showToast("생년월일을 정확히 입력해주세요");
+            return;
+        }
+
         if (TextUtils.isEmpty(binding.editHeight.getText().toString()) || binding.editHeight.getText().toString().length() < 1) {
             binding.editHeight.setText("100");
         }
 
-        if (TextUtils.isEmpty(binding.editAge.getText().toString()) || binding.editAge.getText().toString().length() < 1) {
-            binding.editAge.setText("1900-01-01");
+        if (TextUtils.isEmpty(binding.birthEdt.getText().toString()) || binding.birthEdt.getText().toString().length() < 1) {
+            binding.birthEdt.setText("1900-01-01");
         }
 
         if (TextUtils.isEmpty(binding.editWeight.getText().toString()) || binding.editWeight.getText().toString().length() < 1) {
@@ -304,7 +297,7 @@ public class Main1chActivity extends AppCompatActivity {
         if (!binding.rbMale.isChecked() && !binding.rbFemale.isChecked()) {
             binding.rbMale.setChecked(true);
         }
-
+        binding.birthEdt.removeTextChangedListener(textWatcher);
         moveMeasure();
 
     }
@@ -315,15 +308,9 @@ public class Main1chActivity extends AppCompatActivity {
         UserInfo.getInstance().name = binding.editName.getText().toString();
         UserInfo.getInstance().height = binding.editHeight.getText().toString();
         UserInfo.getInstance().weight = binding.editWeight.getText().toString();
-        UserInfo.getInstance().birth = binding.editAge.getText().toString();
+        UserInfo.getInstance().birth = binding.birthEdt.getText().toString();
         UserInfo.getInstance().memo = binding.editMemo.getText().toString();
         UserInfo.getInstance().gender = infoGender;
-        /*intent.putExtra("name", binding.editName.getText().toString());
-        intent.putExtra("height", binding.editHeight.getText().toString());
-        intent.putExtra("weight", binding.editWeight.getText().toString());
-        intent.putExtra("birth", binding.editAge.getText().toString());
-        intent.putExtra("memo", binding.editMemo.getText().toString());
-        intent.putExtra("gender", infoGender);*/
         startActivity(intent);
     }
 
@@ -331,8 +318,32 @@ public class Main1chActivity extends AppCompatActivity {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * SDK 31 Android 12
+     * 에서는 BLUETOOTH_CONNECT 권한을 따로 물어봐야함
+     * */
+
+    /*private void checkPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            requestPermissionsLauncher.launch(new String[]{
+                    Manifest.permission.BLUETOOTH,
+                    Manifest.permission.BLUETOOTH_CONNECT
+            });
+        }
+    }*/
+
+    /*private final ActivityResultLauncher<String[]> requestPermissionsLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
+                for (Map.Entry<String, Boolean> i : result.entrySet()) {
+                    Log.wtf("i.getValue()", String.valueOf(i.getValue()));
+                }
+
+            });*/
+
+
     private void DeviceOpen() {
         if (isState[0] == STATE_NONE) {
+
             String deviceAddress = "";
             Object selObj = null;
 
@@ -376,7 +387,7 @@ public class Main1chActivity extends AppCompatActivity {
 
             char inputChar = s.charAt(s.length() - 1);
             if (inputChar != '-' && (inputChar < '0' || inputChar > '9')) {
-                binding.editAge.getText().delete(s.length() - 1, s.length());
+                binding.birthEdt.getText().delete(s.length() - 1, s.length());
                 return;
             }
 
@@ -386,18 +397,18 @@ public class Main1chActivity extends AppCompatActivity {
             if (_beforeLenght > _afterLenght) {
                 // 삭제 중에 마지막에 -는 자동으로 지우기
                 if (s.toString().endsWith("-")) {
-                    binding.editAge.setText(s.toString().substring(0, s.length() - 1));
+                    binding.birthEdt.setText(s.toString().substring(0, s.length() - 1));
                 }
             }
             // 입력 중
             else if (_beforeLenght < _afterLenght) {
                 if (_afterLenght == 5 && !s.toString().contains("-")) {
-                    binding.editAge.setText(s.toString().subSequence(0, 4) + "-" + s.toString().substring(4, s.length()));
+                    binding.birthEdt.setText(s.toString().subSequence(0, 4) + "-" + s.toString().substring(4, s.length()));
                 } else if (_afterLenght == 8) {
-                    binding.editAge.setText(s.toString().subSequence(0, 7) + "-" + s.toString().substring(7, s.length()));
+                    binding.birthEdt.setText(s.toString().subSequence(0, 7) + "-" + s.toString().substring(7, s.length()));
                 }
             }
-            binding.editAge.setSelection(binding.editAge.length());
+            binding.birthEdt.setSelection(binding.birthEdt.length());
 
         }
 
@@ -518,25 +529,25 @@ public class Main1chActivity extends AppCompatActivity {
 
                     binding.tvBatt.setText(batt + "%");
                     /*
-                    * 4.2 >= 100
-                    * 4.1 = 90
-                    * 4.0 = 80
-                    * 3.9 = 70
-                    * 3.8 = 60
-                    * 3.7 = 50
-                    * 3.6 = 40
-                    * 3.5 = 30    4.29 ~ 3.50 까지 있음
-                    * 3.4 = 20 --> 3.49 부터 0% 이어야함
-                    * 3.3 = 10
-                    * 3.2 = 0
-                    *
-                    *
-                    *
-                    * 3.99 - 0.3 = 3.69   69
-                    * 3.89
-                    * 3.79
-                    * 3.69
-                    * */
+                     * 4.2 >= 100
+                     * 4.1 = 90
+                     * 4.0 = 80
+                     * 3.9 = 70
+                     * 3.8 = 60
+                     * 3.7 = 50
+                     * 3.6 = 40
+                     * 3.5 = 30    4.29 ~ 3.50 까지 있음
+                     * 3.4 = 20 --> 3.49 부터 0% 이어야함
+                     * 3.3 = 10
+                     * 3.2 = 0
+                     *
+                     *
+                     *
+                     * 3.99 - 0.3 = 3.69   69
+                     * 3.89
+                     * 3.79
+                     * 3.69
+                     * */
 
                     float min = 3.400F;
                     float max = 4.200F;

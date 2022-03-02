@@ -89,22 +89,14 @@ public class Main2chActivity extends AppCompatActivity {
 
     private final Button[] btn_disConnect = new Button[2];
 
-    private String[] deviceAddress;
-
 
     private final int[] recvPktCnt = new int[2];
 
     private final int PERMISSION_STORAGE = 1;
-    private final int PERMISSION_BLUETOOTH = 2;
 
-    private boolean isShowToast = true;
-    private SearchDeviceAdapter searchDeviceAdapter;
-    private ArrayList<BluetoothDevice> pairedList;
     private BluetoothAdapter bluetoothAdapter;
-    //private IntentFilter intentFilter;
-    private SpinnerAdapter adapterDevice;
     private String addedDeviceAddress = null;
-    private int[] batt = new int[]{0, 0};
+    private final int[] batt = new int[]{0, 0};
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -118,21 +110,7 @@ public class Main2chActivity extends AppCompatActivity {
         updateUI();
 
         binding.btnDeviceMeasure.setOnClickListener(v -> {
-            binding.birthEdt.removeTextChangedListener(textWatcher);
             isVail();
-            /*if (isState[0] == STATE_NONE && isState[1] == STATE_NONE){
-                Toast.makeText(MainTestActivity.this,
-                        "기기를 연결 해주세요", Toast.LENGTH_SHORT).show();
-            } else if (isState[0] == STATE_NONE || isState[1] == STATE_NONE){
-                int deviceDirection = (isState[0] == STATE_NONE)? 1 : 0;
-                Log.wtf("deviceDirection", String.valueOf(deviceDirection));
-                Intent intent = new Intent(MainTestActivity.this, MeasureOneActivity.class);
-                intent.putExtra("device", deviceDirection);
-                startActivity(intent);
-            }
-            else {
-                startActivity(new Intent(MainTestActivity.this, MeasureActivity.class));
-            }*/
 
         });
 
@@ -155,8 +133,18 @@ public class Main2chActivity extends AppCompatActivity {
         if (isState[0] == STATE_NONE || isState[1] == STATE_NONE) {
             showToast("기기를 연결해주세요");
             return;
+
+        } else if (batt[0] <= 0 || batt[1] <= 0) {
+            showToast("측정기기 배터리를 충전해주세요");
+            return;
+
         } else if (TextUtils.isEmpty(binding.nameEdt.getText().toString()) || binding.nameEdt.getText().toString().length() < 1) {
             showToast("측정자이름을 입력해주세요");
+            return;
+        }
+
+        if (!TextUtils.isEmpty(binding.birthEdt.getText().toString()) && binding.birthEdt.getText().toString().length() < 10) {
+            showToast("생년월일을 정확히 입력해주세요");
             return;
         }
 
@@ -181,6 +169,8 @@ public class Main2chActivity extends AppCompatActivity {
             binding.rbMale.setChecked(true);
             //showToast("측정자 성별을 선택해주세요");
         }
+        binding.birthEdt.removeTextChangedListener(textWatcher);
+
         moveMeasure();
     }
 
@@ -193,12 +183,6 @@ public class Main2chActivity extends AppCompatActivity {
         UserInfo.getInstance().birth = binding.birthEdt.getText().toString();
         UserInfo.getInstance().memo = binding.specialEdt.getText().toString();
         UserInfo.getInstance().gender = infoGender;
-        /*intent.putExtra("name", binding.editName.getText().toString());
-        intent.putExtra("height", binding.editHeight.getText().toString());
-        intent.putExtra("weight", binding.editWeight.getText().toString());
-        intent.putExtra("birth", binding.editAge.getText().toString());
-        intent.putExtra("memo", binding.editMemo.getText().toString());
-        intent.putExtra("gender", infoGender);*/
         startActivity(intent);
     }
 
@@ -504,7 +488,7 @@ public class Main2chActivity extends AppCompatActivity {
 
 
         Set<BluetoothDevice> devices = btService.GetPairedDeviceList();
-        deviceAddress = new String[devices.size()];
+        String[] deviceAddress = new String[devices.size()];
         int cnt = 0;
 
         AdapterView.OnItemSelectedListener onSelChanged = new AdapterView.OnItemSelectedListener() {
@@ -519,20 +503,16 @@ public class Main2chActivity extends AppCompatActivity {
 
             }
         };
-        pairedList = new ArrayList<>();
 
         for (Iterator<BluetoothDevice> it = devices.iterator(); it.hasNext(); ) {
 
             BluetoothDevice f = it.next();
-            /*Log.wtf("pairedList for name", f.getName());
-            Log.wtf("pairedList for address", f.getAddress());*/
-            pairedList.add(f);
             deviceAddress[cnt++] = f.getAddress();
         }
 
         /*float div = (float) getResources().getInteger(R.integer.spin_device_size);*/
         //spinDevice[0] = findViewById(R.id.spin_right_device);
-        adapterDevice = new SpinnerAdapter(this, android.R.layout.simple_spinner_item, deviceAddress);
+        SpinnerAdapter adapterDevice = new SpinnerAdapter(this, android.R.layout.simple_spinner_item, deviceAddress);
         adapterDevice.SetTextSize(16);
 
 

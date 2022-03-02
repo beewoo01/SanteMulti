@@ -57,15 +57,17 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/control_container"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:paddingStart="@dimen/_5sdp"
-        app:layout_constraintTop_toBottomOf="@id/toolbar_layout"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/graph_container"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar_layout"
+        app:layout_constraintVertical_bias="0.0"
         app:layout_constraintWidth_percent="0.4"
         tools:ignore="RtlSymmetry">
 
@@ -80,8 +82,7 @@
             android:textColor="@color/mainColor"
             android:textSize="@dimen/_11sdp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            />
+            app:layout_constraintTop_toTopOf="parent" />
 
 
         <Button
@@ -93,10 +94,9 @@
             android:background="@drawable/button_01"
             android:text="@string/start"
             android:textColor="@color/mainColor"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/i_motion_txv"
             app:layout_constraintEnd_toStartOf="@id/btn_watchstop"
-            />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/i_motion_txv" />
 
         <Button
             android:id="@+id/btn_watchstop"
@@ -122,25 +122,23 @@
             android:textColor="@color/mainColor"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/btn_watchstop"
-            app:layout_constraintTop_toTopOf="@+id/btn_start"
-            />
+            app:layout_constraintTop_toTopOf="@+id/btn_start" />
 
 
         <Button
             android:id="@+id/btn_section_record"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_10sdp"
             android:background="@drawable/button_02"
             android:enabled="false"
             android:text="@string/record_section"
             android:textColor="@color/mainColor"
             android:textSize="@dimen/_10sdp"
             android:textStyle="bold"
-            android:layout_marginTop="@dimen/_10sdp"
-            app:layout_constraintStart_toStartOf="@id/btn_start"
             app:layout_constraintEnd_toEndOf="@id/btn_start"
-            app:layout_constraintTop_toBottomOf="@id/btn_start"
-            />
+            app:layout_constraintStart_toStartOf="@id/btn_start"
+            app:layout_constraintTop_toBottomOf="@id/btn_start" />
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -155,8 +153,6 @@
             app:layout_constraintTop_toTopOf="@+id/btn_section_record">
 
 
-
-
             <TextView
                 android:id="@+id/txt_watch_second"
                 android:layout_width="wrap_content"
@@ -164,12 +160,11 @@
                 android:layout_centerInParent="true"
                 android:text="00:00"
                 android:textColor="@color/white"
-                app:layout_constraintHorizontal_chainStyle="packed"
-                app:layout_constraintEnd_toStartOf="@id/txt_watch_millisecond"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                />
+                app:layout_constraintEnd_toStartOf="@id/txt_watch_millisecond"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/txt_watch_millisecond"
@@ -177,13 +172,12 @@
                 android:layout_height="wrap_content"
                 android:text=":00"
                 android:textColor="@color/white"
-                app:layout_constraintStart_toEndOf="@id/txt_watch_second"
-                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/txt_watch_second"
+                app:layout_constraintTop_toTopOf="parent"
 
                 />
-
 
 
             <ImageView
@@ -191,13 +185,12 @@
                 android:layout_width="@dimen/_10sdp"
                 android:layout_height="@dimen/_10sdp"
                 android:layout_marginHorizontal="@dimen/_5sdp"
+                android:contentDescription="@string/dropdown"
                 android:src="@drawable/selectbox_arrow"
                 android:visibility="gone"
-                android:contentDescription="@string/dropdown"
-                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                />
+                app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -217,8 +210,7 @@
                 android:layout_marginTop="@dimen/_3sdp"
                 android:background="@drawable/button_08"
                 android:visibility="gone"
-                tools:ignore="UselessParent"
-                >
+                tools:ignore="UselessParent">
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/record_recyclerview"
@@ -232,7 +224,6 @@
         </LinearLayout>
 
 
-
         <Button
             android:id="@+id/btn_alarm"
             android:layout_width="@dimen/_80sdp"
@@ -242,10 +233,9 @@
             android:text="@string/_3sec_alarm"
             android:textColor="@color/mainColor"
             android:textSize="@dimen/_9sdp"
-            app:layout_constraintStart_toStartOf="@id/btn_start"
-            app:layout_constraintTop_toBottomOf="@id/btn_section_record"
             app:layout_constraintEnd_toStartOf="@id/btn_preview"
-            />
+            app:layout_constraintStart_toStartOf="@id/btn_start"
+            app:layout_constraintTop_toBottomOf="@id/btn_section_record" />
 
         <Button
             android:id="@+id/btn_preview"
@@ -310,15 +300,14 @@
             android:id="@+id/test_name_Txv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:fontFamily="@font/spoqahansansneo_bold"
             android:text="@string/test_name"
             android:textColor="@color/black"
-            android:fontFamily="@font/spoqahansansneo_bold"
-            android:layout_marginTop="@dimen/_10sdp"
             android:textSize="@dimen/_8sdp"
-            app:layout_constraintStart_toStartOf="@id/btn_start"
-            app:layout_constraintTop_toBottomOf="@id/btn_acc_axis"
             app:layout_constraintBottom_toTopOf="@id/test_name_edt"
-            />
+            app:layout_constraintStart_toStartOf="@id/btn_start"
+            app:layout_constraintTop_toBottomOf="@id/btn_acc_axis" />
 
         <EditText
             android:id="@+id/test_name_edt"
@@ -339,8 +328,6 @@
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/graph_container"

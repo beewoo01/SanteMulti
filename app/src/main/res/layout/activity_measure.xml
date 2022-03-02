@@ -20,7 +20,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-
             >
 
             <ImageButton
@@ -297,7 +296,6 @@
             android:importantForAutofill="no"
             android:inputType="text"
             android:paddingHorizontal="@dimen/_5sdp"
-            android:textColor="@color/black"
             android:textColorHint="#757575"
             android:textSize="@dimen/_6sdp"
             app:layout_constraintEnd_toEndOf="@id/btn_allstop"

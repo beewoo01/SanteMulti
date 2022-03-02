@@ -150,6 +150,11 @@ public class SanteApp extends Application {
     public float GetEMGMinimunRange() { return defaultValue.EMGMinimumRange; }
     public float GetTimeMinimunRange() { return defaultValue.TimeMinimumRange; }
 
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+    }
+
     public void SetAccHPF(int hpf, int device) {
         SharedPreferences.Editor editor= sharedPreferences.edit();
         editor.putInt("AccHPF"+device ,hpf);
