@@ -442,15 +442,10 @@ public class Main2chActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
 
-        /*StopSave(0);
-        StopSave(1);
-
-        stopTimerTask();*/
     }
 
     ServiceConnection conn = new ServiceConnection() {
-        public void onServiceConnected(ComponentName name,
-                                       IBinder service) {
+        public void onServiceConnected(ComponentName name, IBinder service) {
             // 서비스와 연결되었을 때 호출되는 메서드
             // 서비스 객체를 전역변수로 저장
             BTService.BTBinder mb = (BTService.BTBinder) service;
@@ -488,7 +483,13 @@ public class Main2chActivity extends AppCompatActivity {
 
 
         Set<BluetoothDevice> devices = btService.GetPairedDeviceList();
-        String[] deviceAddress = new String[devices.size()];
+        String[] deviceAddress;
+        if (devices != null) {
+            deviceAddress = new String[devices.size()];
+        }else {
+            deviceAddress = new String[0];
+        }
+
         int cnt = 0;
 
         AdapterView.OnItemSelectedListener onSelChanged = new AdapterView.OnItemSelectedListener() {
@@ -504,14 +505,12 @@ public class Main2chActivity extends AppCompatActivity {
             }
         };
 
-        for (Iterator<BluetoothDevice> it = devices.iterator(); it.hasNext(); ) {
-
-            BluetoothDevice f = it.next();
-            deviceAddress[cnt++] = f.getAddress();
+        if (devices != null) {
+            for (BluetoothDevice f : devices) {
+                deviceAddress[cnt++] = f.getAddress();
+            }
         }
 
-        /*float div = (float) getResources().getInteger(R.integer.spin_device_size);*/
-        //spinDevice[0] = findViewById(R.id.spin_right_device);
         SpinnerAdapter adapterDevice = new SpinnerAdapter(this, android.R.layout.simple_spinner_item, deviceAddress);
         adapterDevice.SetTextSize(16);
 
@@ -687,14 +686,14 @@ public class Main2chActivity extends AppCompatActivity {
         binding.deviceRe.setAdapter(searchDeviceAdapter);
     }*/
 
-    private void checkBluetoothState() {
+    /*private void checkBluetoothState() {
         if (bluetoothAdapter == null) {
             Toast.makeText(this, "Bluetooth를 지원하지 않은 단말기 입니다.", Toast.LENGTH_SHORT).show();
         } else {
             if (bluetoothAdapter.isEnabled()) {
-                /*if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+                *//*if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
                     return;
-                }*/
+                }*//*
                 if (bluetoothAdapter.isDiscovering()) {
                     Toast.makeText(this, "장치 검색중입니다...", Toast.LENGTH_SHORT).show();
                 } else {
@@ -717,7 +716,7 @@ public class Main2chActivity extends AppCompatActivity {
                     checkBluetoothState();
                 }
             }
-    );
+    );*/
 
 
     @SuppressLint("SetTextI18n")
@@ -882,14 +881,14 @@ public class Main2chActivity extends AppCompatActivity {
         }
     }
 
-    @Override
+    /*@Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == 11) {
             checkBluetoothState();
         }
-    }
+    }*/
 
     public class SpinnerAdapter extends ArrayAdapter<String> {
         Context context;

@@ -318,12 +318,12 @@ public class MeasureFragment extends Fragment {
 
     }
 
-    public void SaveData2(int device, Activity activity
+    /*public void SaveData2(int device, Activity activity
             , ArrayList<String> timLab, SanteApp santeApp) {
         //mView.SaveData(activity, info, context, timLab, progressDialog);
         mView.SaveData2(device+1, activity, timLab, firstDataTime, santeApp);
 
-    }
+    }*/
 
     public float[][] getGyroData() {
 

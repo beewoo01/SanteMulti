@@ -1,12 +1,17 @@
 package com.physiolab.sante.BlueToothService;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Application;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
@@ -24,25 +29,39 @@ import java.util.UUID;
 
 import static android.net.sip.SipErrorCode.SOCKET_ERROR;
 
+import androidx.core.app.ActivityCompat;
+
 public class BTService extends Service {
 
     static {
         System.loadLibrary("sante");
     }
 
-    public native long CreateBTSocketFwk(BTService ptr,int index);  //해당 index에 대해서 Class의 object를 생성하고 포인터값(ptr)을 돌려받는다.
+    public native long CreateBTSocketFwk(BTService ptr, int index);  //해당 index에 대해서 Class의 object를 생성하고 포인터값(ptr)을 돌려받는다.
+
     public native void ReleaseBTSocketFwk(long ptr);    //object를 해제한다.
-    public native void SetJNIMainHandler(long ptr,Handler h); //생성된 object가 메세지를 전달할 Handler를 지정한다.
-    public native void SetJNIMonitorHandler(long ptr,Handler h);
+
+    public native void SetJNIMainHandler(long ptr, Handler h); //생성된 object가 메세지를 전달할 Handler를 지정한다.
+
+    public native void SetJNIMonitorHandler(long ptr, Handler h);
+
     public native void DeviceOpend(long ptr);   //장치가 연결되었을때의 초기화 작업을 요청한다.
+
     public native void DeviceClosed(long ptr);  //장치가 연결이 끊어졌음을 알린다.
-    public native void AddCmd(long ptr,byte Cmd, int CmdParam); //장치로 전송할 명령어와 파라미터값을 추가한다. 전달된 명령어는 큐에 추가되고 TimeProgress50m함수에서 장치에 전달된다.
+
+    public native void AddCmd(long ptr, byte Cmd, int CmdParam); //장치로 전송할 명령어와 파라미터값을 추가한다. 전달된 명령어는 큐에 추가되고 TimeProgress50m함수에서 장치에 전달된다.
+
     public native boolean TimeProgress50ms(long ptr);   //명령어 큐에 확인하고 장치로 전송한다.
-    public native void DeviceDataIn(long ptr,byte[] buf, int len);  //장치에서 수신한 데이터를 해당 object로 전달한다.
-    public native byte GetJNIData(long ptr,float[] data);
-    public native void SetEMGFilterJNI(long ptr,int notch,int hpf,int lpf);
-    public native void SetAccFilterJNI(long ptr,int hpf,int lpf);
-    public native void SetGyroFilterJNI(long ptr,int hpf,int lpf);
+
+    public native void DeviceDataIn(long ptr, byte[] buf, int len);  //장치에서 수신한 데이터를 해당 object로 전달한다.
+
+    public native byte GetJNIData(long ptr, float[] data);
+
+    public native void SetEMGFilterJNI(long ptr, int notch, int hpf, int lpf);
+
+    public native void SetAccFilterJNI(long ptr, int hpf, int lpf);
+
+    public native void SetGyroFilterJNI(long ptr, int hpf, int lpf);
 
     private final String TAG = "BTService";
     //private static final boolean D = false;
@@ -63,19 +82,19 @@ public class BTService extends Service {
     public static final int STATE_CONNECTING = 1; // 연결시도중
     public static final int STATE_CONNECTED = 2;  // 장치와 연결이 이루어진 상태
 
-    public static final byte CMD_BLU_NONE = 0;		// 명령 없음
+    public static final byte CMD_BLU_NONE = 0;        // 명령 없음
 
     //
     //* 통신 연결 직후 보내는 명령
     //
-    public static final byte CMD_BLU_COMM_START = 1;		// 통신 시작 , ID 동기용 , 이후 다른 메세지 처리함
-    public static final byte CMD_BLU_DEV_INITIALIZE = 2;	 // 장치 초기화 - 통신 관련 등 초기화
+    public static final byte CMD_BLU_COMM_START = 1;        // 통신 시작 , ID 동기용 , 이후 다른 메세지 처리함
+    public static final byte CMD_BLU_DEV_INITIALIZE = 2;     // 장치 초기화 - 통신 관련 등 초기화
     //
     //* UART 데이터 통신 명령
     //
     // D2P 데이터 관련
-    public static final byte CMD_BLU_D2P_DATA_STOP = 3;					// 장치가 송신 중지
-    public static final byte CMD_BLU_D2P_DATA_REALTIME_START = 4;		// 장치가 ADC/RF In/Flash 재생 데이터 실시간 송신
+    public static final byte CMD_BLU_D2P_DATA_STOP = 3;                    // 장치가 송신 중지
+    public static final byte CMD_BLU_D2P_DATA_REALTIME_START = 4;        // 장치가 ADC/RF In/Flash 재생 데이터 실시간 송신
     //  장치의 상태(State) 및 Flash 재생 기능 수행에 따라 데이터 종류 변경됨
 
 
@@ -87,20 +106,20 @@ public class BTService extends Service {
     public static final int SAMPLE_RATE = 2000;
     //public static final int SAMPLE_RATE = 580000;
 
-    public static final int REQUEST_EMG_FILTER=0;
-    public static final int REQUEST_Acc_FILTER=1;
-    public static final int REQUEST_Gyro_FILTER=2;
+    public static final int REQUEST_EMG_FILTER = 0;
+    public static final int REQUEST_Acc_FILTER = 1;
+    public static final int REQUEST_Gyro_FILTER = 2;
 
 
-    public static final int REQUEST_Time_RANGE=3;
+    public static final int REQUEST_Time_RANGE = 3;
 
-    public static final int RESULT_CANCLE=-1;
-    public static final int RESULT_OK=0;
+    public static final int RESULT_CANCLE = -1;
+    public static final int RESULT_OK = 0;
 
     public static final int MaxMinute = 8;
 
     //public final static long Time_Offset = 621355968000000000L+9L*60L*60L*1000L*1000L*10L;
-    private long Time_Offset = 621355968000000000L+9L*60L*60L*1000L*1000L*10L;
+    private long Time_Offset = 621355968000000000L + 9L * 60L * 60L * 1000L * 1000L * 10L;
 
 
     // RFCOMM Protocol을 위한 UUID
@@ -151,13 +170,12 @@ public class BTService extends Service {
     public void onCreate() {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();    //안드로이드 기본 블루투스관리자 할당
 
-        for(int i=0;i<MaxDeviceIndex;i++)
-        {
-            mState[i]=STATE_NONE;  //현재 상태를 연결이 끓어짐으로 설정
+        for (int i = 0; i < MaxDeviceIndex; i++) {
+            mState[i] = STATE_NONE;  //현재 상태를 연결이 끓어짐으로 설정
 
             mDevNum[i] = "";
 
-            btFwk[i] = CreateBTSocketFwk(this,i);
+            btFwk[i] = CreateBTSocketFwk(this, i);
         }
     }
 
@@ -165,117 +183,113 @@ public class BTService extends Service {
     public void onDestroy() {
         super.onDestroy();
         //if (D) Log.d(TAG,"onDestroy");
-        for(int i=0;i<MaxDeviceIndex;i++)
-        {
+        for (int i = 0; i < MaxDeviceIndex; i++) {
             ReleaseBTSocketFwk(btFwk[i]);
             Close(i);
         }
     }
 
-    public void SetMainHandler(Handler h,int index)
-    {
-        if (index>=MaxDeviceIndex) return;
+    public void SetMainHandler(Handler h, int index) {
+        if (index >= MaxDeviceIndex) return;
         mHandler_main[index] = h;
-        SetJNIMainHandler(btFwk[index],h);
+        SetJNIMainHandler(btFwk[index], h);
     }
 
     public void SetMonitorHandler(Handler h, int index) {
-        if (index>=MaxDeviceIndex) return;
+        if (index >= MaxDeviceIndex) return;
         mHandler_main[index] = h;
         SetJNIMonitorHandler(btFwk[index], h);
     }
 
-    private void SendMessage(int msg,int arg1,int arg2,int index)
-    {
-        if (index>=MaxDeviceIndex) return;
-        try
-        {
-            if (mHandler_main!=null) mHandler_main[index].obtainMessage(msg, arg1, arg2).sendToTarget();
-        }
-        catch (Exception e)
-        {
+    private void SendMessage(int msg, int arg1, int arg2, int index) {
+        if (index >= MaxDeviceIndex) return;
+        try {
+            if (mHandler_main != null)
+                mHandler_main[index].obtainMessage(msg, arg1, arg2).sendToTarget();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     //현재 연결상태를 반환하는 함수
-    public int getState(int index)
-    {
-        if (index>=MaxDeviceIndex) return STATE_NONE;
+    public int getState(int index) {
+        if (index >= MaxDeviceIndex) return STATE_NONE;
         return mState[index];
     }
 
     //현재 연결된 장치의 주소값 반환
-    public String getDeviceNum(int index)
-    {
-        if (index>=MaxDeviceIndex) return "";
+    public String getDeviceNum(int index) {
+        if (index >= MaxDeviceIndex) return "";
         return mDevNum[index];
     }
 
     //현재의 연결상태를 설정함
-    private void setState(int state,int index) {
+    private void setState(int state, int index) {
 
         mState[index] = state;
 
         // Give the new state to the Handler so the UI Activity can update
-        SendMessage(MESSAGE_STATE_CHANGE, state, -1,index);
+        SendMessage(MESSAGE_STATE_CHANGE, state, -1, index);
     }
 
     //장치가 블루투스를 지원하는지 여부를 반환함
-    public boolean getDeviceState()
-    {
+    public boolean getDeviceState() {
 
-        if(bluetoothAdapter == null)
-        {
+        if (bluetoothAdapter == null) {
 
             return false;
-        }
-        else
-        {
+        } else {
 
             return true;
         }
     }
 
     //사용자가 블루투스를 사용하도록 요청한다.
-    public boolean enableBlueTooth(Activity ac)
-    {
-        if (bluetoothAdapter==null) //장치가 블루투스를 지원하지 않는 경우
+    public boolean enableBlueTooth(Activity ac) {
+        if (bluetoothAdapter == null) //장치가 블루투스를 지원하지 않는 경우
         {
             return false;
         }
 
 
-        if(!bluetoothAdapter.isEnabled())
-        {
+        if (!bluetoothAdapter.isEnabled()) {
             // 사용자에게 블루투스의 사용허가를 요청한다.
             Intent i = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+
             ac.startActivityForResult(i, REQUEST_ENABLE_BT); //상위 액티비티에서 결과를 받아볼수 있음
             return false;
-        }
-        else
-        {
+        } else {
             return true;
         }
     }
 
     //페어링된 장치들중에서 원하는 이름을 가진 장치목록을 반환한다.
-    public Set<BluetoothDevice> GetPairedDeviceList()
-    {
+    public Set<BluetoothDevice> GetPairedDeviceList() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
+                    != PackageManager.PERMISSION_GRANTED) {
+                Log.wtf("GetPairedDeviceList", "BLUETOOTH_CONNECT Not Granted");
+                return null;
+            }
+        }
+
         Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
         Set<BluetoothDevice> motiveDevices = new HashSet<BluetoothDevice>();
 
-        for(BluetoothDevice device : pairedDevices)
-        {
+        for (BluetoothDevice device : pairedDevices) {
             if (device.getName().equals(DeviceName)) motiveDevices.add(device);
         }
         return motiveDevices;
     }
 
-    public void Init()
-    {
+    public void Init() {
 
-        for(int i=0;i<MaxDeviceIndex;i++) {
+        for (int i = 0; i < MaxDeviceIndex; i++) {
 
             // Cancel the thread that completed the connection
             if (mConnectThread[i] != null) {
@@ -294,113 +308,131 @@ public class BTService extends Service {
     }
 
     //주소값을 이용해서 해당번호에 대해서 쓰레드를 생성해서 연결을 시도함
-    public void Connect(String deviceNumber,int index)
-    {
-        if (index>=MaxDeviceIndex) return;
+    public void Connect(String deviceNumber, int index) {
+        if (index >= MaxDeviceIndex) return;
 
-        if (mConnectThread[index] !=null) {mConnectThread[index].cancel(); mConnectThread[index] = null;}
-        if (mConnectedThread[index] != null) {mConnectedThread[index].cancel(); mConnectedThread[index] = null;}
+        if (mConnectThread[index] != null) {
+            mConnectThread[index].cancel();
+            mConnectThread[index] = null;
+        }
+        if (mConnectedThread[index] != null) {
+            mConnectedThread[index].cancel();
+            mConnectedThread[index] = null;
+        }
 
         // Get the BluetoothDevice object
         bluetoothDevice[index] = bluetoothAdapter.getRemoteDevice(deviceNumber);
         mDevNum[index] = deviceNumber;
 
         // Start the thread to connect with the given device
-        mConnectThread[index] = new BTService.ConnectThread(bluetoothDevice[index],index);
+        mConnectThread[index] = new BTService.ConnectThread(bluetoothDevice[index], index);
         mConnectThread[index].start();
 
-        setState(STATE_CONNECTING,index);
+        setState(STATE_CONNECTING, index);
     }
 
     //이전에 연결되었던 장치에 대해서 연결을 시도함
-    private void Connect(int index)
-    {
-        if (index>=MaxDeviceIndex) return;
+    private void Connect(int index) {
+        if (index >= MaxDeviceIndex) return;
 
-        if (mConnectThread[index] !=null) {mConnectThread[index].cancel(); mConnectThread[index] = null;}
-        if (mConnectedThread[index] != null) {mConnectedThread[index].cancel(); mConnectedThread[index] = null;}
+        if (mConnectThread[index] != null) {
+            mConnectThread[index].cancel();
+            mConnectThread[index] = null;
+        }
+        if (mConnectedThread[index] != null) {
+            mConnectedThread[index].cancel();
+            mConnectedThread[index] = null;
+        }
 
         // Start the thread to connect with the given device
-        mConnectThread[index] = new BTService.ConnectThread(bluetoothDevice[index],index);
+        mConnectThread[index] = new BTService.ConnectThread(bluetoothDevice[index], index);
         mConnectThread[index].start();
 
-        setState(STATE_CONNECTING,index);
+        setState(STATE_CONNECTING, index);
     }
 
     //장치가 연결되었을시 초기화 작업을 처리
-    private synchronized void Connected(BluetoothSocket socket,int index) {
+    private synchronized void Connected(BluetoothSocket socket, int index) {
 
         // Cancel the thread that completed the connection
-        if (mConnectThread[index] != null) {mConnectThread[index].cancel(); mConnectThread[index] = null;}
+        if (mConnectThread[index] != null) {
+            mConnectThread[index].cancel();
+            mConnectThread[index] = null;
+        }
 
         // Cancel any thread currently running a connection
-        if (mConnectedThread[index] != null) {mConnectedThread[index].cancel(); mConnectedThread[index] = null;}
+        if (mConnectedThread[index] != null) {
+            mConnectedThread[index].cancel();
+            mConnectedThread[index] = null;
+        }
 
         // Start the thread to manage the connection and perform transmissions
-        mConnectedThread[index] = new BTService.ConnectedThread(socket,index);
+        mConnectedThread[index] = new BTService.ConnectedThread(socket, index);
         mConnectedThread[index].start();
 
         DeviceOpend(btFwk[index]);
 
-        setState(STATE_CONNECTED,index);
+        setState(STATE_CONNECTED, index);
     }
 
     //데이터획득 명령을 보냄
-    public void Start(int index)
-    {
-        if (index>=MaxDeviceIndex) return;
+    public void Start(int index) {
+        if (index >= MaxDeviceIndex) return;
 
         AddCmd(btFwk[index], CMD_BLU_D2P_DATA_REALTIME_START, 0);
     }
 
     //데이터획득 정지명령을 보냄
-    public void Stop(int index)  {
-        if (index>=MaxDeviceIndex) return;
+    public void Stop(int index) {
+        if (index >= MaxDeviceIndex) return;
 
-        AddCmd(btFwk[index],CMD_BLU_D2P_DATA_STOP, 0);
+        AddCmd(btFwk[index], CMD_BLU_D2P_DATA_STOP, 0);
     }
 
     //요구하는 장치(index)에서 데이터를 가져옴
-    public byte GetData(ST_DATA_PROC data, int index)
-    {
-        if (index>=MaxDeviceIndex) return -1;
+    public byte GetData(ST_DATA_PROC data, int index) {
+        if (index >= MaxDeviceIndex) return -1;
 
-        float[] arr = new float[PACKET_SAMPLE_NUM*5+(PACKET_SAMPLE_NUM/10)*6];
-        byte ret = GetJNIData(btFwk[index],arr);
+        float[] arr = new float[PACKET_SAMPLE_NUM * 5 + (PACKET_SAMPLE_NUM / 10) * 6];
+        byte ret = GetJNIData(btFwk[index], arr);
         data.SetData(arr);
-        return (byte)ret;
+        return (byte) ret;
     }
 
     //요구하는 장치(index)를 통해서 데이터를 전송함.
     //jni 라이브러리에서 호출됨.
-    public boolean Write(byte[] buf,int len,int index)
-    {
-        if (index>=MaxDeviceIndex) return false;
+    public boolean Write(byte[] buf, int len, int index) {
+        if (index >= MaxDeviceIndex) return false;
 
         // Create temporary object
         BTService.ConnectedThread r;
         // Synchronize a copy of the ConnectedThread
         synchronized (this) {
-            if (mState[index] != STATE_CONNECTED || mConnectedThread[index]==null) return false;
+            if (mState[index] != STATE_CONNECTED || mConnectedThread[index] == null) return false;
             r = mConnectedThread[index];
         }
         // Perform the write unsynchronized
-        return r.write(buf,len);
+        return r.write(buf, len);
     }
 
     //요구하는 장치(index)의 연결을 끊음.
-    public void Close(int index)
-    {
-        if (index>=MaxDeviceIndex) return;
+    public void Close(int index) {
+        if (index >= MaxDeviceIndex) return;
 
 
         // Cancel the thread that completed the connection
-        if (mConnectThread[index] != null) {mConnectThread[index].cancel(); mConnectThread[index] = null;}
+        if (mConnectThread[index] != null) {
+            mConnectThread[index].cancel();
+            mConnectThread[index] = null;
+        }
 
         // Cancel any thread currently running a connection
-        if (mConnectedThread[index] != null) {mConnectedThread[index].cancel(); mConnectedThread[index] = null;}
+        if (mConnectedThread[index] != null) {
+            mConnectedThread[index].cancel();
+            mConnectedThread[index] = null;
+        }
 
-        setState(STATE_NONE,index);
+        setState(STATE_NONE, index);
     }
 
     ///////////////////////////////////////////////
@@ -408,33 +440,30 @@ public class BTService extends Service {
     //hpf : 0-사용안함, 1-3Hz, 2-20Hz
     //lpf : 0-사용안함, 1-250Hz, 2-500Hz
     ///////////////////////////////////////////////
-    public void SetEMGFilter(int notch,int hpf,int lpf,int index)
-    {
-        if (index>=MaxDeviceIndex) return;
+    public void SetEMGFilter(int notch, int hpf, int lpf, int index) {
+        if (index >= MaxDeviceIndex) return;
 
-        SetEMGFilterJNI(btFwk[index],notch,hpf,lpf);
+        SetEMGFilterJNI(btFwk[index], notch, hpf, lpf);
     }
 
     ///////////////////////////////////////////////
     //hpf : 0-사용안함, 1-0.5Hz, 2-1Hz
     //lpf : 0-사용안함, 1-10Hz, 2-20Hz
     ///////////////////////////////////////////////
-    public void SetAccFilter(int hpf,int lpf,int index)
-    {
-        if (index>=MaxDeviceIndex) return;
+    public void SetAccFilter(int hpf, int lpf, int index) {
+        if (index >= MaxDeviceIndex) return;
 
-        SetAccFilterJNI(btFwk[index],hpf,lpf);
+        SetAccFilterJNI(btFwk[index], hpf, lpf);
     }
 
     ///////////////////////////////////////////////
     //hpf : 0-사용안함, 1-0.5Hz, 2-1Hz
     //lpf : 0-사용안함, 1-10Hz, 2-20Hz
     ///////////////////////////////////////////////
-    public void SetGyroFilter(int hpf,int lpf,int index)
-    {
-        if (index>=MaxDeviceIndex) return;
+    public void SetGyroFilter(int hpf, int lpf, int index) {
+        if (index >= MaxDeviceIndex) return;
 
-        SetGyroFilterJNI(btFwk[index],hpf,lpf);
+        SetGyroFilterJNI(btFwk[index], hpf, lpf);
     }
 
     //블루투스장치에 연결을 위한 쓰레드
@@ -444,19 +473,26 @@ public class BTService extends Service {
         private final BluetoothDevice mmDevice;
 
         //jni호출을 위한 index번호
-        private int deviceIndex=-1;
+        private int deviceIndex = -1;
 
-        private boolean isLive=false;
+        private boolean isLive = false;
 
-        public ConnectThread(BluetoothDevice device,int index) {
+        public ConnectThread(BluetoothDevice device, int index) {
             mmDevice = device;
-            deviceIndex=index;
+            deviceIndex = index;
         }
 
+        @SuppressLint("MissingPermission")
         public void run() {
             setName("ConnectThread");
 
+
             // Always cancel discovery because it will slow down a connection
+            /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                if (ActivityCompat.checkSelfPermission(, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                    return;
+                }
+            }*/
             bluetoothAdapter.cancelDiscovery();
 
             isLive=true;

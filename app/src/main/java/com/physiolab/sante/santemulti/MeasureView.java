@@ -1070,9 +1070,9 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
     }*/
 
     //폴더 만들기
-    private boolean CreateFolder2() {
-        //File f = new File(getContext().getExternalFilesDir(null) + "/I-Motion Lab/");
-        File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/");
+    /*private boolean CreateFolder2() {
+        File f = new File(getContext().getExternalFilesDir(null) + "/I-Motion Lab/");
+        //File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/");
         boolean ret = false;
         if (f.exists()) {
             if (!f.isDirectory()) {
@@ -1089,12 +1089,12 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
             }
         }
         return ret;
-    }
+    }*/
 
     //폴더 만들기
     private void CreateFolder() {
-        //File f = new File(getContext().getExternalFilesDir(null) + "/I-Motion Lab/");
-        File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/");
+        File f = new File(getContext().getExternalFilesDir(null) + "/I-Motion Lab/");
+        //File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/");
 
         if (f.exists()) {
             if (!f.isDirectory()) {
@@ -1167,7 +1167,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
     }
 
-    private SaveDataThread sdThread;
+    /*private SaveDataThread sdThread;
 
     public void SaveData2(int device, Context context, ArrayList<String> timeLab, String firstTime, SanteApp santeApp) {
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -1188,10 +1188,10 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         sdThread.start();
 
 
-    }
+    }*/
 
 
-    class SaveDataThread extends Thread {
+    /*class SaveDataThread extends Thread {
         private Context context;
         private Date date;
         private int device;
@@ -1294,7 +1294,7 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
 
 
         }
-    }
+    }*/
 
     /*class SaveTxtThread extends Thread {
 
@@ -2223,8 +2223,8 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         String outputStr = "";
         String str = "";
 
-        File logFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + "/I_Motion_TUG.log");
-        //File logFile = new File(getContext().getExternalFilesDir(null), "/I-Motion Lab/" + "/I_Motion_TUG.log");
+        //File logFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + "/I_Motion_TUG.log");
+        File logFile = new File(getContext().getExternalFilesDir(null), "/I-Motion Lab/" + "/I_Motion_TUG.log");
 
 
         if (!logFile.exists()) {
@@ -2329,8 +2329,8 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         CreateFolder();
 
 
-        File logFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + "/I_Motion_TUG.log");
-        //File logFile = new File(getContext().getExternalFilesDir(null) + "/I-Motion Lab/" + "/I_Motion_TUG.log");
+        //File logFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + "/I_Motion_TUG.log");
+        File logFile = new File(getContext().getExternalFilesDir(null) + "/I-Motion Lab/" + "/I_Motion_TUG.log");
 
         FileOutputStream fileOutput = null;
         BufferedWriter bufWriter = null;

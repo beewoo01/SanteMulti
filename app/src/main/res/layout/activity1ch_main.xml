@@ -414,6 +414,7 @@
                 android:textColor="@color/mainColor"
                 android:textSize="@dimen/_12sdp"
                 android:visibility="gone" />
+
         </LinearLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout

@@ -128,7 +128,13 @@ public class Main1chActivity extends AppCompatActivity {
 
 
         Set<BluetoothDevice> devices = btService.GetPairedDeviceList();
-        String[] deviceAddress = new String[devices.size()];
+        String[] deviceAddress;
+        if (devices != null) {
+            deviceAddress = new String[devices.size()];
+        }else  {
+            deviceAddress = new String[0];
+        }
+
         this.deviceAddress = deviceAddress;
         int cnt = 0;
 
@@ -145,9 +151,12 @@ public class Main1chActivity extends AppCompatActivity {
             }
         };
 
-        for (BluetoothDevice f : devices) {
-            deviceAddress[cnt++] = f.getAddress();
+        if (devices != null) {
+            for (BluetoothDevice f : devices) {
+                deviceAddress[cnt++] = f.getAddress();
+            }
         }
+
 
         SpinnerAdapter adapterDevice = new SpinnerAdapter(this, android.R.layout.simple_spinner_item, deviceAddress);
         adapterDevice.SetTextSize(16);

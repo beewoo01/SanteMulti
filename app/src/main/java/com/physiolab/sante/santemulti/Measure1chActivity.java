@@ -1217,8 +1217,8 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
 
     private void deleteFile() {
         Log.wtf("deleteFile", "deleteFile");
-        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + saveFileName);
-        //File file = new File(Measure1chActivity.this.getExternalFilesDir(null), "/I-Motion Lab/" + saveFileName);
+        //File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + saveFileName);
+        File file = new File(Measure1chActivity.this.getExternalFilesDir(null), "/I-Motion Lab/" + saveFileName);
         if (file.exists()) {
             file.delete();
             saveFileName = null;
@@ -1227,6 +1227,7 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
 
     @SuppressLint("SimpleDateFormat")
     private void StartSave(int index) {
+
         Log.wtf("StopSave", "StartSave");
         StopSave(index);
         if (saveThread != null) {
@@ -1250,7 +1251,8 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
             saveFileName += UserInfo.getInstance().spacial + "_";
             int device = index + 1;
             saveFileName += "ch" + device + ".csv";
-            File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + saveFileName);
+            File file = new File(Measure1chActivity.this.getExternalFilesDir(null), "/I-Motion Lab/" + saveFileName);
+            //File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + saveFileName);
 
             saveThread = new DataSaveThread2(file, index, santeApps, firstDataTime, this);
             isSave[index] = true;
@@ -1262,8 +1264,8 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
 
     private boolean createFolder() {
         boolean ret = false;
-        File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/");
-        //File f = new File(Measure1chActivity.this.getExternalFilesDir(null), "/I-Motion Lab/");
+        //File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/");
+        File f = new File(Measure1chActivity.this.getExternalFilesDir(null), "/I-Motion Lab/");
 
         if (f.exists()) {
             ret = f.isDirectory();
