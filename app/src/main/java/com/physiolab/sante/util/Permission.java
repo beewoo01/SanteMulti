@@ -13,7 +13,7 @@ public class Permission {
 
     public static final String[] REQUIRED_PERMISSIONS1 = new String[]{
             Manifest.permission.BLUETOOTH,
-            Manifest.permission.BLUETOOTH_CONNECT,
+            /*Manifest.permission.BLUETOOTH_CONNECT,*/
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -50,7 +50,7 @@ public class Permission {
         return true;
     }
 
-    public void requestDangerousPermissions(Activity activity) {
+    /*public void requestDangerousPermissions(Activity activity) {
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -66,7 +66,7 @@ public class Permission {
                     REQUEST_CODE_PERMISSIONS
             );
         }
-    }
+    }*/
 
    /* public boolean permissionState() {
 

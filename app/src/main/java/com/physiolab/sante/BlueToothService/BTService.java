@@ -255,11 +255,11 @@ public class BTService extends Service {
         if (!bluetoothAdapter.isEnabled()) {
             // 사용자에게 블루투스의 사용허가를 요청한다.
             Intent i = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
                     return false;
                 }
-            }
+            }*/
 
             ac.startActivityForResult(i, REQUEST_ENABLE_BT); //상위 액티비티에서 결과를 받아볼수 있음
             return false;
@@ -270,13 +270,13 @@ public class BTService extends Service {
 
     //페어링된 장치들중에서 원하는 이름을 가진 장치목록을 반환한다.
     public Set<BluetoothDevice> GetPairedDeviceList() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
                     != PackageManager.PERMISSION_GRANTED) {
                 Log.wtf("GetPairedDeviceList", "BLUETOOTH_CONNECT Not Granted");
                 return null;
             }
-        }
+        }*/
 
         Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
         Set<BluetoothDevice> motiveDevices = new HashSet<BluetoothDevice>();

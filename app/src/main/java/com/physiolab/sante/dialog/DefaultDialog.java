@@ -18,24 +18,13 @@ import com.physiolab.sante.santemulti.databinding.DialogDefaultBinding;
 
 public class DefaultDialog extends BaseDialog{
 
-    private String title;
-    private String body;
-    private boolean isFullScreen = false;
-    private View.OnClickListener mCloseButtonListener;
-    private Context mContext;
+    private final String title;
+    private final String body;
     private DialogDefaultBinding binding;
 
-    private DialogOnClick listener;
-
-    public DefaultDialog(Context context, View.OnClickListener closeButtonListener, String title, String body) {
-        super(context, R.style.FullScreenDialogStyle);
-        mCloseButtonListener = closeButtonListener;
-        mContext = context;
-        this.title = title;
-        this.body = body;
+    private final DialogOnClick listener;
 
 
-    }
 
     public DefaultDialog(Context context, DialogOnClick listener, String title, String body) {
         super(context, R.style.FullScreenDialogStyle);

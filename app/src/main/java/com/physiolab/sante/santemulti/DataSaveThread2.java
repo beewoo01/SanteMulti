@@ -99,11 +99,28 @@ public class DataSaveThread2 extends Thread {
 
         if (isDirExist) {
             try {
+                /*
                 long Time_Offset = 621355968000000000L + 9L * 60L * 60L * 1000L * 1000L * 10L;
                 long measureTime =
                         Time_Offset + UserInfo.getInstance().measureTime.getTime() * 10000L;
+                        */
 
-                bufOutput.write(String.format(measureTime + "," +
+                bufOutput.write(String.format("생년월일" + ",").getBytes("EUC-KR"));
+                bufOutput.write(String.format("=\"" + UserInfo.getInstance().birth + "\"" + ",").getBytes());
+
+                bufOutput.write(String.format("키" + ",").getBytes("EUC-KR"));
+                bufOutput.write(String.format(UserInfo.getInstance().height + ",").getBytes());
+
+                bufOutput.write(String.format("몸무게" + ",").getBytes("EUC-KR"));
+                bufOutput.write(String.format(UserInfo.getInstance().weight + ",").getBytes());
+
+                bufOutput.write(String.format("성별" + ",").getBytes("EUC-KR"));
+                bufOutput.write(String.format((UserInfo.getInstance().gender ? "남" : "여") + ",").getBytes("EUC-KR"));
+
+                bufOutput.write(String.format("측정일시" + ",").getBytes("EUC-KR"));
+                bufOutput.write(String.format(firstDataTime + "\r\n").getBytes());
+
+                /*bufOutput.write(String.format(measureTime + "," +
                                 UserInfo.getInstance().gender + "," +
                                 "=\"" + UserInfo.getInstance().birth + "\"" + "," +
                                 UserInfo.getInstance().height + "," +
@@ -111,9 +128,15 @@ public class DataSaveThread2 extends Thread {
                                 UserInfo.getInstance().alarm + "," +
                                 firstDataTime + "\r\n"
                         ).getBytes()
-                );
+                );*/
 
-                bufOutput.write(String.format(UserInfo.getInstance().name + "\r\n").getBytes("EUC-KR"));
+                bufOutput.write(String.format("이름" + ",").getBytes("EUC-KR"));
+                bufOutput.write(String.format(UserInfo.getInstance().name + ",").getBytes("EUC-KR"));
+
+                bufOutput.write(String.format("테스트명" + ",").getBytes("EUC-KR"));
+                bufOutput.write(String.format(UserInfo.getInstance().spacial + "\r\n").getBytes("EUC-KR"));
+
+                bufOutput.write(String.format("특이사항" + ",").getBytes("EUC-KR"));
                 bufOutput.write(String.format(UserInfo.getInstance().memo + "\r\n").getBytes("EUC-KR"));
 
                 writeDataInfo(bufOutput);
@@ -210,80 +233,6 @@ public class DataSaveThread2 extends Thread {
 
             }
 
-            /*while (isLive || queue.size() > 0) {
-                ST_DATA_PROC data = queue.poll();
-
-                if (data == null) continue;
-
-                EMGData.addAll(Arrays.asList(ArrayUtils.toObject(data.Filted)));
-                if (EMGData.size() > (conInt + BTService.PACKET_SAMPLE_NUM)) {
-                    EMGData.subList(0, EMGData.size() - (conInt + BTService.PACKET_SAMPLE_NUM)).clear();
-                }
-
-                int index = 0;
-                for (int i = 0; i < BTService.PACKET_SAMPLE_NUM; i++) {
-                    //BTService.PACKET_SAMPLE_NUM = 40
-                    index = (int) Math.floor((double) i / 10.0);
-
-                    //EMGData.add(data.Filted[i]);
-
-                    try {
-
-                        bufOutput.write(
-                                String.format("%.4f, " +//1
-                                                "%.8f, " +//2
-                                                "%.8f, " +//3
-                                                "%.8f, " +//4
-                                                "%.8f, " +//5
-                                                "%.8f, " +//6
-                                                "%.8f, " +//7
-                                                "%.8f," +//8
-                                                "%.8f\r\n",
-                                        //"%.8f\r\n",
-                                        time,//1
-                                        data.Acc[0][index],//2
-                                        data.Acc[1][index],//3
-                                        data.Acc[2][index],//4
-                                        data.Gyro[0][index],//5
-                                        data.Gyro[1][index],//6
-                                        data.Gyro[2][index],//7
-                                        data.Filted[i], //EMG Data//8
-                                        //data.BPF_DC[i], //Lead Off
-                                        //SampleRMS2(data.Filted, data.Filted.length, santeApp.GetEMGRMS(deviceIndex))//RMS
-                                        SampleRMS2(i)//RMS
-                                        //data.RMS[i]
-
-                                ).getBytes()
-                        );
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    time += 0.0005F;
-                    //EMGCount++;
-                }
-
-                if (!isLive) {
-                        *//*Log.wtf("queue.size()", String.valueOf(queue.size()));
-                        Log.wtf("deviceIndex", String.valueOf(deviceIndex));*//*
-                    if (!isDone) {
-                        isDone = true;
-                        allProcess = queue.size();
-                    }
-                    saveProcess++;
-                    int percent = (int) ((double) saveProcess / (double) allProcess * 100);
-
-                    //Log.wtf("savePercentage", String.valueOf(percent));
-                    //saveFileListener.onSuccess(deviceIndex, percent);
-                    if (percent % 10 == 0) {
-                        saveFileListener.onSuccess(deviceIndex, percent);
-                    }
-
-                }
-
-            }*/
-            //saveFileListener.onSuccess(deviceIndex);
 
             try {
                 bufOutput.flush();
@@ -410,11 +359,19 @@ public class DataSaveThread2 extends Thread {
 
         try {
             bufOutput.write(
+                    String.format("Filter Info." + "," +
+                            "Acc HPF," + AccHPF + ",Acc LPF," + AccLPF +
+                            ",Gyro HPF," + GyroHPF + ",Gyro LPF," + GyroLPF +
+                            ",EMG Notch," + EMGNotch + ",EMG HPF," + EMGHPF +
+                            ",EMG LPF," + EMGLPF + ",EMG RMS," + EMGRMS + "\r\n").getBytes()
+            );
+
+            bufOutput.write(
                     String.format(
-                            " ,Acc HPF," + AccHPF + ",Acc LPF," + AccLPF +
-                                    ",Gyro HPF," + GyroHPF + ",Gyro LPF," + GyroLPF +
-                                    ",EMG Notch," + EMGNotch + ",EMG HPF," + EMGHPF +
-                                    ",EMG LPF," + EMGLPF + ",EMG RMS," + EMGRMS + "\r\n").getBytes()
+                            "TIME (s) ," + "ACC X (g)," + "ACC Y (g)," + "ACC Z (g),"
+                                    + "GYRO X (°/s)," + "GYRO Y (°/s)," + "GYRO Z (°/s),"
+                                    + "EMG (μV)," + "EMG RMS (μV)" + "\r\n"
+                    ).getBytes("EUC-KR")
             );
         } catch (IOException e) {
             e.printStackTrace();
@@ -423,8 +380,8 @@ public class DataSaveThread2 extends Thread {
 
     private boolean CreateFolder() {
         boolean ret = false;
-        File f = new File(activity.getExternalFilesDir(null).getAbsolutePath(), "/I-Motion Lab/");
-        //File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/");
+        //File f = new File(activity.getExternalFilesDir(null).getAbsolutePath(), "/I-Motion Lab/");
+        File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/");
 
         //Log.d("SaveTest","Create Folder 1");
 

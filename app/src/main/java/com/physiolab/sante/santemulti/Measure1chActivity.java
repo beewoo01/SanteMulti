@@ -823,7 +823,7 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
                 //여기 파일저장
                 Log.wtf("StopSave", "MeasureStop");
                 StopSave(0);
-                DefaultDialog defaultDialog = new DefaultDialog(this, (DialogOnClick) isSave -> {
+                DefaultDialog defaultDialog = new DefaultDialog(this, isSave -> {
                     if (isSave) {
                         UserInfo.getInstance().watchCnt = cntWatch;
                         UserInfo.getInstance().spacial = binding.testNameEdt.getText().toString();
@@ -1143,7 +1143,7 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
                                 if (isFirst && !isPreview) {
                                     isFirst = false;
                                     long time = System.currentTimeMillis();
-                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm:ss.SSSZ");
+                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm:ss.SSS");
                                     String firstDataTime = sdf.format(time);
                                     fragMeasure.SetFirstDataTime(firstDataTime);
                                     UserInfo.getInstance().spacial = binding.testNameEdt.getText().toString();
@@ -1217,8 +1217,8 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
 
     private void deleteFile() {
         Log.wtf("deleteFile", "deleteFile");
-        //File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + saveFileName);
-        File file = new File(Measure1chActivity.this.getExternalFilesDir(null), "/I-Motion Lab/" + saveFileName);
+        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + saveFileName);
+        //File file = new File(Measure1chActivity.this.getExternalFilesDir(null), "/I-Motion Lab/" + saveFileName);
         if (file.exists()) {
             file.delete();
             saveFileName = null;
@@ -1240,7 +1240,7 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
         }
 
         long time = System.currentTimeMillis();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm:ss.SSSZ");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm:ss.SSS");
         String firstDataTime = sdf.format(time);
         boolean isDirExist = createFolder();
 
@@ -1251,8 +1251,8 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
             saveFileName += UserInfo.getInstance().spacial + "_";
             int device = index + 1;
             saveFileName += "ch" + device + ".csv";
-            File file = new File(Measure1chActivity.this.getExternalFilesDir(null), "/I-Motion Lab/" + saveFileName);
-            //File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + saveFileName);
+            //File file = new File(Measure1chActivity.this.getExternalFilesDir(null), "/I-Motion Lab/" + saveFileName);
+            File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + saveFileName);
 
             saveThread = new DataSaveThread2(file, index, santeApps, firstDataTime, this);
             isSave[index] = true;
@@ -1264,8 +1264,8 @@ public class Measure1chActivity extends AppCompatActivity implements SaveFileLis
 
     private boolean createFolder() {
         boolean ret = false;
-        //File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/");
-        File f = new File(Measure1chActivity.this.getExternalFilesDir(null), "/I-Motion Lab/");
+        File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/");
+        //File f = new File(Measure1chActivity.this.getExternalFilesDir(null), "/I-Motion Lab/");
 
         if (f.exists()) {
             ret = f.isDirectory();
