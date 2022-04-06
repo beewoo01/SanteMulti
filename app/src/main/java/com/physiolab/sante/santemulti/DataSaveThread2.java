@@ -380,8 +380,8 @@ public class DataSaveThread2 extends Thread {
 
     private boolean CreateFolder() {
         boolean ret = false;
-        //File f = new File(activity.getExternalFilesDir(null).getAbsolutePath(), "/I-Motion Lab/");
         File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/");
+        //File f = new File(activity.getExternalFilesDir(null).getAbsolutePath(), "/I-Motion Lab/");
 
         //Log.d("SaveTest","Create Folder 1");
 

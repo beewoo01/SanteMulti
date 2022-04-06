@@ -1648,8 +1648,8 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
             saveFileName[index] += DateFormat.format("yyyyMMdd_HHmmss_", new Date()).toString();
             saveFileName[index] += UserInfo.getInstance().spacial + "_";
             saveFileName[index] += "ch" + saveIndex + ".csv";
-            File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + saveFileName[index]);
             //File file = new File(Measure2chActivity.this.getExternalFilesDir(null), "/I-Motion Lab/" + saveFileName[index]);
+            File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + saveFileName[index]);
 
             saveThread[index] =
                     new DataSaveThread2(file, index, santeApps[index], firstDataTime, this);
@@ -1684,8 +1684,8 @@ public class Measure2chActivity extends AppCompatActivity implements SaveFileLis
 
     private boolean createFolder() {
         boolean ret = false;
-        File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/");
         //File f = new File(Measure2chActivity.this.getExternalFilesDir(null) + "/I-Motion Lab/");
+        File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/");
 
         if (f.exists()) {
             ret = f.isDirectory();

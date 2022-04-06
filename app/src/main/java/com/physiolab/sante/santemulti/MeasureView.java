@@ -1064,8 +1064,8 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         String outputStr = "";
         String str = "";
 
-        File logFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + "/I_Motion_TUG.log");
         //File logFile = new File(getContext().getExternalFilesDir(null), "/I-Motion Lab/" + "/I_Motion_TUG.log");
+        File logFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + "/I_Motion_TUG.log");
 
 
         if (!logFile.exists()) {
@@ -1170,8 +1170,8 @@ public class MeasureView extends SurfaceView implements SurfaceHolder.Callback {
         CreateFolder();
 
 
-        File logFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + "/I_Motion_TUG.log");
         //File logFile = new File(getContext().getExternalFilesDir(null) + "/I-Motion Lab/" + "/I_Motion_TUG.log");
+        File logFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/I-Motion Lab/" + "/I_Motion_TUG.log");
 
         FileOutputStream fileOutput = null;
         BufferedWriter bufWriter = null;
